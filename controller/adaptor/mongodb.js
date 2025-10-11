@@ -248,17 +248,14 @@ async function UpdateAllDocument(model, criteria, doc, options) {
 
 }
 
-async function GetCount(model, conditions) {
-    try {
-        // const count=await  db[model].count(conditions)
-        const count = await db[model].find().count(conditions)
-        return count
-    } catch (err) {
-        return err
-    }
-    // db[model].count(conditions, function (err, count) {
-    //     callback(err, count);
-    // });
+async function GetCount(model, conditions = {}) {
+  try {
+    const count = await db[model].countDocuments(conditions);
+    return count;
+  } catch (err) {
+    console.error("Error in GetCount:", err);
+    throw err;
+  }
 }
 
 

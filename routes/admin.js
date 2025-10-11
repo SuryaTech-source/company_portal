@@ -71,6 +71,7 @@ module.exports = function (app, io) {
         var attendence = require('../controller/admin/attendence.js')(app);
         var invoice = require('../controller/admin/invoice.js')(app);
         var performance = require('../controller/admin/performance.js')(app);
+        var fleetAssignment = require('../controller/admin/fleetassignment.js')(app);
 
 
 
@@ -714,6 +715,12 @@ module.exports = function (app, io) {
     //performance management
     app.post('/admin/performance/report', ensureAuthorized, performance.performanceReport);
     app.post('/admin/performance/update-driver-behaviour',performance.updateDrivingBehaviour)
+
+    //fleet assignments
+    app.post('/admin/fleet/assignment/assign', ensureAuthorized, fleetAssignment.assignFleet);
+    app.post('/admin/fleet/assignment/list', ensureAuthorized, fleetAssignment.listFleetAssignments);
+    app.post('/admin/fleet/assignment/unassign', ensureAuthorized, fleetAssignment.unassignFleet);
+    app.post('/admin/fleet/assignment/assignment-stats', ensureAuthorized, fleetAssignment.fleetAssignmentCounts);
     } catch (e) {
         console.log('erroe in index.js---------->>>>', e);
     }

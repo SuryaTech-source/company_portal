@@ -88,12 +88,12 @@ export class PerformanceAnalysisListComponent implements OnInit {
   }
 
   // ✅ Fetch list of drivers for modal dropdown
-  loadDrivers() {
-    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1, role: 'Driver' })
-      .subscribe((res: any) => {
-        if (res.status) this.drivers = res.data;
-      });
-  }
+    loadDrivers() {
+      this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1, role: 'Driver' })
+        .subscribe((res: any) => {
+          if (res.status) this.drivers = res.data;
+        });
+    }
 
   // ✅ Filtered & Sorted Records
   get filteredRecords() {

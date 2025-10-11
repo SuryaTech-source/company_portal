@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/_services/api.service';
-import * as html2pdf from 'html2pdf.js';
+import { NotificationService } from 'src/app/_services/notification.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
+import * as html2pdf from 'html2pdf.js';
 
 @Component({
   selector: 'app-assignment',
@@ -10,28 +11,154 @@ import { Apiconfig } from 'src/app/_helpers/api-config';
 })
 export class AssignmentComponent implements OnInit {
   fleets: any[] = [];
+  drivers: any[] = [];
   totalVehicles = 0;
   deployedVehicles = 0;
   vehiclesOnMaintenance = 0;
 
-  constructor(private apiService: ApiService) {}
+  // Pagination
+  page = 1;
+  limit = 10;
+  count = 0;
+  search = '';
+
+  // Modal controls
+  showAssignModal = false;
+  showUnassignModal = false;
+
+  // Assignment form
+  assignForm: any = {
+    fleetId: '',
+    driverId: '',
+    dateAssigned: '',
+    odometerReadingStart: '',
+    contractId: '',
+    remarks: ''
+  };
+
+  unassignForm: any = {
+    assignmentId: '',
+    odometerReadingEnd: '',
+    remarks: ''
+  };
+
+  constructor(private apiService: ApiService, private notify: NotificationService) {}
 
   ngOnInit(): void {
     this.loadFleetAssignments();
+    this.loadCounts();
+    this.loadDrivers();
   }
 
+  /** 🔹 Load all assignments */
   loadFleetAssignments() {
-    this.apiService.CommonApi(Apiconfig.listFleets.method, Apiconfig.listFleets.url, {})
+    const data = {
+      page: this.page,
+      limit: this.limit,
+      search: this.search
+    };
+
+    this.apiService.CommonApi(Apiconfig.listfleetassignments.method, Apiconfig.listfleetassignments.url, data)
       .subscribe((res: any) => {
         if (res?.status) {
           this.fleets = res.data || [];
-          this.totalVehicles = this.fleets.length;
-          this.deployedVehicles = this.fleets.filter(f => f.deployedContract).length;
-          this.vehiclesOnMaintenance = this.fleets.filter(f => f.maintenance?.nextMaintenanceDue).length;
+          this.count = res.count || this.fleets.length;
+        } else {
+          this.notify.showError(res.message || 'Failed to load assignments');
         }
       });
   }
 
+  /** 🔹 Load top counts */
+  loadCounts() {
+    this.apiService.CommonApi(Apiconfig.fleetassignmentcount.method, Apiconfig.fleetassignmentcount.url, {})
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.totalVehicles = res.data.totalVehicles;
+          this.deployedVehicles = res.data.deployed;
+          this.vehiclesOnMaintenance = res.data.maintenance;
+        }
+      });
+  }
+
+  /** 🔹 Load all available drivers */
+  loadDrivers() {
+    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1, role: 'Driver' })
+      .subscribe((res: any) => {
+        if (res.status) this.drivers = res.data;
+      });
+  }
+
+  /** 🔹 Load fleets for dropdown */
+  loadFleets() {
+    this.apiService.CommonApi(Apiconfig.listFleets.method, Apiconfig.listFleets.url, { status: 1 })
+      .subscribe((res: any) => {
+        if (res.status) this.fleetOptions = res.data;
+      });
+  }
+
+  fleetOptions: any[] = [];
+
+  /** 🔹 Open Add Assignment Modal */
+  openAssignModal() {
+    this.assignForm = {
+      fleetId: '',
+      driverId: '',
+      dateAssigned: new Date().toISOString().substring(0, 10),
+      odometerReadingStart: '',
+      contractId: '',
+      remarks: ''
+    };
+    this.loadFleets();
+    this.showAssignModal = true;
+  }
+
+  /** 🔹 Save Assignment */
+  saveAssignment() {
+    if (!this.assignForm.fleetId || !this.assignForm.driverId) {
+      this.notify.showError('Fleet and Driver are required');
+      return;
+    }
+
+    this.apiService.CommonApi(Apiconfig.fleetassignments.method, Apiconfig.fleetassignments.url, this.assignForm)
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.notify.showSuccess('Fleet assigned successfully');
+          this.showAssignModal = false;
+          this.loadFleetAssignments();
+          this.loadCounts();
+        } else {
+          this.notify.showError(res.message || 'Failed to assign fleet');
+        }
+      });
+  }
+
+  /** 🔹 Open Unassign Modal */
+  openUnassignModal(assignment: any) {
+    this.unassignForm.assignmentId = assignment._id;
+    this.unassignForm.odometerReadingEnd = '';
+    this.unassignForm.remarks = '';
+    this.showUnassignModal = true;
+  }
+
+  /** 🔹 Unassign Fleet */
+  unassignFleet() {
+    if (!this.unassignForm.assignmentId) return;
+
+    this.apiService.CommonApi(Apiconfig.fleetunassignments.method, Apiconfig.fleetunassignments.url, this.unassignForm)
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.notify.showSuccess('Fleet unassigned successfully');
+          this.showUnassignModal = false;
+          this.loadFleetAssignments();
+          this.loadCounts();
+        } else {
+          this.notify.showError(res.message || 'Error unassigning fleet');
+        }
+      });
+  }
+
+  /** 🔹 Export PDF */
   downloadPDF() {
     const element = document.getElementById('pdfContent');
     const opt = {

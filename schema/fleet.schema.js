@@ -14,6 +14,7 @@ FLEET_SCHEMA.FLEET = {
     cubicCapacity: Number,
     colour: String,
     seatingCapacity: Number,
+      isDeployed: { type: Boolean, default: false },
 
     deployedContract: { type: Schema.Types.ObjectId, ref: "Contract" },
     maintenance: {
