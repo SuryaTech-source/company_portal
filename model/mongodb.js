@@ -85,8 +85,7 @@ var invoice_schema = require('../schema/invoice.schema.js');
 var attendance_schema = require('../schema/attendance.schema.js');
 var sparepart_schema = require('../schema/spareParts.schema.js');
 var payment_schema = require('../schema/coustomerVentorPayment.schema.js');
-
-
+var fleetfleetassignment_schema = require('../schema/fleetassignment.schema.js');
 
 // define the schema for our user model
 var adminSchema = mongoose.Schema(config_admin_schema.ADMIN, { timestamps: true, versionKey: false });
@@ -175,6 +174,7 @@ var attendanceSchema = mongoose.Schema(attendance_schema.ATTENDANCE, { timestamp
 var sparepartSchema = mongoose.Schema(sparepart_schema.SPAREPART, { timestamps: true, versionKey: false });
 var vendorPaymentSchema = mongoose.Schema(payment_schema.VENDOR_PAYMENT, { timestamps: true, versionKey: false });
 var customerPaymentSchema = mongoose.Schema(payment_schema.CUSTOMER_PAYMENT, { timestamps: true, versionKey: false });
+var fleetAssignmentSchema = mongoose.Schema(fleetfleetassignment_schema.FLEET_ASSIGNMENT, { timestamps: true, versionKey: false });
 
 // var checkin_schema = mongoose.Schema(checkin_schema.CHECKIN,{timestamps:true,versionkey:false})
 /* 
@@ -578,6 +578,7 @@ var attendance = mongoose.model('attendance', attendanceSchema, 'attendance');
 var sparepart = mongoose.model('sparepart', sparepartSchema, 'sparepart');
 var vendorPayment = mongoose.model('vendorPayment', vendorPaymentSchema, 'vendorPayment');
 var customerPayment = mongoose.model('customerPayment', customerPaymentSchema, 'customerPayment');
+var fleetAssignment = mongoose.model('fleetAssignment', fleetAssignmentSchema, 'fleetAssignment');
 // var checkin = mongoose.model('checkin',checkin_schema,'checkin');
 const tags = mongoose.model('tags', tagsSchema, 'tags');
 const deals = mongoose.model('deals', dealsSchema, 'deals');
@@ -671,5 +672,6 @@ module.exports = {
 	'sparepart': sparepart
 	,'vendorPayment': vendorPayment
 	,'customerPayment': customerPayment
+	,'fleetAssignment': fleetAssignment
 	// 'checkin':checkin
 };

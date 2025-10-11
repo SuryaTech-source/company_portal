@@ -3,65 +3,149 @@
 
   <!-- Top Cards -->
   <div class="row text-center mb-4">
-    <div class="col-md-4 mb-3">
+    <div class="col-md-4 mb-3" *ngFor="let card of [
+        { title: 'Total No. of Vehicles', value: totalVehicles },
+        { title: 'Deployed Vehicles', value: deployedVehicles },
+        { title: 'Vehicles on Maintenance Schedule', value: vehiclesOnMaintenance }
+      ]">
       <div class="card bg-light shadow">
         <div class="card-body">
-          <h5>Total No. of Vehicles</h5>
-          <h2>{{ totalVehicles }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-      <div class="card bg-light shadow">
-        <div class="card-body">
-          <h5>Deployed Vehicles</h5>
-          <h2>{{ deployedVehicles }}</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-      <div class="card bg-light shadow">
-        <div class="card-body">
-          <h5>Vehicles on Maintenance Schedule</h5>
-          <h2>{{ vehiclesOnMaintenance }}</h2>
+          <h5>{{ card.title }}</h5>
+          <h2>{{ card.value }}</h2>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Assignment Table -->
+  <!-- Actions -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input class="form-control w-25" placeholder="Search..." [(ngModel)]="search" (keyup.enter)="loadFleetAssignments()">
+    <div>
+      <button class="btn btn-success me-2" (click)="openAssignModal()">+ Add Assignment</button>
+      <button class="btn btn-outline-primary" (click)="downloadPDF()">Download as PDF</button>
+    </div>
+  </div>
+
+  <!-- Table -->
   <div id="pdfContent" class="table-responsive">
     <table class="table table-bordered table-striped text-center">
-      <thead class="thead-dark">
+      <thead class="table-dark">
         <tr>
-          <th>VEHICLE NO & NAME</th>
-          <th>ASSET CODE</th>
-          <th>ASSIGNED TO</th>
-          <th>DATE ASSIGNED</th>
-          <th>ODOMETER READING</th>
-          <th>CONTRACT ID</th>
-          <th>REMARKS</th>
+          <th>Vehicle No & Name</th>
+          <th>Asset Code</th>
+          <th>Assigned To</th>
+          <th>Date Assigned</th>
+          <th>Odometer Start</th>
+          <th>Contract ID</th>
+          <th>Remarks</th>
+          <th>Status</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let fleet of fleets">
           <td>{{ fleet.registrationNo }} - {{ fleet.vehicleName }}</td>
           <td>{{ fleet.assetCode }}</td>
-          <td>{{ fleet.deployedContract?.clientName || '-' }}</td>
-          <td>{{ fleet.deployedContract?.startDate | date:'dd/MM/yyyy' }}</td>
-          <td>{{ fleet.odometerReading || '-' }}</td>
-          <td>{{ fleet.deployedContract?.contractId || '-' }}</td>
-          <td>{{ fleet.maintenance?.remarks || '-' }}</td>
+          <td>{{ fleet.assignedTo }}</td>
+          <td>{{ fleet.dateAssigned | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ fleet.odometerReadingStart || '-' }}</td>
+          <td>{{ fleet.contractId || '-' }}</td>
+          <td>{{ fleet.remarks || '-' }}</td>
+          <td>
+            <span class="badge" [ngClass]="fleet.status == 1 ? 'bg-success' : 'bg-secondary'">
+              {{ fleet.status == 1 ? 'Active' : 'Completed' }}
+            </span>
+          </td>
+          <td>
+            <button *ngIf="fleet.status == 1" class="btn btn-sm btn-danger" (click)="openUnassignModal(fleet)">
+              Unassign
+            </button>
+          </td>
         </tr>
         <tr *ngIf="fleets.length === 0">
-          <td colspan="7">No fleet assignments found</td>
+          <td colspan="9">No assignments found</td>
         </tr>
       </tbody>
     </table>
   </div>
+</div>
 
-  <!-- PDF Download -->
-  <div class="text-center mt-3">
-    <button class="btn btn-outline-primary" (click)="downloadPDF()">Download as PDF</button>
+<!-- ✅ Assign Modal -->
+<div class="modal fade show" tabindex="-1" [ngClass]="{ 'd-block': showAssignModal }" *ngIf="showAssignModal">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <form (ngSubmit)="saveAssignment()">
+        <div class="modal-header">
+          <h5 class="modal-title">Assign Fleet to Driver</h5>
+          <button type="button" class="btn-close" (click)="showAssignModal = false"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group mb-2">
+            <label>Fleet</label>
+            <select class="form-select" [(ngModel)]="assignForm.fleetId" name="fleetId" required>
+              <option value="">Select Fleet</option>
+              <option *ngFor="let f of fleetOptions" [value]="f._id">
+                {{ f.registrationNo }} - {{ f.vehicleName }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group mb-2">
+            <label>Driver</label>
+            <select class="form-select" [(ngModel)]="assignForm.driverId" name="driverId" required>
+              <option value="">Select Driver</option>
+              <option *ngFor="let d of drivers" [value]="d._id">{{ d.fullName }}</option>
+            </select>
+          </div>
+          <div class="form-group mb-2">
+            <label>Date Assigned</label>
+            <input type="date" class="form-control" [(ngModel)]="assignForm.dateAssigned" name="dateAssigned">
+          </div>
+          <div class="form-group mb-2">
+            <label>Odometer Reading</label>
+            <input type="number" class="form-control" [(ngModel)]="assignForm.odometerReadingStart" name="odometerReadingStart">
+          </div>
+          <div class="form-group mb-2">
+            <label>Contract ID</label>
+            <input type="text" class="form-control" [(ngModel)]="assignForm.contractId" name="contractId">
+          </div>
+          <div class="form-group mb-2">
+            <label>Remarks</label>
+            <textarea class="form-control" [(ngModel)]="assignForm.remarks" name="remarks"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="showAssignModal = false">Cancel</button>
+          <button type="submit" class="btn btn-primary">Assign</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Unassign Modal -->
+<div class="modal fade show" tabindex="-1" [ngClass]="{ 'd-block': showUnassignModal }" *ngIf="showUnassignModal">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <form (ngSubmit)="unassignFleet()">
+        <div class="modal-header">
+          <h5 class="modal-title">Unassign Fleet</h5>
+          <button type="button" class="btn-close" (click)="showUnassignModal = false"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group mb-2">
+            <label>Odometer End Reading</label>
+            <input type="number" class="form-control" [(ngModel)]="unassignForm.odometerReadingEnd" name="odometerReadingEnd" required>
+          </div>
+          <div class="form-group mb-2">
+            <label>Remarks</label>
+            <textarea class="form-control" [(ngModel)]="unassignForm.remarks" name="remarks"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="showUnassignModal = false">Cancel</button>
+          <button type="submit" class="btn btn-danger">Unassign</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

@@ -66,6 +66,24 @@ export const Apiconfig = {
         "method": "post"
     },
 
+    fleetassignments:{
+        "url": "admin/fleet/assignment/assign",
+        "method": "post"
+    },
+
+    fleetunassignments:{
+        "url": "admin/fleet/assignment/unassign",
+        "method": "post"
+    },
+    listfleetassignments:{
+        "url": "admin/fleet/assignment/list",
+        "method": "post"
+    },
+    fleetassignmentcount:{
+        "url": "admin/fleet/assignment/assignment-stats",
+        "method": "post"
+    },
+
    listFuels:{
         "url": "admin/fuel/list",
         "method": "post"
