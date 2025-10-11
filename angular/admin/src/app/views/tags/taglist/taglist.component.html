@@ -1,105 +1,10 @@
-<div class="product-product_list tag_list">
-    <div class="container">
-        <app-common-table [settings]="settings" [source]="source" [count]="count" [itemsPerPage]="limit"
+<div class="vendor-vendor_list_page global_search">
+    <app-common-table [settings]="settings" [source]="source" [count]="count" [itemsPerPage]="limit"
         [tablename]="'Vendor List'" [add_btn]="add_btn" [addBtnUrl]="addBtnUrl" [addBtnName]="addBtnName"
         [editUrl]="editUrl" [viewUrl]="viewUrl" (onDeleteChange)="onDeleteChange($event)"
         (onitemsPerPageChange)="onitemsPerPageChange($event)" (onPageChange)="onPageChange($event)"
         [bulk_action]="bulk_action" [deleteApis]="deleteApis" (onheaderCardChange)="onheaderCardChange($event)"
         (onSearchChange)="onSearchChange($event)" [filter_action]="filter_action"
         [filter_action_list]="filter_action_list" (onFilterAction)="onFilterAction($event)">
-</app-common-table>
-
-
-        <!-- <div bsModal #confirmModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
-            aria-labelledby="dialog-sizes-name1">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content cases-model">
-                    <div class="modal-header">
-                        <h4 id="dialog-sizes-name1" class="modal-title pull-left">Edit Price Details</h4>
-                        <button type="button" class="btn-close close pull-right" (click)="confirmModal.hide()"
-                            aria-label="Close">
-                            <span aria-hidden="true" class="visually-hidden">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-body edit-price-modal ng-scope" *ngIf="productDetails">
-                            <form #foodForm="ngForm" (ngSubmit)="Changeprice(foodForm)" role="form">
-                                <tabel class="table">
-                                    <thead *ngIf="productDetails.price_details">
-                                        <tr>
-                                            <th></th>
-                                            <th><label>Product quantity</label></th>
-                                            <th><label>MRP Price</label></th>
-                                            <th><label>
-                                                    <strong>Sale Price</strong>
-
-                                                </label></th>
-                                        </tr>
-                                        <tr *ngFor="let priceDetail of productDetails.price_details;let i=index">
-                                            <td>
-                                                <input class="form-control btn btn-danger ng-scope" style="width: 80px;"
-                                                    type="button" value="Delete" required (click)="removeAttri(i)">
-                                            </td>
-                                            <td>
-                                                <input type="text" name="quantity{{i}}" class="form-control" ngModel
-                                                    #quantity="ngModel"
-                                                    [(ngModel)]="productDetails.price_details[i].quantity" id="adname0"
-                                                    required="">
-                                                <p class="help-block">
-                                                    <span
-                                                        *ngIf="foodForm.submitted && !productDetails.price_details[i].quantity"
-                                                        class="invalid-feedback">Quantity is required.</span>
-                                                </p>
-
-                                            </td>
-                                            <td>
-
-                                                <input type="number" name="mprice{{i}}" [(ngModel)]="priceDetail.mprice"
-                                                    class="form-control" ngModel #mprice="ngModel" required
-                                                    id="addmprice0">
-                                                <p class="help-block">
-                                                    <span *ngIf="foodForm.submitted && !priceDetail.mprice"
-                                                        class="invalid-feedback">MRP price is required.</span>
-                                                </p>
-
-                                            </td>
-                                            <td>
-                                                <small style="float:right;">(Same as MRP Price)</small>
-                                                <input class="price-checkbox ng-pristine ng-untouched ng-valid ng-empty"
-                                                    type="checkbox" ng-model="ischecked" id="ischecked0" value=""
-                                                    (click)="setPrice($event,i)">
-                                                <input type="number" [(ngModel)]="priceDetail.sprice" name="sprice{{i}}"
-                                                    class="form-control" ngModel #sprice="ngModel" required
-                                                    max="priceDetail.mprice" ng-model="field.sprice" id="addsprice0"
-                                                    ng-required="EPC.addsprice0">
-                                                <p class="help-block">
-                                                    <span class="invalid-feedback"
-                                                        *ngIf="foodForm.submitted && !priceDetail.sprice">Sale price is
-                                                        required
-                                                    </span>
-                                                    <span
-                                                        *ngIf="foodForm.submitted && priceDetail.sprice > priceDetail.mprice"
-                                                        style="color:red" class="invalid-feedback"> Sale price need to
-                                                        be
-                                                        Less-than
-                                                        Mrp price</span>
-                                                </p>
-
-                                            </td>
-                                        </tr>
-                                    </thead>
-                                </tabel>
-                                <div class="modal-footer ng-scope">
-                                    <button type="submit"
-                                        class="btn btn-success btn-border price-submit-btn">Submit</button>
-                                    <button type="button" class="btn btn-danger btn-border cancel-submit-btn"
-                                        (click)="confirmModal?.hide()">Cancel</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
+    </app-common-table>
+</div>

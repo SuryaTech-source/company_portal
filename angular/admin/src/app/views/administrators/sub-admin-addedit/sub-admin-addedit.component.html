@@ -1,4 +1,4 @@
-<div class="administration-subadmin_list">
+<div class="administration-add_edit_list">
     <div class="container-fluid">
         <h1 class="page_title">{{pageTitle | titlecase}}</h1>
         <form #adminForm="ngForm" (ngSubmit)="onFormSubmit(adminForm)" autocomplete="off">
@@ -181,8 +181,16 @@
                         class="close_btn">
                         Cancel
                     </button>
-                    <button type="submit" *ngIf="!viewpage" class="bg_green">
-                        Submit
+
+                    <button type="submit" class=" bg_green" *ngIf="!viewpage"> Submit
+                        <div class="icon">
+                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path
+                                    d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </div>
                     </button>
                 </div>
             </div>

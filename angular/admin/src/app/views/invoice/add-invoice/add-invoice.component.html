@@ -1,96 +1,120 @@
-<div class="banner-add_web_banner margin_top">
-  <div class="container">
-    <h4 class="full_page_title"><strong>Add Invoice</strong></h4>
-
-    <form #invoiceFormRef="ngForm" (ngSubmit)="submitForm(invoiceFormRef)">
-      <div class="row">
-        <!-- Left Column -->
-        <div class="col-lg-6">
-          <div class="form-group">
-            <label>Invoice No <span class="color_red">*</span></label>
-            <input type="text" class="form-control" name="invoiceNo" [(ngModel)]="invoiceForm.invoiceNo" required />
-          </div>
-
-          <div class="form-group mt-3">
-            <label>Date <span class="color_red">*</span></label>
-            <input type="date" class="form-control" name="date" [(ngModel)]="invoiceForm.date" required />
-          </div>
-
-          <div class="form-group mt-3">
-            <label>Due Date <span class="color_red">*</span></label>
-            <input type="date" class="form-control" name="dueDate" [(ngModel)]="invoiceForm.dueDate" required />
-          </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="col-lg-6">
-          <div class="form-group">
-            <label>Client Name <span class="color_red">*</span></label>
-            <select class="form-control" name="clientName" [(ngModel)]="invoiceForm.clientName" required>
-              <option value="" disabled>Select Client</option>
-              <option *ngFor="let client of clientOptions" [value]="client">{{ client }}</option>
-            </select>
-          </div>
-
-          <div class="form-group mt-3">
-            <label>Payment Details</label>
-            <div class="row">
-              <div class="col-sm-6 mb-2">
-                <input type="text" class="form-control" placeholder="BANK NAME" name="bankName" [(ngModel)]="invoiceForm.paymentDetails.bankName" required />
-              </div>
-              <div class="col-sm-6 mb-2">
-                <input type="text" class="form-control" placeholder="ACCOUNT NO" name="accountNo" [(ngModel)]="invoiceForm.paymentDetails.accountNo" required />
-              </div>
-            </div>
-          </div>
-        </div>
+<div class="invoice-add_invoice_page">
+  <h4 class="page_title">Add Invoice</h4>
+  <form class="row" #invoiceFormRef="ngForm" (ngSubmit)="submitForm(invoiceFormRef)">
+    <div class="col-lg-6 col-sm-12">
+      <div class="label_input">
+        <label>Invoice No <span class="color_red">*</span></label>
+        <input type="text" class="form-control" name="invoiceNo" [(ngModel)]="invoiceForm.invoiceNo" required />
       </div>
+    </div>
 
-      <!-- Items Table -->
-      <div class="mt-4">
-        <h5>Invoice Items</h5>
-        <button type="button" class="btn btn-sm btn-success mb-2" (click)="openItemModal()">+ Add Item</button>
-
-        <table class="table table-bordered" *ngIf="invoiceForm.items.length > 0">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th>Quantity</th>
-              <th>Unit Price</th>
-              <th>Total</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of invoiceForm.items; let i = index">
-              <td>{{ item.description }}</td>
-              <td>{{ item.quantity }}</td>
-              <td>{{ item.unitPrice | currency:'INR' }}</td>
-              <td>{{ item.total | currency:'INR' }}</td>
-              <td><button class="btn btn-sm btn-danger" type="button" (click)="deleteItem(i)">Delete</button></td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <th colspan="3">Grand Total</th>
-              <th colspan="2">{{ invoiceForm.totalAmount | currency:'INR' }}</th>
-            </tr>
-          </tfoot>
-        </table>
+    <div class="col-lg-6 col-sm-12">
+      <div class="label_input">
+        <label>Client Name <span class="color_red">*</span></label>
+        <select class="form-control" name="clientName" [(ngModel)]="invoiceForm.clientName" required>
+          <option value="" disabled>Select Client</option>
+          <option *ngFor="let client of clientOptions" [value]="client">{{ client }}</option>
+        </select>
       </div>
+    </div>
+    <div class="col-lg-6 col-sm-12">
+      <div class="label_input ">
+        <label>Date <span class="color_red">*</span></label>
+        <input type="date" class="form-control" name="date" [(ngModel)]="invoiceForm.date" required />
+      </div>
+    </div>
 
-      <!-- Remarks -->
-      <div class="form-group mt-3">
+    <div class="col-lg-6 col-sm-12">
+      <div class="label_input ">
+        <label>Due Date <span class="color_red">*</span></label>
+        <input type="date" class="form-control" name="dueDate" [(ngModel)]="invoiceForm.dueDate" required />
+      </div>
+    </div>
+
+    <h5 class="col-12">Payment Details</h5>
+    <div class="col-sm-6 mb-2">
+      <div class="label_input ">
+        <label>Bank Name <span class="color_red">*</span></label>
+        <input type="text" class="form-control" placeholder="BANK NAME" name="bankName"
+          [(ngModel)]="invoiceForm.paymentDetails.bankName" required />
+      </div>
+    </div>
+    <div class="col-md-6 col-sm-12">
+      <div class="label_input ">
+        <label>Account Number <span class="color_red">*</span></label>
+        <input type="text" class="form-control" placeholder="ACCOUNT NO" name="accountNo"
+          [(ngModel)]="invoiceForm.paymentDetails.accountNo" required />
+      </div>
+    </div>
+    <div class=" col-12">
+      <div class="label_input ">
         <label>Remarks</label>
         <textarea class="form-control" name="remarks" [(ngModel)]="invoiceForm.remarks" rows="3"></textarea>
       </div>
-
-      <!-- Submit -->
-      <div class="col-lg-12 card_footer_btn_single mt-4 text-center">
-        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    <div class="mt-4 col-12">
+      <div class="title_sec">
+        <h5>Invoice Items</h5>
+        <button type="button" class="btn btn-sm btn-success mb-2" (click)="openItemModal()">+ Add Item</button>
       </div>
-    </form>
-  </div>
+
+      <table class="table table-bordered" *ngIf="invoiceForm.items.length > 0">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of invoiceForm.items; let i = index">
+            <td>{{ item.description }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice | currency:'INR' }}</td>
+            <td>{{ item.total | currency:'INR' }}</td>
+            <td>
+              <button class="table_delete" (click)="deleteItem(i)">
+                <svg class="bin-top" viewBox="0 0 39 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+                  <line x1="12" y1="1.5" x2="26.0357" y2="1.5" stroke="white" stroke-width="3"></line>
+                </svg>
+                <svg class="bin-bottom" viewBox="0 0 33 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <mask id="path-1-inside-1_8_19" fill="white">
+                    <path d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"></path>
+                  </mask>
+                  <path
+                    d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
+                    fill="white" mask="url(#path-1-inside-1_8_19)"></path>
+                  <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
+                  <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3">Grand Total</th>
+            <th colspan="2">{{ invoiceForm.totalAmount | currency:'INR' }}</th>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="page_footer">
+        <button type="submit" class=" bg_green"> Submit
+          <div class="icon">
+            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                fill="currentColor"></path>
+            </svg>
+          </div>
+        </button>
+      </div>
+    </div>
+  </form>
 </div>
 
 <!-- Item Modal -->
@@ -107,20 +131,31 @@
           <input type="text" class="form-control mb-2" [(ngModel)]="itemForm.description" name="description" required />
 
           <label>Quantity</label>
-          <input type="number" class="form-control mb-2" [(ngModel)]="itemForm.quantity" name="quantity" min="1" (input)="updateItemTotal()" required />
+          <input type="number" class="form-control mb-2" [(ngModel)]="itemForm.quantity" name="quantity" min="1"
+            (input)="updateItemTotal()" required />
 
           <label>Unit Price</label>
-          <input type="number" class="form-control mb-2" [(ngModel)]="itemForm.unitPrice" name="unitPrice" min="0.01" step="0.01" (input)="updateItemTotal()" required />
+          <input type="number" class="form-control mb-2" [(ngModel)]="itemForm.unitPrice" name="unitPrice" min="0.01"
+            step="0.01" (input)="updateItemTotal()" required />
 
           <label>Total</label>
           <input type="number" class="form-control" [(ngModel)]="itemForm.total" name="total" readonly />
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeItemModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Add Item</button>
+        <div class="page_footer mb-3 p-3">
+          <button type="button" (click)="closeItemModal()" class="close_btn">
+            Cancel
+          </button>
+          <button type="submit" class=" bg_green" *ngIf="!viewpage"> Add Item
+            <div class="icon">
+              <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </button>
         </div>
       </form>
     </div>
   </div>
 </div>
-  

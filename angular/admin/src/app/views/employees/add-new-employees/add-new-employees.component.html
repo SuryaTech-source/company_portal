@@ -314,7 +314,7 @@
       <div class="col-md-3">
         <div *ngIf="doc.fileUrl" class="mt-4">
           <button type="button" class="btn btn-sm btn-info mr-2" (click)="previewDocument(doc.fileUrl)">
-            <i class="fa fa-eye"></i> Preview 
+            <i class="fa fa-eye"></i> Preview
           </button>
           <a [href]="getFullFileUrl(doc.fileUrl)" download class="btn btn-sm btn-success">
             <i class="fa fa-download"></i> Download
@@ -346,7 +346,15 @@
 
     <div class="page_footer" *ngIf="!readonly">
       <button type="button" class="close_btn" (click)="cancel()">Cancel</button>
-      <button type="submit" class="bg_green">{{ id ? 'Update' : 'Save' }}</button>
+      <button type="submit" class=" bg_green"> {{ id ? 'Update' : 'Save' }}
+        <div class="icon">
+          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+              fill="currentColor"></path>
+          </svg>
+        </div>
+      </button>
     </div>
   </form>
 </div>

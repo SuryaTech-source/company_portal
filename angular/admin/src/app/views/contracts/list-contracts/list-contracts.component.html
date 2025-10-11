@@ -1,70 +1,64 @@
-<div class="contracts-page mt-4">
-  <div class="container-fluid">
-    <h2 class="text-center mb-4">
-      <strong>Active Contracts</strong>
-    </h2>
+<div class="contract-active_contracts_page">
+  <div class="title_sec">
+    <h2 class="page_title">Active Contracts</h2>
+    <button class="pdf_download" (click)="downloadPDF()">
+      <i class="fa fa-download"></i> Download as PDF
+    </button>
+  </div>
 
-    <!-- Download PDF Button -->
-    <div class="text-right mb-3">
-      <button class="btn btn-success" (click)="downloadPDF()">
-        <i class="fa fa-download"></i> Download as PDF
-      </button>
-    </div>
+  <div *ngIf="loading" class="text-center">Loading contracts...</div>
 
-    <div *ngIf="loading" class="text-center">Loading contracts...</div>
+  <div class="table-responsive" *ngIf="!loading && contracts.length > 0" id="contractsTable">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th>Client Name</th>
+          <th>Contract ID</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Next Invoicing Date</th>
+          <th>Last Payment</th>
+          <th>Status</th>
+          <th>Buses/Drivers Deployed</th>
+          <th>Contact Officer</th>
+          <th>Contract Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contract of contracts">
+          <td>{{ contract.clientName }}</td>
+          <td>{{ contract.contractId }}</td>
+          <td>{{ contract.startDate | date }}</td>
+          <td>{{ contract.endDate | date }}</td>
+          <td>{{ contract.invoicingDate | date }}</td>
+          <td>{{ contract.lastPayment | date }}</td>
+          <td>
+            <span *ngIf="contract.status === 1" class="badge badge-success">Active</span>
+            <span *ngIf="contract.status === 2" class="badge badge-warning">Inactive</span>
+            <span *ngIf="contract.status === 0" class="badge badge-danger">Deleted</span>
+          </td>
+          <td>
+            <div>
+              <strong>Buses:</strong>
+              <span *ngFor="let bus of contract.fleetDetails; let i = index">
+                {{ bus.vehicleName }}<span *ngIf="i < contract.fleetDetails.length - 1">, </span>
+              </span>
+            </div>
+            <div>
+              <strong>Drivers:</strong>
+              <span *ngFor="let driver of contract.driverDetails; let i = index">
+                {{ driver.name }}<span *ngIf="i < contract.driverDetails.length - 1">, </span>
+              </span>
+            </div>
+          </td>
+          <td>{{ contract.contactOfficer }}</td>
+          <td>{{ contract.contractType }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-    <div class="table-responsive" *ngIf="!loading && contracts.length > 0" id="contractsTable">
-      <table class="table table-bordered table-striped">
-        <thead class="thead-dark">
-          <tr>
-            <th>Client Name</th>
-            <th>Contract ID</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Next Invoicing Date</th>
-            <th>Last Payment</th>
-            <th>Status</th>
-            <th>Buses/Drivers Deployed</th>
-            <th>Contact Officer</th>
-            <th>Contract Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let contract of contracts">
-            <td>{{ contract.clientName }}</td>
-            <td>{{ contract.contractId }}</td>
-            <td>{{ contract.startDate | date }}</td>
-            <td>{{ contract.endDate | date }}</td>
-            <td>{{ contract.invoicingDate | date }}</td>
-            <td>{{ contract.lastPayment | date }}</td>
-            <td>
-              <span *ngIf="contract.status === 1" class="badge badge-success">Active</span>
-              <span *ngIf="contract.status === 2" class="badge badge-warning">Inactive</span>
-              <span *ngIf="contract.status === 0" class="badge badge-danger">Deleted</span>
-            </td>
-            <td>
-              <div>
-                <strong>Buses:</strong>
-                <span *ngFor="let bus of contract.fleetDetails; let i = index">
-                  {{ bus.vehicleName }}<span *ngIf="i < contract.fleetDetails.length - 1">, </span>
-                </span>
-              </div>
-              <div>
-                <strong>Drivers:</strong>
-                <span *ngFor="let driver of contract.driverDetails; let i = index">
-                  {{ driver.name }}<span *ngIf="i < contract.driverDetails.length - 1">, </span>
-                </span>
-              </div>
-            </td>
-            <td>{{ contract.contactOfficer }}</td>
-            <td>{{ contract.contractType }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div *ngIf="!loading && contracts.length === 0" class="text-center">
-      No active contracts found.
-    </div>
+  <div *ngIf="!loading && contracts.length === 0" class="text-center">
+    No active contracts found.
   </div>
 </div>

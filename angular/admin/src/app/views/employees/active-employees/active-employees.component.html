@@ -1,45 +1,36 @@
-<div class="drivers-employees-page mt-4 container-fluid">
-  <div class="text-center mb-4">
-    <button class="btn" 
-            [ngClass]="{'btn-primary': activeTab==='drivers', 'btn-light': activeTab!=='drivers'}"
-            (click)="switchTab('drivers')">DRIVERS</button>
-    <button class="btn ml-2" 
-            [ngClass]="{'btn-primary': activeTab==='employees', 'btn-light': activeTab!=='employees'}"
-            (click)="switchTab('employees')">EMPLOYEES</button>
+<div class="employees-active_employees">
+  <div class="driver_employees">
+    <button [ngClass]="{'active': activeTab==='drivers', 'inactive': activeTab!=='drivers'}"
+      (click)="switchTab('drivers')">DRIVERS</button>
+    <button [ngClass]="{'active': activeTab==='employees', 'inactive': activeTab!=='employees'}"
+      (click)="switchTab('employees')">EMPLOYEES</button>
   </div>
 
-  <!-- Drivers Section -->
   <div *ngIf="activeTab === 'drivers'">
-    <!-- Top Cards -->
     <div class="row text-center mb-4">
-      <div class="col-md-4 mb-3">
-        <div class="card shadow bg-light">
-          <div class="card-body">
-            <h5>Total No. of Drivers</h5>
-            <h3>{{ totalDrivers }}</h3>
-          </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="stat-card total text-center">
+          <h5>Total Drivers</h5>
+          <h3>{{ totalDrivers }}</h3>
         </div>
       </div>
-      <div class="col-md-4 mb-3">
-        <div class="card shadow bg-light">
-          <div class="card-body">
-            <h5>Deployed Drivers</h5>
-            <h3>{{ deployedDrivers }}</h3>
-          </div>
+
+      <div class="col-md-4 col-sm-12">
+        <div class="stat-card deployed text-center">
+          <h5>Deployed Drivers</h5>
+          <h3>{{ deployedDrivers }}</h3>
         </div>
       </div>
-      <div class="col-md-4 mb-3">
-        <div class="card shadow bg-light">
-          <div class="card-body">
-            <h5>Drivers on Vacation</h5>
-            <h3>{{ driversOnVacation }}</h3>
-          </div>
+
+      <div class="col-md-4 col-sm-12">
+        <div class="stat-card vacation text-center">
+          <h5>Drivers on Vacation</h5>
+          <h3>{{ driversOnVacation }}</h3>
         </div>
       </div>
     </div>
 
-    <!-- Driver Table -->
-    <div id="driverTable" class="table-responsive mt-4">
+    <div id="driverTable" class="table_section">
       <table class="table table-bordered table-striped text-center">
         <thead class="thead-dark">
           <tr>
@@ -78,28 +69,28 @@
     </div>
   </div>
 
-  <!-- Employees Section -->
   <div *ngIf="activeTab === 'employees'">
-    <!-- Employee Stats Cards -->
     <div class="row text-center mb-4">
       <div class="col-md-4 mb-3">
-        <div class="card shadow bg-light">
+        <div class="card total shadow">
           <div class="card-body">
             <h5>Total Employees</h5>
             <h3>{{ totalEmployees }}</h3>
           </div>
         </div>
       </div>
+
       <div class="col-md-4 mb-3">
-        <div class="card shadow bg-light">
+        <div class="card active shadow">
           <div class="card-body">
             <h5>Active Employees</h5>
             <h3>{{ activeEmployees }}</h3>
           </div>
         </div>
       </div>
+
       <div class="col-md-4 mb-3">
-        <div class="card shadow bg-light">
+        <div class="card inactive shadow">
           <div class="card-body">
             <h5>Inactive Employees</h5>
             <h3>{{ inactiveEmployees }}</h3>
@@ -108,8 +99,7 @@
       </div>
     </div>
 
-    <!-- Employee Table -->
-    <div id="employeeTable" class="table-responsive mt-4">
+    <div id="employeeTable" class="table_section">
       <table class="table table-bordered table-striped text-center">
         <thead class="thead-dark">
           <tr>
@@ -119,7 +109,6 @@
             <th>D.O.J</th>
             <th>STATUS</th>
             <th>nationality</th>
-            <!-- <th>PHONE</th> -->
             <th>ACTIONS</th>
           </tr>
         </thead>
@@ -135,7 +124,6 @@
               </span>
             </td>
             <td>{{ employee.nationality || '-' }}</td>
-            <!-- <td>{{ employee.phone || '-' }}</td> -->
             <td>
               <button class="btn btn-sm btn-info mr-1" (click)="viewEmployee(employee)">View</button>
               <button class="btn btn-sm btn-warning" (click)="editEmployee(employee)">Edit</button>
@@ -151,8 +139,6 @@
       <button class="btn btn-outline-primary" (click)="downloadEmployeesPDF()">Download Employees as PDF</button>
     </div>
   </div>
-
-  <!-- Loading Spinner -->
   <div *ngIf="loading" class="text-center mt-4">
     <div class="spinner-border" role="status">
       <span class="sr-only">Loading...</span>

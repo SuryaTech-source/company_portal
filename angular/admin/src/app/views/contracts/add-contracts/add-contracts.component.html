@@ -1,93 +1,98 @@
-<div class="contract-page mt-4">
-  <div class="container-fluid">
-    <h2 class="text-center">
-      <strong>
-        {{ mode === 'add' ? 'Add Contract' : mode === 'edit' ? 'Edit Contract' : 'View Contract' }}
-      </strong>
-    </h2>
-
-    <form #contractForm="ngForm" (ngSubmit)="submitForm(contractForm)">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            <label>Client Name</label>
-            <input type="text" class="form-control" [(ngModel)]="clientName" name="clientName" [readonly]="readonly" required>
-          </div>
-          <div class="form-group">
-            <label>Contract ID</label>
-            <input type="text" class="form-control" [(ngModel)]="contractId" name="contractId" [readonly]="readonly">
-          </div>
-          <div class="form-group">
-            <label>Start Date</label>
-            <input type="date" class="form-control" [(ngModel)]="startDate" name="startDate" [readonly]="readonly">
-          </div>
-          <div class="form-group">
-            <label>End Date</label>
-            <input type="date" class="form-control" [(ngModel)]="endDate" name="endDate" [readonly]="readonly">
-          </div>
-          <div class="form-group">
-            <label>Contract Type</label>
-            <select class="form-control" [(ngModel)]="contractType" name="contractType" [disabled]="readonly">
-              <option value="Fixed">Fixed</option>
-              <option value="Flexible">Flexible</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="form-group">
-  <label>Buses Deployed</label>
-  <ng-select
-    [items]="fleetOptions"
-    bindLabel="vehicleName"
-    bindValue="_id"
-    [(ngModel)]="busesDeployed"
-    name="busesDeployed"
-    [multiple]="true"
-    [disabled]="readonly"
-    placeholder="Select Buses">
-  </ng-select>
-</div>
-          <div class="form-group">
-  <label>Drivers Deployed</label>
-  <ng-select
-    [items]="employeeOptions"
-    bindLabel="name"
-    bindValue="_id"
-    [(ngModel)]="driversDeployed"
-    name="driversDeployed"
-    [multiple]="true"
-    [disabled]="readonly"
-    placeholder="Select Drivers">
-  </ng-select>
-</div>
-          <div class="form-group">
-            <label>Contact Officer</label>
-            <input type="text" class="form-control" [(ngModel)]="contactOfficer" name="contactOfficer" [readonly]="readonly">
-          </div>
-          <div class="form-group">
-            <label>Invoicing Date</label>
-            <input type="date" class="form-control" [(ngModel)]="invoicingDate" name="invoicingDate" [readonly]="readonly">
-          </div>
-          <div class="form-group">
-            <label>Last Payment Date</label>
-            <input type="date" class="form-control" [(ngModel)]="lastPayment" name="lastPayment" [readonly]="readonly">
-          </div>
-          <div class="form-group" *ngIf="mode !== 'add'">
-            <label>Status</label>
-            <select class="form-control" [(ngModel)]="status" name="status" [disabled]="readonly">
-              <option [value]="1">Active</option>
-              <option [value]="2">Inactive</option>
-              <option [value]="0">Deleted</option>
-            </select>
-          </div>
-        </div>
+<div class="contract-new_contract_page">
+  <h2 class="page_title">{{ mode === 'add' ? 'Add Contract' : mode === 'edit' ? 'Edit Contract' : 'View Contract' }}
+  </h2>
+  <form class="row" #contractForm="ngForm" (ngSubmit)="submitForm(contractForm)">
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Client Name</label>
+        <input type="text" class="form-control" [(ngModel)]="clientName" name="clientName" [readonly]="readonly"
+          required>
       </div>
-
-      <div class="mt-4 text-center" *ngIf="!readonly">
-        <button type="button" class="btn btn-secondary mr-3" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary">{{ id ? 'Update' : 'Save' }}</button>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Contract ID</label>
+        <input type="text" class="form-control" [(ngModel)]="contractId" name="contractId" [readonly]="readonly">
       </div>
-    </form>
-  </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Start Date</label>
+        <input type="date" class="form-control" [(ngModel)]="startDate" name="startDate" [readonly]="readonly">
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>End Date</label>
+        <input type="date" class="form-control" [(ngModel)]="endDate" name="endDate" [readonly]="readonly">
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Contract Type</label>
+        <select class="form-control" [(ngModel)]="contractType" name="contractType" [disabled]="readonly">
+          <option value="Fixed">Fixed</option>
+          <option value="Flexible">Flexible</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Buses Deployed</label>
+        <ng-select [items]="fleetOptions" bindLabel="vehicleName" bindValue="_id" [(ngModel)]="busesDeployed"
+          name="busesDeployed" [multiple]="true" [disabled]="readonly" placeholder="Select Buses">
+        </ng-select>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Drivers Deployed</label>
+        <ng-select [items]="employeeOptions" bindLabel="name" bindValue="_id" [(ngModel)]="driversDeployed"
+          name="driversDeployed" [multiple]="true" [disabled]="readonly" placeholder="Select Drivers">
+        </ng-select>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Contact Officer</label>
+        <input type="text" class="form-control" [(ngModel)]="contactOfficer" name="contactOfficer"
+          [readonly]="readonly">
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Invoicing Date</label>
+        <input type="date" class="form-control" [(ngModel)]="invoicingDate" name="invoicingDate" [readonly]="readonly">
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label>Last Payment Date</label>
+        <input type="date" class="form-control" [(ngModel)]="lastPayment" name="lastPayment" [readonly]="readonly">
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input" *ngIf="mode !== 'add'">
+        <label>Status</label>
+        <select class="form-control" [(ngModel)]="status" name="status" [disabled]="readonly">
+          <option [value]="1">Active</option>
+          <option [value]="2">Inactive</option>
+          <option [value]="0">Deleted</option>
+        </select>
+      </div>
+    </div>
+    <div class="page_footer" *ngIf="!readonly">
+      <button type="button" class="close_btn" (click)="cancel()">Cancel</button>
+
+      <button type="submit" class=" bg_green"> {{ id ? 'Update' : 'Save' }}
+        <div class="icon">
+          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+              fill="currentColor"></path>
+          </svg>
+        </div>
+      </button>
+    </div>
+  </form>
 </div>

@@ -1,12 +1,10 @@
-<div class="product-product_list tag_list">
-    <div class="container">
-        <app-common-table [settings]="settings" [source]="source" [count]="count" [itemsPerPage]="limit"
-            [tablename]="'Asset List'" [add_btn]="add_btn" [addBtnUrl]="addBtnUrl" [addBtnName]="addBtnName"
-            [editUrl]="editUrl" [viewUrl]="viewUrl" (onDeleteChange)="onDeleteChange($event)"
-            (onitemsPerPageChange)="onitemsPerPageChange($event)" (onPageChange)="onPageChange($event)"
-            [bulk_action]="bulk_action" [deleteApis]="deleteApis" (onheaderCardChange)="onheaderCardChange($event)"
-            (onSearchChange)="onSearchChange($event)" [filter_action]="filter_action"
-            [filter_action_list]="filter_action_list" (onFilterAction)="onFilterAction($event)">
-        </app-common-table>
-    </div>
+<div class="feet-asset_feet global_search">
+    <app-common-table [settings]="settings" [source]="source" [count]="count" [itemsPerPage]="limit"
+        [tablename]="'Asset List'" [add_btn]="add_btn" [addBtnUrl]="addBtnUrl" [addBtnName]="addBtnName"
+        [editUrl]="editUrl" [viewUrl]="viewUrl" (onDeleteChange)="onDeleteChange($event)"
+        (onitemsPerPageChange)="onitemsPerPageChange($event)" (onPageChange)="onPageChange($event)"
+        [bulk_action]="bulk_action" [deleteApis]="deleteApis" (onheaderCardChange)="onheaderCardChange($event)"
+        (onSearchChange)="onSearchChange($event)" [filter_action]="filter_action"
+        [filter_action_list]="filter_action_list" (onFilterAction)="onFilterAction($event)">
+    </app-common-table>
 </div>

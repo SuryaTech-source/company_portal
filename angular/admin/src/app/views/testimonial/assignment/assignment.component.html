@@ -1,36 +1,31 @@
-<div class="assignment-page container-fluid mt-4">
-  <h2 class="text-center mb-4"><strong>Fleet Assignment Report</strong></h2>
-
-  <!-- Top Cards -->
+<div class="feet-assignment_page">
+  <h2 class="page_title">Feet Assignment Report</h2>
   <div class="row text-center mb-4">
     <div class="col-md-4 mb-3">
-      <div class="card bg-light shadow">
-        <div class="card-body">
-          <h5>Total No. of Vehicles</h5>
-          <h2>{{ totalVehicles }}</h2>
-        </div>
+      <div class="card-body total">
+        <h5>Total No. of Vehicles</h5>
+        <h2>{{ totalVehicles }}</h2>
       </div>
     </div>
+
     <div class="col-md-4 mb-3">
-      <div class="card bg-light shadow">
-        <div class="card-body">
-          <h5>Deployed Vehicles</h5>
-          <h2>{{ deployedVehicles }}</h2>
-        </div>
+      <div class="card-body deployed">
+        <h5>Deployed Vehicles</h5>
+        <h2>{{ deployedVehicles }}</h2>
       </div>
     </div>
+
     <div class="col-md-4 mb-3">
-      <div class="card bg-light shadow">
-        <div class="card-body">
-          <h5>Vehicles on Maintenance Schedule</h5>
-          <h2>{{ vehiclesOnMaintenance }}</h2>
-        </div>
+      <div class="card-body maintenance">
+        <h5>Vehicles on Maintenance Schedule</h5>
+        <h2>{{ vehiclesOnMaintenance }}</h2>
       </div>
     </div>
   </div>
 
+
   <!-- Assignment Table -->
-  <div id="pdfContent" class="table-responsive">
+  <div id="pdfContent" class="table_section">
     <table class="table table-bordered table-striped text-center">
       <thead class="thead-dark">
         <tr>

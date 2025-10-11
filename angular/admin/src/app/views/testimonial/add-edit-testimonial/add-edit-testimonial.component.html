@@ -1,75 +1,90 @@
-<div class="asset_page mt-5">
-  <div class="container-fluid">
-    <h2 class="text-center"><strong>ADD NEW ASSET</strong></h2>
-    <form #testimonialForm="ngForm" (ngSubmit)="submitForm(testimonialForm)">
-      <div class="row">
-
-        <!-- Left Column: Asset Details -->
-        <div class="col-lg-6 col-md-7">
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label>VEHICLE NAME</label>
-              <input type="text" class="form-control" name="vehicleName" ngModel required maxlength="30">
-            </div>
-            <div class="form-group col-md-6">
-              <label>CUBIC CAPACITY</label>
-              <input type="number" class="form-control" name="cubicCapacity" ngModel required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>REGISTRATION NO.</label>
-              <input type="text" class="form-control" name="registrationNo" ngModel required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>COLOUR</label>
-              <input type="text" class="form-control" name="colour" ngModel required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>INSURANCE NO.</label>
-              <input type="text" class="form-control" name="insuranceNo" ngModel required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>SEATING CAPACITY</label>
-              <input type="number" class="form-control" name="seatingCapacity" ngModel required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>MONTH & YR OF</label>
-              <input type="month" class="form-control" name="monthYrOf" ngModel required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>NEXT PASSING DUE</label>
-              <input type="date" class="form-control" name="nextPassingDue" ngModel required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>MAKER'S NAME</label>
-              <input type="text" class="form-control" name="makersName" ngModel>
-            </div>
-          </div>
+<div class="feet-new_feet_page">
+  <h2 class="page_title">ADD NEW ASSET</h2>
+  <form #testimonialForm="ngForm" (ngSubmit)="submitForm(testimonialForm)">
+    <div class="row">
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>VEHICLE NAME</label>
+          <input type="text" class="form-control" name="vehicleName" ngModel required maxlength="30">
         </div>
-
-        <!-- Right Column: Documents Section -->
-        <div class="col-lg-6 col-md-5">
-          <div class="documents-section">
-            <h5 class="mb-3">DOCUMENTS</h5>
-            <div class="form-group">
-              <label for="document">ADD NEW DOCUMENT</label>
-              <input type="file" class="form-control" name="document" (change)="onDocumentSelected($event)">
-            </div>
-            <div class="form-group">
-              <label>DOCUMENT TYPE</label>
-              <select class="form-control" name="documentType" [(ngModel)]="documentType" required>
-                <option value="" disabled selected>Select type</option>
-                <option *ngFor="let option of documentTypeOptions" [value]="option">{{option}}</option>
-              </select>
-            </div>
-          </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>CUBIC CAPACITY</label>
+          <input type="number" class="form-control" name="cubicCapacity" ngModel required>
         </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>REGISTRATION NO.</label>
+          <input type="text" class="form-control" name="registrationNo" ngModel required>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>COLOUR</label>
+          <input type="text" class="form-control" name="colour" ngModel required>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>INSURANCE NO.</label>
+          <input type="text" class="form-control" name="insuranceNo" ngModel required>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>SEATING CAPACITY</label>
+          <input type="number" class="form-control" name="seatingCapacity" ngModel required>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>MONTH & YR OF</label>
+          <input type="month" class="form-control" name="monthYrOf" ngModel required>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>NEXT PASSING DUE</label>
+          <input type="date" class="form-control" name="nextPassingDue" ngModel required>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>MAKER'S NAME</label>
+          <input type="text" class="form-control" name="makersName" ngModel>
+        </div>
+      </div>
+      <h5 class="col-12 ">DOCUMENTS</h5>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label for="document">ADD NEW DOCUMENT</label>
+          <input type="file" class="form-control" name="document" (change)="onDocumentSelected($event)">
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>DOCUMENT TYPE</label>
+          <select class="form-control" name="documentType" [(ngModel)]="documentType" required>
+            <option value="" disabled selected>Select type</option>
+            <option *ngFor="let option of documentTypeOptions" [value]="option">{{option}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="page_footer">
+      <button type="button" class="close_btn" (click)="cancel()">Cancel</button>
 
-      </div>
-      <!-- Buttons -->
-      <div class="mt-4 text-center">
-        <button type="button" class="btn btn-secondary mr-3" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
-    </form>
-  </div>
+      <button type="submit" class=" bg_green"> Submit
+        <div class="icon">
+          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+              fill="currentColor"></path>
+          </svg>
+        </div>
+      </button>
+    </div>
+  </form>
 </div>

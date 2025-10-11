@@ -14,6 +14,18 @@
   color: red;
 }
 
+button {
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+  height: 38px;
+  display: flex;
+  padding: 5px 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+}
+
 .title_sec {
   display: flex;
   justify-content: space-between;
@@ -27,8 +39,10 @@
 
 }
 
+
+
 .page_title {
-  font-size: 20px;
+  font-size: 18px;
   text-transform: uppercase;
   font-weight: 700;
   margin-bottom: 15px;
@@ -47,6 +61,12 @@
   box-shadow: 0 0 10px 0 #ccc;
 }
 
+input,
+select {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
 .input_search {
   position: relative;
   width: 300px;
@@ -55,8 +75,6 @@
   input {
     width: 100%;
     height: 40px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
 
   }
 
@@ -81,40 +99,210 @@
   }
 }
 
+.pdf_download {
+  background-color: #ED6AFF;
+  border: 1px solid #ED6AFF;
+  color: #fff;
+}
+
 .page_footer {
   display: flex;
   justify-content: end;
   gap: 10px;
   margin-top: 10px;
 
-
   .bg_green {
-    background-color: #00df77;
-    border: 1px solid #00df77;
-    color: #fff;
-    width: 100px;
-    height: 38px;
-    border-radius: 8px;
-    transition: all 0.3s ease-in-out;
+    background: #31C950;
+    color: white;
+    font-family: inherit;
+    padding: 0.35em 3.3em 0.35em 1.2em;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 0.9em;
+    border: none;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 0 1.6em -0.6em #31C950;
+    overflow: hidden;
+    position: relative;
+    height: 2.8em;
 
-    &:hover {
-      background-color: transparent;
-      color: #00df77;
+    .icon {
+      background: white;
+      margin-left: 1em;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 2.2em;
+      width: 2.2em;
+      border-radius: 0.7em;
+      box-shadow: 0.1em 0.1em 0.6em 0.2em #31C950;
+      right: 0.3em;
+      transition: all 0.3s;
+
+      svg {
+        width: 1.1em;
+        transition: transform 0.3s;
+        color: #31C950;
+      }
     }
 
+    &:hover {
+      .icon {
+        width: calc(100% - 0.6em);
+
+        svg {
+          transform: translateX(0.1em);
+        }
+      }
+    }
+
+    &:active {
+      .icon {
+        transform: scale(0.95);
+      }
+    }
   }
 
+
   .close_btn {
-    border: 1px solid #848b8b;
-    color: #848b8b;
+    border: 1px solid #D1D5DC;
+    color: #D1D5DC;
     width: 100px;
-    height: 38px;
-    border-radius: 8px;
-    transition: all 0.3s ease-in-out;
 
     &:hover {
-      background-color: #848b8b;
+      background-color: #D1D5DC;
       color: #fff;
     }
+  }
+}
+
+
+::ng-deep {
+  .global_search {
+    position: relative;
+
+    .input_search {
+      position: absolute;
+      top: 0;
+      right: 180px;
+    }
+  }
+}
+
+
+.table_delete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+  border-radius: 15px;
+  background-color: rgb(255, 95, 95);
+  gap: 0;
+  cursor: pointer;
+  border: 3px solid rgb(255, 201, 201);
+  transition-duration: 0.3s;
+
+  .bin-bottom {
+    width: 15px;
+  }
+
+  .bin-top {
+    width: 17px;
+    transform-origin: right;
+    transition-duration: 0.3s;
+  }
+
+  &:hover {
+    background-color: rgb(255, 0, 0);
+
+    .bin-top {
+      transform: rotate(45deg);
+    }
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+
+.export_btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  white-space: nowrap;
+  width: fit-content;
+  height: 40px;
+  border: none;
+  padding: 0 15px;
+  border-radius: 5px;
+  background-color: rgb(49, 49, 83);
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  .folderContainer {
+    width: 40px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+
+    .fileBack {
+      z-index: 1;
+      width: 80%;
+      height: auto;
+    }
+
+    .filePage {
+      width: 50%;
+      height: auto;
+      position: absolute;
+      z-index: 2;
+      transition: all 0.3s ease-out;
+    }
+
+    .fileFront {
+      width: 85%;
+      height: auto;
+      position: absolute;
+      z-index: 3;
+      opacity: 0.95;
+      transform-origin: bottom;
+      transition: all 0.3s ease-out;
+    }
+  }
+
+  .text {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+
+  &:hover {
+    background-color: rgb(58, 58, 94);
+
+    .folderContainer {
+      .filePage {
+        transform: translateY(-5px);
+      }
+
+      .fileFront {
+        transform: rotateX(30deg);
+      }
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }
