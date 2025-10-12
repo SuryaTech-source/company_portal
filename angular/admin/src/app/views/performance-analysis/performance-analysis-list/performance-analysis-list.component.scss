@@ -1,24 +1,11 @@
-.report-container {
-    background: #f9fbff;
-    padding: 20px;
-    border-radius: 8px;
-}
+.month_analysis {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+    margin-bottom: 10px;
 
-
-/* Button */
-.btn-primary {
-    background-color: #003366;
-    border: none;
-}
-
-.btn-primary:hover {
-    background-color: #0055aa;
-}
-
-
-
-
-table tr th {
-    background-color: #000000 !important;
-    padding: 10px 14px;
+    select {
+        width: 150px;
+    }
 }

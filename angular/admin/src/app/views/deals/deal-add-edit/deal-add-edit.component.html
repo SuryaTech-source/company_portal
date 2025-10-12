@@ -1,525 +1,224 @@
-<!-- <div class="user-add_user margin_top add_edit_page">
-    <div class="container">
-        <div class="animated fadeIn" *ngIf="!viewpage">
-            <div class="row">
-                <div class="col-sm-12">
-                    
-
-                    <div class="full_page_title">
-                        <strong>{{pageTitle | titlecase}}</strong>
-                    </div>
-
-                    <form #tagAddEditForm="ngForm" class="coupon_add" (ngSubmit)="onFormSubmit(tagAddEditForm)" autocomplete="off">
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="first_name">
-                                            <label for="first_name">Deal Name <span class="mandatory">*</span></label>
-                                    
-                                            <ng-select [items]="dealNameOptions"
-                                                       bindLabel="label"
-                                                       bindValue="value"
-                                                       [(ngModel)]="selectedDealName"
-                                                       name="first_name"
-                                                       #first_name="ngModel"
-                                                       required
-                                                       placeholder="Select Deal Name"
-                                                       class="form-control custom-ng-select"
-                                                       [ngClass]="{ 'is-valid': !first_name.errors && first_name.valid}">
-                                            </ng-select>
-                                    
-                                            <div *ngIf="tagAddEditForm.submitted && !first_name.valid">
-                                                <div class="invalid-feedback" *ngIf="first_name.errors?.required">Deal Name is required.</div>
-                                            </div>
-                                    
-                                            <div class="invalid-feedback" *ngIf="first_name.errors?.duplicateTagName">
-                                                Tag name already exists.
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 ">
-                                        <div class="status">
-                                            <label for="status">Status <span class="mandatory">*</span></label>
-                                            
-
-                                            <ng-select class="form-control custom-ng-select" [items]="statusOptions"
-                                                bindLabel="label" bindValue="value"
-                                                [(ngModel)]="tagAddEditForm.value.status" name="status" id="status"
-                                                #status="ngModel" [style.border-radius.px]="dropdownBorderRadius1"
-                                            
-                                                required>
-                                            </ng-select>
-                                            <div *ngIf="tagAddEditForm.submitted && !status.valid">
-                                                <div class="invalid-feedback" *ngIf="status.errors.required">Status is
-                                                    required.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-6 mt-4">
-                                        <div class="select_gender">
-                                            <label for="gender">Select Category <span class="mandatory">*</span></label>
-                                           
-                                           
-                                            <ng-select class="form-control custom-ng-select" [items]="categoryOptions"
-                                                bindLabel="rcatname" bindValue="_id"
-                                                [(ngModel)]="tagAddEditForm.value.category" name="category"
-                                                id="category" #category="ngModel"
-                                  
-                                                [style.border-radius.px]="dropdownBorderRadius1" required bindvalue="id"
-                                                (change)="getProducts($event)" multiple="true">
-
-                                            </ng-select>
-
-                                            <div *ngIf="tagAddEditForm.submitted && !category.valid">
-                                                <div class="invalid-feedback" *ngIf="category.errors.required">Category
-                                                    is
-                                                    required.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    
-                                    <div class="col-md-6 mt-4">
-                                        <div class="select_product">
-                                            <label for="product">Select Product <span class="mandatory">*</span></label>
-                                            <ng-select class="form-control custom-ng-select" [items]="productOptions"
-                                                bindLabel="name" bindValue="_id"
-                                                [(ngModel)]="tagAddEditForm.value.product" name="product" id="product"
-                                                #product="ngModel"
-                                            
-                                                [style.border-radius.px]="dropdownBorderRadius1" required
-                                                multiple="true">
-                                            </ng-select>
-
-                                            <div *ngIf="tagAddEditForm.submitted && !product.valid">
-                                                <div class="invalid-feedback" *ngIf="product.errors.required">Product is
-                                                    required.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 mt-4">
-                                        <div class="select_gender">
-                                            <div class="select_color">
-                                                <label for="color">Select Color <span class="mandatory">*</span></label>
-                                                <ng-select class="form-control custom-ng-select" [items]="colorOptions"
-                                                    bindLabel="name" bindValue="value"
-                                                    [(ngModel)]="tagAddEditForm.value.color" name="color" id="color"
-                                                    #color="ngModel" [ngClass]="{
-                                                  'is-invalid': tagAddEditForm.submitted && color.errors,
-                                                  'is-valid': !color.errors && color.valid
-                                                }" [style.border-radius.px]="dropdownBorderRadius1"
-                                                    required></ng-select>
-
-                                                <div *ngIf="tagAddEditForm.submitted && !color.valid">
-                                                    <div class="invalid-feedback" *ngIf="color.errors.required">
-                                                        Color is required.
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                
-                            </div>
-
-
-                          
-
-                            <div class="card_footer_btn">
-
-                                <button type="button" routerLink="/app/tags/list" class="btn btn-sm ">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="btn btn-sm " [disabled]="submitebtn">
-                                    Submit
-                                </button>
-                            </div>
-
-                        </div>
-
-
-                        <div class="col-md-4">
-
-                           
-                        </div>
-                    </form>
-
-                </div>
-
+<div class="drivers-diver_list_page">
+  <div class="row" *ngIf="!viewpage">
+    <div class="page_title">{{ pageTitle | titlecase }}</div>
+    <form #driverForm="ngForm" class="row" (ngSubmit)="onFormSubmit(driverForm)" autocomplete="off">
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label for="driverName">Driver Name <span class="mandatory">*</span></label>
+          <input type="text" class="form-control" id="driverName" name="driverName"
+            [(ngModel)]="driverDetails.driverName" #driverName="ngModel" required />
+          <div *ngIf="driverForm.submitted && driverName.errors">
+            <div class="invalid-feedback" *ngIf="driverName.errors?.required">
+              Driver Name is required.
             </div>
-        </div>
-    </div>
-</div> -->
-
-
-
-<div class="user-add_user margin_top add_edit_page">
-  <div class="container">
-    <div class="animated fadeIn" *ngIf="!viewpage">
-      <div class="row">
-        <div class="col-sm-12">
-
-          <div class="full_page_title">
-            <strong>{{ pageTitle | titlecase }}</strong>
           </div>
-
-          <form
-            #driverForm="ngForm"
-            class="driver_add"
-            (ngSubmit)="onFormSubmit(driverForm)"
-            autocomplete="off"
-          >
-            <div class="row">
-              <div class="col-lg-8">
-                <div class="row">
-                  <!-- Driver Name -->
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="driverName">Driver Name <span class="mandatory">*</span></label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="driverName"
-                        name="driverName"
-                        [(ngModel)]="driverDetails.driverName"
-                        #driverName="ngModel"
-                        required
-                      />
-                      <div *ngIf="driverForm.submitted && driverName.errors">
-                        <div class="invalid-feedback" *ngIf="driverName.errors?.required">
-                          Driver Name is required.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- ID No -->
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="idNo">ID No <span class="mandatory">*</span></label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="idNo"
-                        name="idNo"
-                        [(ngModel)]="driverDetails.idNo"
-                        #idNo="ngModel"
-                        required
-                      />
-                      <div *ngIf="driverForm.submitted && idNo.errors">
-                        <div class="invalid-feedback" *ngIf="idNo.errors?.required">
-                          ID No is required.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- License No -->
-                  <div class="col-md-6 mt-4">
-                    <div class="form-group">
-                      <label for="licenseNo">License No <span class="mandatory">*</span></label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="licenseNo"
-                        name="licenseNo"
-                        [(ngModel)]="driverDetails.licenseNo"
-                        #licenseNo="ngModel"
-                        required
-                      />
-                      <div *ngIf="driverForm.submitted && licenseNo.errors">
-                        <div class="invalid-feedback" *ngIf="licenseNo.errors?.required">
-                          License No is required.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Date of Joining -->
-                  <div class="col-md-6 mt-4">
-                    <div class="form-group">
-                      <label for="doj">Date of Joining <span class="mandatory">*</span></label>
-                      <input
-                        type="date"
-                        class="form-control"
-                        id="doj"
-                        name="doj"
-                        [(ngModel)]="driverDetails.doj"
-                        #doj="ngModel"
-                        required
-                      />
-                      <div *ngIf="driverForm.submitted && doj.errors">
-                        <div class="invalid-feedback" *ngIf="doj.errors?.required">
-                          Date of Joining is required.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Valid Expiry Date -->
-                  <div class="col-md-6 mt-4">
-                    <div class="form-group">
-                      <label for="expiryDate">Valid Expiry Date <span class="mandatory">*</span></label>
-                      <input
-                        type="date"
-                        class="form-control"
-                        id="expiryDate"
-                        name="expiryDate"
-                        [(ngModel)]="driverDetails.expiryDate"
-                        #expiryDate="ngModel"
-                        required
-                      />
-                      <div *ngIf="driverForm.submitted && expiryDate.errors">
-                        <div class="invalid-feedback" *ngIf="expiryDate.errors?.required">
-                          Expiry Date is required.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Nominee Name -->
-                  <div class="col-md-6 mt-4">
-                    <div class="form-group">
-                      <label for="nomineeName">Nominee Name <span class="mandatory">*</span></label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="nomineeName"
-                        name="nomineeName"
-                        [(ngModel)]="driverDetails.nomineeName"
-                        #nomineeName="ngModel"
-                        required
-                      />
-                      <div *ngIf="driverForm.submitted && nomineeName.errors">
-                        <div class="invalid-feedback" *ngIf="nomineeName.errors?.required">
-                          Nominee Name is required.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Nationality -->
-                  <div class="col-md-6 mt-4">
-                    <div class="form-group">
-                      <label for="nationality">Nationality <span class="mandatory">*</span></label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="nationality"
-                        name="nationality"
-                        [(ngModel)]="driverDetails.nationality"
-                        #nationality="ngModel"
-                        required
-                      />
-                      <div *ngIf="driverForm.submitted && nationality.errors">
-                        <div class="invalid-feedback" *ngIf="nationality.errors?.required">
-                          Nationality is required.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Buttons -->
-              <div class="card_footer_btn mt-4">
-                <button type="button" routerLink="/app/drivers/list" class="btn btn-sm">
-                  Cancel
-                </button>
-                <button type="submit" class="btn btn-sm" [disabled]="submitebtn">
-                  Submit
-                </button>
-              </div>
-            </div>
-          </form>
-
         </div>
       </div>
-    </div>
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label for="idNo">ID No <span class="mandatory">*</span></label>
+          <input type="text" class="form-control" id="idNo" name="idNo" [(ngModel)]="driverDetails.idNo" #idNo="ngModel"
+            required />
+          <div *ngIf="driverForm.submitted && idNo.errors">
+            <div class="invalid-feedback" *ngIf="idNo.errors?.required">
+              ID No is required.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 ">
+        <div class="label_input">
+          <label for="licenseNo">License No <span class="mandatory">*</span></label>
+          <input type="text" class="form-control" id="licenseNo" name="licenseNo" [(ngModel)]="driverDetails.licenseNo"
+            #licenseNo="ngModel" required />
+          <div *ngIf="driverForm.submitted && licenseNo.errors">
+            <div class="invalid-feedback" *ngIf="licenseNo.errors?.required">
+              License No is required.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 ">
+        <div class="label_input">
+          <label for="doj">Date of Joining <span class="mandatory">*</span></label>
+          <input type="date" class="form-control" id="doj" name="doj" [(ngModel)]="driverDetails.doj" #doj="ngModel"
+            required />
+          <div *ngIf="driverForm.submitted && doj.errors">
+            <div class="invalid-feedback" *ngIf="doj.errors?.required">
+              Date of Joining is required.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 ">
+        <div class="label_input">
+          <label for="expiryDate">Valid Expiry Date <span class="mandatory">*</span></label>
+          <input type="date" class="form-control" id="expiryDate" name="expiryDate"
+            [(ngModel)]="driverDetails.expiryDate" #expiryDate="ngModel" required />
+          <div *ngIf="driverForm.submitted && expiryDate.errors">
+            <div class="invalid-feedback" *ngIf="expiryDate.errors?.required">
+              Expiry Date is required.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 ">
+        <div class="label_input">
+          <label for="nomineeName">Nominee Name <span class="mandatory">*</span></label>
+          <input type="text" class="form-control" id="nomineeName" name="nomineeName"
+            [(ngModel)]="driverDetails.nomineeName" #nomineeName="ngModel" required />
+          <div *ngIf="driverForm.submitted && nomineeName.errors">
+            <div class="invalid-feedback" *ngIf="nomineeName.errors?.required">
+              Nominee Name is required.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 ">
+        <div class="label_input">
+          <label for="nationality">Nationality <span class="mandatory">*</span></label>
+          <input type="text" class="form-control" id="nationality" name="nationality"
+            [(ngModel)]="driverDetails.nationality" #nationality="ngModel" required />
+          <div *ngIf="driverForm.submitted && nationality.errors">
+            <div class="invalid-feedback" *ngIf="nationality.errors?.required">
+              Nationality is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page_footer">
+        <button type="button" class="close_btn" routerLink="/app/drivers/list">Cancel</button>
+
+        <button type="submit" class=" bg_green" [disabled]="submitebtn"> Submit
+          <div class="icon">
+            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                fill="currentColor"></path>
+            </svg>
+          </div>
+        </button>
+      </div>
+
+    </form>
   </div>
-</div>
 
-<!--View page-->
+  <!--View page-->
 
-<div class="customer_list-view_user">
-    <div class="container">
-        <div class="animated fadeIn" *ngIf="viewpage">
-            <div class="row">
-                <div class="col-sm-12">
-                
+  <div class="drivers-diver_list_view_page" *ngIf="viewpage">
+    <div class="page_title">{{pageTitle | titlecase}}</div>
+    <form #tagAddEditForm="ngForm" class="coupon_add row" (ngSubmit)="onFormSubmit(tagAddEditForm)" autocomplete="off">
+      <div class="row">
+        <div class="col-md-4 col-sm-12">
+          <div class="label_input">
+            <label for="first_name">Deal Name <span class="mandatory">*</span></label>
 
-                    <div class="full_page_title">
-                        <strong>{{pageTitle | titlecase}}</strong>
-                    </div>
-                    <form #tagAddEditForm="ngForm" class="coupon_add" (ngSubmit)="onFormSubmit(tagAddEditForm)" autocomplete="off">
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="first_name">
-                                            <label for="first_name">Deal Name <span class="mandatory">*</span></label>
-                                    
-                                            <ng-select [items]="dealNameOptions"
-                                                       bindLabel="label"
-                                                       bindValue="value"
-                                                       [(ngModel)]="selectedDealName"
-                                                       name="first_name"
-                                                       #first_name="ngModel"
-                                                       required
-                                                       placeholder="Select Deal Name"
-                                                       class="form-control custom-ng-select"
-                                                       [ngClass]="{ 'is-valid': !first_name.errors && first_name.valid}">
-                                            </ng-select>
-                                    
-                                            <div *ngIf="tagAddEditForm.submitted && !first_name.valid">
-                                                <div class="invalid-feedback" *ngIf="first_name.errors?.required">Deal Name is required.</div>
-                                            </div>
-                                    
-                                            <div class="invalid-feedback" *ngIf="first_name.errors?.duplicateTagName">
-                                                Tag name already exists.
-                                            </div>
-                                        </div>
-                                    </div>
-                                   
-                                    <div class="col-md-6 mt-4">
-                                        <div class="status">
-                                            <label for="status">Status <span class="mandatory">*</span></label>
-                                            <ng-select class="form-control custom-ng-select" [items]="statusOptions"
-                                                bindLabel="label" bindValue="value"
-                                                [(ngModel)]="tagAddEditForm.value.status " name="status" id="status"
-                                                #status="ngModel" [style.border-radius.px]="dropdownBorderRadius1"
-                                        
-                                                required>
-                                            </ng-select>
-                                            <div *ngIf="tagAddEditForm.submitted && !status.valid">
-                                                <div class="invalid-feedback" *ngIf="status.errors.required">Status is
-                                                    required.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+            <ng-select [items]="dealNameOptions" bindLabel="label" bindValue="value" [(ngModel)]="selectedDealName"
+              name="first_name" #first_name="ngModel" required placeholder="Select Deal Name"
+              class="form-control custom-ng-select" [ngClass]="{ 'is-valid': !first_name.errors && first_name.valid}">
+            </ng-select>
 
+            <div *ngIf="tagAddEditForm.submitted && !first_name.valid">
+              <div class="invalid-feedback" *ngIf="first_name.errors?.required">Deal Name is required.</div>
+            </div>
 
-                                    <!-- Category Selector -->
+            <div class="invalid-feedback" *ngIf="first_name.errors?.duplicateTagName">
+              Tag name already exists.
+            </div>
+          </div>
+        </div>
 
-                                    <div class="col-md-6 mt-4">
-                                        <div class="select_gender">
-                                            <label for="gender">Select Category <span class="mandatory">*</span></label>
+        <div class="col-md-4 col-sm-12 ">
+          <div class="status">
+            <label for="status">Status <span class="mandatory">*</span></label>
+            <ng-select class="form-control custom-ng-select" [items]="statusOptions" bindLabel="label" bindValue="value"
+              [(ngModel)]="tagAddEditForm.value.status " name="status" id="status" #status="ngModel"
+              [style.border-radius.px]="dropdownBorderRadius1" required>
+            </ng-select>
+            <div *ngIf="tagAddEditForm.submitted && !status.valid">
+              <div class="invalid-feedback" *ngIf="status.errors.required">Status is
+                required.
+              </div>
+            </div>
+          </div>
+        </div>
 
-                                            <ng-select class="form-control custom-ng-select" [items]="categoryOptions"
-                                                bindLabel="rcatname" bindValue="_id"
-                                                [(ngModel)]="tagAddEditForm.value.category" name="category"
-                                                id="category" #category="ngModel"
-                             
-                                                [style.border-radius.px]="dropdownBorderRadius1" required bindvalue="id"
-                                                (change)="getProducts($event)" multiple="true">
+        <div class="col-md-4 col-sm-12 ">
+          <div class="select_gender">
+            <label for="gender">Select Category <span class="mandatory">*</span></label>
 
-                                            </ng-select>
+            <ng-select class="form-control custom-ng-select" [items]="categoryOptions" bindLabel="rcatname"
+              bindValue="_id" [(ngModel)]="tagAddEditForm.value.category" name="category" id="category"
+              #category="ngModel" [style.border-radius.px]="dropdownBorderRadius1" required bindvalue="id"
+              (change)="getProducts($event)" multiple="true">
 
-                                            <div *ngIf="tagAddEditForm.submitted && !category.valid">
-                                                <div class="invalid-feedback" *ngIf="category.errors.required">Category
-                                                    is
-                                                    required.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+            </ng-select>
 
-                                    <!-- Product Selector -->
+            <div *ngIf="tagAddEditForm.submitted && !category.valid">
+              <div class="invalid-feedback" *ngIf="category.errors.required">Category
+                is
+                required.
+              </div>
+            </div>
+          </div>
+        </div>
 
-                                    <div class="col-md-6 mt-4">
-                                        <div class="select_product">
-                                            <label for="product">Select Product <span class="mandatory">*</span></label>
-                                            <ng-select class="form-control custom-ng-select" [items]="productOptions"
-                                                bindLabel="name" bindValue="_id"
-                                                [(ngModel)]="tagAddEditForm.value.product" name="product" id="product"
-                                                #product="ngModel"
-                                       
-                                                [style.border-radius.px]="dropdownBorderRadius1" required multiple="true"
-                                                >
-                                            </ng-select>
+        <div class="col-md-4 col-sm-12 ">
+          <div class="select_product">
+            <label for="product">Select Product <span class="mandatory">*</span></label>
+            <ng-select class="form-control custom-ng-select" [items]="productOptions" bindLabel="name" bindValue="_id"
+              [(ngModel)]="tagAddEditForm.value.product" name="product" id="product" #product="ngModel"
+              [style.border-radius.px]="dropdownBorderRadius1" required multiple="true">
+            </ng-select>
 
-                                            <div *ngIf="tagAddEditForm.submitted && !product.valid">
-                                                <div class="invalid-feedback" *ngIf="product.errors.required">Product is
-                                                    required.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+            <div *ngIf="tagAddEditForm.submitted && !product.valid">
+              <div class="invalid-feedback" *ngIf="product.errors.required">Product is
+                required.
+              </div>
+            </div>
+          </div>
+        </div>
 
-                                    <div class="col-md-6 mt-4">
-                                        <div class="select_gender">
-                                            <div class="select_color">
-                                                <label for="color">Select Color <span class="mandatory">*</span></label>
-                                                <ng-select class="form-control custom-ng-select" [items]="colorOptions"
-                                                    bindLabel="name" bindValue="value"
-                                                    [(ngModel)]="tagAddEditForm.value.colors" name="color" id="color"
-                                                    #color="ngModel" [ngClass]="{
+        <div class="col-md-4 col-sm-12 ">
+          <div class="select_gender">
+            <div class="select_color">
+              <label for="color">Select Color <span class="mandatory">*</span></label>
+              <ng-select class="form-control custom-ng-select" [items]="colorOptions" bindLabel="name" bindValue="value"
+                [(ngModel)]="tagAddEditForm.value.colors" name="color" id="color" #color="ngModel" [ngClass]="{
                                                   'is-invalid': tagAddEditForm.submitted && color.errors,
                                                   'is-valid': !color.errors && color.valid
                                                 }" [style.border-radius.px]="dropdownBorderRadius1"
-                                                    required></ng-select>
+                required></ng-select>
 
-                                                <div *ngIf="tagAddEditForm.submitted && !color.valid">
-                                                    <div class="invalid-feedback" *ngIf="color.errors.required">
-                                                        Color is required.
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                               
-                            </div>
-
-
-
-                            <div class="card_footer_btn">
-
-                                <button type="button" routerLink="/app/tags/list" class="btn btn-sm ">
-                                    Cancel
-                                </button>
-                                <button type="submit" class="btn btn-sm " [disabled]="submitebtn">
-                                    Submit
-                                </button>
-                            </div>
-
-                        </div>
-
-
-                        <div class="card-body row">
-                            <div class="form-group  grouping-strains row">
-
-                            </div>
-                        </div>
-
-                        <!--profile image div-->
-                        <div class="col-md-4">
-
-                        </div>
-                    </form>
-
+              <div *ngIf="tagAddEditForm.submitted && !color.valid">
+                <div class="invalid-feedback" *ngIf="color.errors.required">
+                  Color is required.
                 </div>
-
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+
+      </div>
+
+
+
+      <div class="page_footer">
+        <button type="button" class="close_btn" routerLink="/app/tags/list">Cancel</button>
+
+        <button type="submit" class=" bg_green" [disabled]="submitebtn"> Submit
+          <div class="icon">
+            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                fill="currentColor"></path>
+            </svg>
+          </div>
+        </button>
+      </div>
+    </form>
+
+  </div>
+
 </div>

@@ -1,4 +1,3 @@
-
 .general_setting .add_img {
   //   justify-content: space-between !important;
   margin-top: 30px;
@@ -218,15 +217,15 @@ input:checked+.slider:before {
 }
 
 .setting-general_setting :where(.logo, .favicon, .app_icon, .web_login_img, .web_register_img) .mychs input::-webkit-file-upload-button {
-  width: 28px;
-  height: 28px;
+  width: 50px;
+  height: 35px;
   border-radius: 15px;
   border: none;
-  background: #fff;
+  background: unset;
   background-image: url("../../../../assets/image/pencil.png");
   background-repeat: no-repeat;
   background-position: center;
-  box-shadow: 0px 0 3px 0 #ccc;
+  box-shadow: unset;
   color: rgba(255, 255, 255, 0);
   z-index: 1;
   position: relative;

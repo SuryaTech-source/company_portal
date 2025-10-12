@@ -1,26 +1,70 @@
-<div class="container mt-4 report-container">
-  <!-- Tabs -->
-  <ul class="nav nav-tabs custom-tabs">
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="activeTab === 'attendance'" (click)="setTab('attendance')">Attendance</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="activeTab === 'customers'" (click)="setTab('customers')">Payments from Customers</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" [class.active]="activeTab === 'vendors'" (click)="setTab('vendors')">Payments to Vendors</button>
-    </li>
-  </ul>
+<div class="report_page">
+  <div class="d-flex justify-content-between">
+    <ul class="nav nav-tabs custom-tabs">
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'attendance'"
+          (click)="setTab('attendance')">Attendance</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'customers'" (click)="setTab('customers')">Payments from
+          Customers</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'vendors'" (click)="setTab('vendors')">Payments to
+          Vendors</button>
+      </li>
+    </ul>
+    <button class="export_btn" (click)="downloadPDF()">
+      <span class="folderContainer">
+        <svg class="fileBack" width="146" height="113" viewBox="0 0 146 113" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M0 4C0 1.79086 1.79086 0 4 0H50.3802C51.8285 0 53.2056 0.627965 54.1553 1.72142L64.3303 13.4371C65.2799 14.5306 66.657 15.1585 68.1053 15.1585H141.509C143.718 15.1585 145.509 16.9494 145.509 19.1585V109C145.509 111.209 143.718 113 141.509 113H3.99999C1.79085 113 0 111.209 0 109V4Z"
+            fill="url(#paint0_linear_117_4)"></path>
+          <defs>
+            <linearGradient id="paint0_linear_117_4" x1="0" y1="0" x2="72.93" y2="95.4804"
+              gradientUnits="userSpaceOnUse">
+              <stop stop-color="#8F88C2"></stop>
+              <stop offset="1" stop-color="#5C52A2"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+        <svg class="filePage" width="88" height="99" viewBox="0 0 88 99" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="88" height="99" fill="url(#paint0_linear_117_6)"></rect>
+          <defs>
+            <linearGradient id="paint0_linear_117_6" x1="0" y1="0" x2="81" y2="160.5" gradientUnits="userSpaceOnUse">
+              <stop stop-color="white"></stop>
+              <stop offset="1" stop-color="#686868"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
 
-  <!-- Header -->
+        <svg class="fileFront" width="160" height="79" viewBox="0 0 160 79" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M0.29306 12.2478C0.133905 9.38186 2.41499 6.97059 5.28537 6.97059H30.419H58.1902C59.5751 6.97059 60.9288 6.55982 62.0802 5.79025L68.977 1.18034C70.1283 0.410771 71.482 0 72.8669 0H77H155.462C157.87 0 159.733 2.1129 159.43 4.50232L150.443 75.5023C150.19 77.5013 148.489 79 146.474 79H7.78403C5.66106 79 3.9079 77.3415 3.79019 75.2218L0.29306 12.2478Z"
+            fill="url(#paint0_linear_117_5)"></path>
+          <defs>
+            <linearGradient id="paint0_linear_117_5" x1="38.7619" y1="8.71323" x2="66.9106" y2="82.8317"
+              gradientUnits="userSpaceOnUse">
+              <stop stop-color="#C3BBFF"></stop>
+              <stop offset="1" stop-color="#51469A"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <p class="text">Download as PDF</p>
+    </button>
+  </div>
   <div class="d-flex justify-content-between align-items-center my-3">
     <h5 class="mb-0">
-      {{ activeTab === "attendance" ? "Attendance Report" : activeTab === "customers" ? "Payments from Customers" : "Payments to Vendors" }}
+      {{ activeTab === "attendance" ? "Attendance Report" : activeTab === "customers" ? "Payments from Customers" :
+      "Payments to Vendors" }}
     </h5>
 
-    <div class="d-flex gap-2 align-items-center">
-      <input type="text" class="form-control form-control-sm" [placeholder]="'🔍 ' + filterOptions.placeholder" [(ngModel)]="searchText" />
-      <select class="form-select form-select-sm" [(ngModel)]="filterStatus">
+    <div class="input_select">
+      <input type="text" [placeholder]="'🔍 ' + filterOptions.placeholder" [(ngModel)]="searchText" />
+      <select [(ngModel)]="filterStatus">
         <option value="">All Status</option>
         <option *ngIf="activeTab === 'attendance'" value="P">Present</option>
         <option *ngIf="activeTab === 'attendance'" value="A">Absent</option>
@@ -29,113 +73,81 @@
         <option *ngIf="activeTab !== 'attendance'" value="Unpaid">Unpaid</option>
         <option *ngIf="activeTab !== 'attendance'" value="Partial">Partial</option>
       </select>
-      <input type="date" class="form-control form-control-sm" [(ngModel)]="startDate" />
-      <input type="date" class="form-control form-control-sm" [(ngModel)]="endDate" />
-      <select class="form-select form-select-sm" [(ngModel)]="sortBy">
+      <input type="date" class="date_input" [(ngModel)]="startDate" />
+      <input type="date" class="date_input" [(ngModel)]="endDate" />
+      <select [(ngModel)]="sortBy">
         <option value="">Sort ⬍</option>
         <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
       </select>
-      
-  <!-- Show Mark All button only in attendance tab -->
-  <button *ngIf="activeTab === 'attendance'" class="btn btn-sm btn-success" (click)="markAllPresentToday()">
-    <i class="bi bi-check-all"></i> Mark All Present
-  </button>
+
+      <!-- Show Mark All button only in attendance tab -->
+      <button *ngIf="activeTab === 'attendance'" class="btn btn-sm btn-success" (click)="markAllPresentToday()">
+        <i class="bi bi-check-all"></i> Mark All Present
+      </button>
       <button class="btn btn-sm btn-success" (click)="openModal()"><i class="bi bi-plus-lg"></i> Add</button>
-      <button class="btn btn-sm btn-primary" (click)="downloadPDF()"><i class="bi bi-file-earmark-arrow-down"></i> PDF</button>
+
+
+
+
     </div>
   </div>
-
-  <!-- Table -->
   <div #tableContent>
-    <!-- Attendance -->
-<div *ngIf="activeTab === 'attendance'">
-  <!-- Bulk Action Toolbar -->
-  <div class="mb-2 d-flex gap-2 align-items-center">
-    <input
-      type="date"
-      class="form-control form-control-sm"
-      [(ngModel)]="selectedDate"
-      (change)="loadAttendanceByDate()"
-    />
-    <button
-      class="btn btn-sm btn-success"
-      (click)="bulkMarkAttendance('P')"
-      [disabled]="selectedEmployees.length === 0"
-    >
-      Mark Present
-    </button>
-    <button
-      class="btn btn-sm btn-danger"
-      (click)="bulkMarkAttendance('A')"
-      [disabled]="selectedEmployees.length === 0"
-    >
-      Mark Absent
-    </button>
-    <button
-      class="btn btn-sm btn-warning"
-      (click)="bulkMarkAttendance('L')"
-      [disabled]="selectedEmployees.length === 0"
-    >
-      Mark Leave
-    </button>
-  </div>
+    <div *ngIf="activeTab === 'attendance'">
+      <div class="mb-2 d-flex gap-2 align-items-center justify-content-end">
+        <input type="date" class="date_input" [(ngModel)]="selectedDate" (change)="loadAttendanceByDate()" />
+        <button class="btn btn-sm btn-success" (click)="bulkMarkAttendance('P')"
+          [disabled]="selectedEmployees.length === 0">
+          Mark Present
+        </button>
+        <button class="btn btn-sm btn-danger" (click)="bulkMarkAttendance('A')"
+          [disabled]="selectedEmployees.length === 0">
+          Mark Absent
+        </button>
+        <button class="btn btn-sm btn-warning" (click)="bulkMarkAttendance('L')"
+          [disabled]="selectedEmployees.length === 0">
+          Mark Leave
+        </button>
+      </div>
+      <div class="table_section">
+        <table class="table table-bordered table-striped custom-table">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" (change)="toggleSelectAll($event)" [checked]="isAllSelected()" />
+              </th>
+              <th>Employee Name</th>
+              <th>ID No.</th>
+              <th>Status</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
 
-  <table class="table table-bordered table-striped custom-table">
-    <thead>
-      <tr>
-        <th>
-          <input
-            type="checkbox"
-            (change)="toggleSelectAll($event)"
-            [checked]="isAllSelected()"
-          />
-        </th>
-        <th>Employee Name</th>
-        <th>ID No.</th>
-        <th>Status</th>
-        <th>Remarks</th>
-      </tr>
-    </thead>
-    <tbody>
-      
-      <tr *ngFor="let row of filteredAttendance">
-        <td>
-          <input
-            type="checkbox"
-            [checked]="selectedEmployees.includes(row._id)"
-            (change)="toggleEmployee(row._id, $event)"
-          />
-        </td>
-        <td>{{ row.employeeName }}</td>
-        <td>{{ row.idNo }}</td>
-        <td>
-          <select
-            class="form-select form-select-sm"
-            [(ngModel)]="row.status"
-            (change)="updateAttendance(row)"
-          >
-            <option value="P">Present</option>
-            <option value="A">Absent</option>
-            <option value="L">Leave</option>
-          </select>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            [(ngModel)]="row.remarks"
-            (blur)="updateAttendance(row)"
-            placeholder="Remarks"
-          />
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+            <tr *ngFor="let row of filteredAttendance">
+              <td>
+                <input type="checkbox" [checked]="selectedEmployees.includes(row._id)"
+                  (change)="toggleEmployee(row._id, $event)" />
+              </td>
+              <td>{{ row.employeeName }}</td>
+              <td>{{ row.idNo }}</td>
+              <td>
+                <select class="form-select form-select-sm" [(ngModel)]="row.status" (change)="updateAttendance(row)">
+                  <option value="P">Present</option>
+                  <option value="A">Absent</option>
+                  <option value="L">Leave</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="row.remarks"
+                  (blur)="updateAttendance(row)" placeholder="Remarks" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-
-    <!-- Customers -->
-    <div *ngIf="activeTab === 'customers'">
+    <div *ngIf="activeTab === 'customers'" class="table_section">
       <table class="table table-bordered table-striped custom-table">
         <thead>
           <tr>
@@ -165,9 +177,7 @@
         </tbody>
       </table>
     </div>
-
-    <!-- Vendors -->
-    <div *ngIf="activeTab === 'vendors'">
+    <div *ngIf="activeTab === 'vendors'" class="table_section">
       <table class="table table-bordered table-striped custom-table">
         <thead>
           <tr>
@@ -198,8 +208,6 @@
       </table>
     </div>
   </div>
-
-  <!-- Modal -->
   <div class="modal fade show" tabindex="-1" [ngClass]="{ 'd-block': showModal }" *ngIf="showModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -209,69 +217,151 @@
             <button type="button" class="btn-close" (click)="closeModal()"></button>
           </div>
           <div class="modal-body">
-            <!-- Attendance -->
             <ng-container *ngIf="activeTab === 'attendance'">
-              <label>Employee</label>
-              <input type="text" class="form-control mb-2" [(ngModel)]="form.employee" name="employee" required>
-              <label>Date</label>
-              <input type="date" class="form-control mb-2" [(ngModel)]="form.date" name="date" required>
-              <label>Status</label>
-              <select class="form-select mb-2" [(ngModel)]="form.status" name="status">
-                <option value="P">Present</option>
-                <option value="A">Absent</option>
-                <option value="L">Leave</option>
-              </select>
-              <label>Remarks</label>
-              <textarea class="form-control" [(ngModel)]="form.remarks" name="remarks"></textarea>
-            </ng-container>
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <div class="label_input">
+                    <label>Employee</label>
+                    <input type="text" class="form-control mb-2" [(ngModel)]="form.employee" name="employee" required>
+                  </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                  <div class="label_input">
+                    <label>Date</label>
+                    <input type="date" class="form-control mb-2" [(ngModel)]="form.date" name="date" required>
+                  </div>
+                </div>
+                <div class="col-md-12 col-sm-12">
+                  <div class="label_input">
+                    <label>Status</label>
+                    <select class="form-select mb-2" [(ngModel)]="form.status" name="status">
+                      <option value="P">Present</option>
+                      <option value="A">Absent</option>
+                      <option value="L">Leave</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-12 col-sm-12">
+                  <div class="label_input">
+                    <label>Remarks</label>
+                    <textarea class="form-control" [(ngModel)]="form.remarks" name="remarks"></textarea>
+                  </div>
+                </div>
+              </div>
 
-            <!-- Customers -->
-            <ng-container *ngIf="activeTab === 'customers'">
-              <label>Client</label>
-              <input type="text" class="form-control mb-2" [(ngModel)]="form.client" name="client" required>
-              <label>Contract ID</label>
-              <input type="text" class="form-control mb-2" [(ngModel)]="form.contractId" name="contractId" required>
-              <label>Invoice No.</label>
-              <input type="text" class="form-control mb-2" [(ngModel)]="form.invoiceNo" name="invoiceNo">
-              <label>Due Date</label>
-              <input type="date" class="form-control mb-2" [(ngModel)]="form.dueDate" name="dueDate">
-              <label>Amount Paid</label>
-              <input type="number" class="form-control mb-2" [(ngModel)]="form.amountPaid" name="amountPaid">
-              <label>Status</label>
-              <select class="form-select mb-2" [(ngModel)]="form.status" name="status">
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
-                <option value="Partial">Partial</option>
-              </select>
-              <label>Remarks</label>
-              <textarea class="form-control" [(ngModel)]="form.remarks" name="remarks"></textarea>
             </ng-container>
+            <ng-container class="row" *ngIf="activeTab === 'customers'">
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Client</label>
+                  <input type="text" class="form-control mb-2" [(ngModel)]="form.client" name="client" required>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Contract ID</label>
+                  <input type="text" class="form-control mb-2" [(ngModel)]="form.contractId" name="contractId" required>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Invoice No.</label>
+                  <input type="text" class="form-control mb-2" [(ngModel)]="form.invoiceNo" name="invoiceNo">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Due Date</label>
+                  <input type="date" class="form-control mb-2" [(ngModel)]="form.dueDate" name="dueDate">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Amount Paid</label>
+                  <input type="number" class="form-control mb-2" [(ngModel)]="form.amountPaid" name="amountPaid">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Status</label>
+                  <select class="form-select mb-2" [(ngModel)]="form.status" name="status">
+                    <option value="Paid">Paid</option>
+                    <option value="Unpaid">Unpaid</option>
+                    <option value="Partial">Partial</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="label_input">
+                  <label>Remarks</label>
+                  <textarea class="form-control" [(ngModel)]="form.remarks" name="remarks"></textarea>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container class="row" *ngIf="activeTab === 'vendors'">
 
-            <!-- Vendors -->
-            <ng-container *ngIf="activeTab === 'vendors'">
-              <label>Vendor</label>
-              <input type="text" class="form-control mb-2" [(ngModel)]="form.vendor" name="vendor" required>
-              <label>Contract ID</label>
-              <input type="text" class="form-control mb-2" [(ngModel)]="form.contractId" name="contractId">
-              <label>Invoice No.</label>
-              <input type="text" class="form-control mb-2" [(ngModel)]="form.invoiceNo" name="invoiceNo">
-              <label>Due Date</label>
-              <input type="date" class="form-control mb-2" [(ngModel)]="form.dueDate" name="dueDate">
-              <label>Amount Paid</label>
-              <input type="number" class="form-control mb-2" [(ngModel)]="form.amountPaid" name="amountPaid">
-              <label>Status</label>
-              <select class="form-select mb-2" [(ngModel)]="form.status" name="status">
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
-                <option value="Partial">Partial</option>
-              </select>
-              <label>Remarks</label>
-              <textarea class="form-control" [(ngModel)]="form.remarks" name="remarks"></textarea>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Vendor</label>
+                  <input type="text" class="form-control mb-2" [(ngModel)]="form.vendor" name="vendor" required>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Contract ID</label>
+                  <input type="text" class="form-control mb-2" [(ngModel)]="form.contractId" name="contractId">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Invoice No.</label>
+                  <input type="text" class="form-control mb-2" [(ngModel)]="form.invoiceNo" name="invoiceNo">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Due Date</label>
+                  <input type="date" class="form-control mb-2" [(ngModel)]="form.dueDate" name="dueDate">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Amount Paid</label>
+                  <input type="number" class="form-control mb-2" [(ngModel)]="form.amountPaid" name="amountPaid">
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Status</label>
+                  <select class="form-select mb-2" [(ngModel)]="form.status" name="status">
+                    <option value="Paid">Paid</option>
+                    <option value="Unpaid">Unpaid</option>
+                    <option value="Partial">Partial</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                  <label>Remarks</label>
+                  <textarea class="form-control" [(ngModel)]="form.remarks" name="remarks"></textarea>
+                </div>
+              </div>
             </ng-container>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
-            <button type="submit" class="btn btn-primary">{{ editData ? 'Update' : 'Save' }}</button>
+
+          <div class="page_footer mb-3 p-3">
+            <button type="button" (click)="closeModal()" class="close_btn">
+              Cancel
+            </button>
+            <button type="submit" class=" bg_green"> {{ editData ? 'Update' : 'Save' }}
+              <div class="icon">
+                <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                    fill="currentColor"></path>
+                </svg>
+              </div>
+            </button>
           </div>
         </form>
       </div>
