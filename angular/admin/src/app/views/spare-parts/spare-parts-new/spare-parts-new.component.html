@@ -1,45 +1,59 @@
-<div class="spare-part-form card shadow-sm p-4">
-  <h5 class="mb-3">
-    {{ isEdit ? 'Edit Spare Part' : 'Add New Spare Part' }}
-  </h5>
+<div class="add_spare_part_page">
+  <h5 class="page_title">{{ isEdit ? 'Edit Spare Part' : 'Add New Spare Part' }}</h5>
 
-  <form [formGroup]="sparePartForm" (ngSubmit)="saveSparePart()">
-    <div class="mb-3">
-      <label class="form-label">Part Name</label>
-      <input type="text" class="form-control" formControlName="name" placeholder="Enter part name">
-      <div *ngIf="sparePartForm.controls['name'].touched && sparePartForm.controls['name'].invalid" class="text-danger">
-        Part name is required
+  <form class="row" [formGroup]="sparePartForm" (ngSubmit)="saveSparePart()">
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label class="form-label">Part Name</label>
+        <input type="text" class="form-control" formControlName="name" placeholder="Enter part name">
+        <div *ngIf="sparePartForm.controls['name'].touched && sparePartForm.controls['name'].invalid"
+          class="text-danger">
+          Part name is required
+        </div>
       </div>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label">Part Number</label>
-      <input type="text" class="form-control" formControlName="partNumber" placeholder="Enter part number">
-      <div *ngIf="sparePartForm.controls['partNumber'].touched && sparePartForm.controls['partNumber'].invalid" class="text-danger">
-        Part number is required
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label class="form-label">Part Number</label>
+        <input type="text" class="form-control" formControlName="partNumber" placeholder="Enter part number">
+        <div *ngIf="sparePartForm.controls['partNumber'].touched && sparePartForm.controls['partNumber'].invalid"
+          class="text-danger">
+          Part number is required
+        </div>
       </div>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label">Description</label>
-      <textarea rows="2" class="form-control" formControlName="description" placeholder="Optional"></textarea>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label class="form-label">Description</label>
+        <textarea rows="2" class="form-control" formControlName="description" placeholder="Optional"></textarea>
+      </div>
     </div>
 
-    <div class="row">
-      <div class="col-md-6 mb-3">
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
         <label class="form-label">Quantity</label>
         <input type="number" class="form-control" formControlName="totalQuantity" min="0">
       </div>
-      <div class="col-md-6 mb-3">
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
         <label class="form-label">Unit Price</label>
         <input type="number" class="form-control" formControlName="unitPrice" min="0" step="0.01">
       </div>
     </div>
 
-    <div class="d-flex justify-content-end gap-2">
-      <!-- <button type="button" class="btn btn-secondary" (click)="router.navigate(['/spare-parts'])">Cancel</button> -->
-      <button type="submit" class="btn btn-primary" [disabled]="loading">
-        {{ loading ? 'Saving...' : (isEdit ? 'Update' : 'Save') }}
+    <div class="page_footer">
+      <button type="submit" class=" bg_green" [disabled]="loading"> {{ loading ? 'Saving...' : (isEdit ? 'Update' :
+        'Save') }}
+        <div class="icon">
+          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+              fill="currentColor"></path>
+          </svg>
+        </div>
       </button>
     </div>
   </form>

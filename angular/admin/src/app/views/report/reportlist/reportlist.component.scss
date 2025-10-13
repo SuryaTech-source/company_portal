@@ -1,10 +1,3 @@
-/* Container */
-.report-container {
-    background: #f9fbff;
-    padding: 20px;
-    border-radius: 8px;
-}
-
 /* Tabs */
 .custom-tabs .nav-link {
     color: #003366;
@@ -17,29 +10,13 @@
     color: #fff;
 }
 
-/* Filters */
-.filter-bar select,
-.filter-bar input {
-    font-size: 13px;
+.input_select {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    input:nth-of-type(1) {
+        width: 155px;
+    }
+
 }
-
-
-/* Table */
-.custom-table thead {
-    background: #003366 !important;
-    color: #fff;
-}
-
-
-/* PDF Button */
-.btn-primary {
-    background-color: #003366;
-    border: none;
-}
-
-.btn-primary:hover {
-    background-color: #0055aa;
-}
-
-
-

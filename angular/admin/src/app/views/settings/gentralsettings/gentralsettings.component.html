@@ -1,650 +1,342 @@
-<div class="animated fadeIn setting-general_setting margin_top">
-    <div class="container">
-        <div class="full_page_title"><strong>General Settings</strong></div>
-        <!-- <form #gentrelSettingForm="ngForm" (ngSubmit)="onFormSubmit(gentrelSettingForm)" autocomplete="off"> -->
-        <form #gentrelSettingForm="ngForm" autocomplete="off">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="site_title">
-                        <label for="site_title">Site Title <span class="mandatory">*</span> </label>
-                        <input type="text" id="site_title" ngModel name="site_title" #site_title="ngModel" required
-                            class="form-control" placeholder="Enter Site Title" pattern="^[^\d]+$" [disabled]="viewOnly"
-                            [ngClass]="{ 'is-invalid': submitted && site_title.errors }"
-                            [ngClass]="{ 'is-valid': !site_title.errors && site_title.valid}">
-                        <div *ngIf="submitted && !site_title.valid">
-                            <div class="invalid-feedback" *ngIf="site_title.errors.required">Site Title is
-                                required.</div>
-                            <div class="invalid-feedback" *ngIf="site_title.errors.pattern">Numbers are not
-                                allowed.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="email_address">
-                        <label for="email_address">E-mail Address <span class="mandatory">*</span> </label>
-                        <input type="text" id="email_address" ngModel name="email_address" placeholder="Enter E-Mail"
-                            #email_address="ngModel" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required
-                            class="form-control" email [disabled]="viewOnly"
-                            [ngClass]="{ 'is-invalid': submitted && email_address.errors }"
-                            [ngClass]="{ 'is-valid': !email_address.errors && email_address.valid}">
-                        <div *ngIf="submitted && !email_address.valid">
-                            <div class="invalid-feedback" *ngIf="email_address.errors.required">E-Mail is
-                                required.
-                            </div>
-                            <div class="invalid-feedback" *ngIf="email_address.errors?.pattern">Invalid email</div>
-                            <!-- <div class="invalid-feedback" *ngIf="email_address.errors.email">Invalid E-Mail
-                                ID
-                            </div> -->
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="email_address">
-                        <label for="email_address">Report E-mail Address <span class="mandatory">*</span> </label>
-                        <input type="text" id="report_email" ngModel name="report_email" placeholder="Enter E-Mail"
-                            #report_email="ngModel" required class="form-control" email [disabled]="viewOnly"
-                            pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                            [ngClass]="{ 'is-invalid': submitted && report_email.errors }"
-                            [ngClass]="{ 'is-valid': !report_email.errors && report_email.valid}">
-                        <div *ngIf="submitted && !report_email.valid">
-                            <div class="invalid-feedback" *ngIf="report_email.errors.required">E-Mail is
-                                required.
-                            </div>
-                            <!-- <div class="invalid-feedback" *ngIf="report_email.errors.email">Invalid E-Mail
-                                ID
-                            </div> -->
-                            <div class="invalid-feedback" *ngIf="email_address.errors?.pattern">Invalid email</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- <div class="col-md-4">
-                    <div class="phone_number">
-                        <label for="phone">Phone Number <span class="mandatory">*</span> </label>
-                        <input type="text" id="phone" ngModel name="phone" #phone="ngModel" required
-                            class="form-control" pattern="^[0-9+\s]+"  (keypress)="allowOnlyPhoneNumbers($event)" placeholder="Enter Phone Number"
-                            [ngClass]="{ 'is-invalid': submitted && phone.errors }"
-                            [ngClass]="{ 'is-valid': !phone.errors && phone.valid}">
-                        <div *ngIf="submitted && !phone.valid">
-                            <div class="invalid-feedback" *ngIf="phone.errors.pattern">Alphabets are not
-                                allowed
-
-                            </div>
-                            <div class="invalid-feedback" *ngIf="phone.errors.required">Phone Number is
-                                required.
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-                <div class="col-md-4">
-                    <div class="phone_number">
-                        <label for="phone">Phone Number <span class="mandatory">*</span></label>
-                        <input type="text" id="phone" ngModel name="phone" #phone="ngModel" required
-                            class="form-control" pattern="^[0-9+\s]+$" maxlength="16" placeholder="Enter Phone Number"
-                            (keypress)="allowOnlyPhoneNumbers($event)" [disabled]="viewOnly"
-                            [ngClass]="{ 'is-invalid': submitted && phone.errors }"
-                            [ngClass]="{ 'is-valid': !phone.errors && phone.valid }">
-
-                        <div *ngIf="submitted && !phone.valid">
-                            <div class="invalid-feedback" *ngIf="phone.errors?.pattern">
-                                Alphabets are not allowed.
-                            </div>
-                            <div class="invalid-feedback" *ngIf="phone.errors?.required">
-                                Phone Number is required.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="site_address">
-                        <label for="site_address">Site Address <span class="mandatory">*</span> </label>
-                        <input type="text" id="site_address" ngModel name="site_address" #site_address="ngModel"
-                            required class="form-control" placeholder="Enter Site Address"
-                            [ngClass]="{ 'is-invalid': submitted && site_address.errors }" [disabled]="viewOnly"
-                            [ngClass]="{ 'is-valid': !site_address.errors && site_address.valid}">
-                        <div *ngIf="submitted && !site_address.valid">
-                            <div class="invalid-feedback" *ngIf="site_address.errors.required">Site Address
-                                is required.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="site_url">
-                        <label for="site_url">Site URL <span class="mandatory">*</span> </label>
-                        <input type="text" id="site_url" ngModel name="site_url" #site_url="ngModel" required
-                            class="form-control" placeholder="Enter Site URL" [disabled]="viewOnly"
-                            [ngClass]="{ 'is-invalid': submitted && site_url.errors }"
-                            [ngClass]="{ 'is-valid': !site_url.errors && site_url.valid}">
-                        <div *ngIf="submitted && !site_url.valid">
-                            <div class="invalid-feedback" *ngIf="site_url.errors.required">Site URL Number
-                                is required.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="booking_id_prefix">
-                        <label for="booking_id">Booking Id Prefix <span class="mandatory">*</span> </label>
-                        <input type="text" id="booking_id" ngModel name="booking_id" #booking_id="ngModel" required
-                            class="form-control" pattern="[A-Za-z\s\-.,'&]*" placeholder="Enter Booking ID"
-                            [ngClass]="{ 'is-invalid': submitted && booking_id.errors }" [disabled]="viewOnly"
-                            [ngClass]="{ 'is-valid': !booking_id.errors && booking_id.valid}">
-                        <div *ngIf="submitted && !booking_id.valid">
-                            <div class="invalid-feedback" *ngIf="booking_id.errors?.pattern">
-                                Only alphabetic characters, hyphens, periods, commas, apostrophes,
-                                and ampersands are allowed"
-                            </div>
-                            <div class="invalid-feedback" *ngIf="booking_id.errors.required">Booking Id
-                                Prefix is required.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- <div class="col-md-4">
-                    <div class="select_web_header_menu_category">
-                        <label for="web_header">Select Web Header Menu Category <span class="mandatory">*</span>
-                        </label>
-                        <ng-select [items]="webfoodcategory" id="web_header" bindValue="_id" bindLabel="rcatname"
-                            [multiple]="true" ngModel name="web_header" #web_header="ngModel" required
-                            placeholder="Select Your web_header" [searchable]="true" [clearable]="true"
-                            [ngClass]="{ 'is-invalid': submitted && web_header.errors }"
-                            [ngClass]="{ 'is-valid': !web_header.errors && web_header.valid}">
-                            <ng-template ng-option-tmp let-item="item" let-index="index">
-                                <b>{{ item.rcatname }}</b>
-                            </ng-template>
-                        </ng-select>
-                        <div *ngIf="submitted && !web_header.valid">
-                            <div class="invalid-feedback" *ngIf="web_header.errors.required">Your Web Header
-                                Menu is required.
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-                <!-- <div class="col-md-4">
-                    <div class="rating_reviews_time_slot">
-                        <div class="ratings_review m-0">
-                            <label for="web_header">Ratings & Reviews <span class="mandatory">*</span> </label>
-                            <label class="switch">
-                                <input type="checkbox" ngModel name="reviwes_rating" [(ngModel)]="review_rat"
-                                    id="reviwes_rating" #reviwes_rating="ngModel" checked>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div class="time_slot">
-                            <label for="exampleSelect">Time Slot</label>
-                            <label class="switch">
-                                <input type="checkbox" ngModel name="time_slot" id="time_slot"
-                                    [(ngModel)]="time_slot_check" (change)="change_timeSlot($event.target.checked)">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div> -->
-                <div class="col-md-4">
-                    <div class=" no_of_day_delivery" *ngIf="time_slot === 'disable'">
-                        <label for="exampleSelect">Number of delivery days <span class="mandatory">*</span>
-                        </label>
-                        <input type="number" class="form-control" [(ngModel)]="number_of_days" [min]="1"
-                            name="number_of_days" [disabled]="viewOnly">
+<div class="setting-general_setting">
+    <div class="page_title"><strong>General Settings</strong></div>
+    <form #gentrelSettingForm="ngForm" autocomplete="off">
+        <div class="row">
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="site_title">Site Title <span class="mandatory">*</span> </label>
+                    <input type="text" id="site_title" ngModel name="site_title" #site_title="ngModel" required
+                        class="form-control" placeholder="Enter Site Title" pattern="^[^\d]+$" [disabled]="viewOnly"
+                        [ngClass]="{ 'is-invalid': submitted && site_title.errors }"
+                        [ngClass]="{ 'is-valid': !site_title.errors && site_title.valid}">
+                    <div *ngIf="submitted && !site_title.valid">
+                        <div class="invalid-feedback" *ngIf="site_title.errors.required">Site Title is
+                            required.</div>
+                        <div class="invalid-feedback" *ngIf="site_title.errors.pattern">Numbers are not
+                            allowed.</div>
                     </div>
                 </div>
             </div>
-            <div class="full_page_title"><strong>Home page Meta Details</strong></div>
-            <div class="row meta mt-4">
-                <div class="col-md-6">
-                    <div class="meta_title">
-                        <label for="">Meta Title
-                            <span class="mandatory">*</span></label>
-                        <input name="meta_title" id="meta_title" class="form-control" ngModel #meta_title="ngModel"
-                            required placeholder="Enter Title" required [disabled]="viewOnly">
-                        <div *ngIf="submitted && !meta_title.valid">
-                            <div class="invalid-feedback" *ngIf="meta_title.errors?.required"> Title
-                                is
-                                required.
-                            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="email_address">E-mail Address <span class="mandatory">*</span> </label>
+                    <input type="text" id="email_address" ngModel name="email_address" placeholder="Enter E-Mail"
+                        #email_address="ngModel" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required
+                        class="form-control" email [disabled]="viewOnly"
+                        [ngClass]="{ 'is-invalid': submitted && email_address.errors }"
+                        [ngClass]="{ 'is-valid': !email_address.errors && email_address.valid}">
+                    <div *ngIf="submitted && !email_address.valid">
+                        <div class="invalid-feedback" *ngIf="email_address.errors.required">E-Mail is
+                            required.
                         </div>
+                        <div class="invalid-feedback" *ngIf="email_address.errors?.pattern">Invalid email</div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="meta_keyword">
-                        <label for="">Meta Keyword
-                            <span class="mandatory">*</span></label>
-                        <div class="tags-box">
-                            <input type="text" class="form-control" id="meta_keyword" name="meta_keyword"
-                                [(ngModel)]="metakeyname" ngModel #meta_keyword="ngModel" placeholder="#meta keyword"
-                                (keypress)="addmetamanage($event)" [disabled]="viewOnly">
-                            <ul class="tags-box-list">
-                                <li *ngFor="let item of metakeyList; let i = index">
-                                    <span>{{ item }}</span>
-                                    <i class="fa fa-times" (click)="removemetaTag(i)" *ngIf="!view"></i>
-                                </li>
-                            </ul>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="email_address">Report E-mail Address <span class="mandatory">*</span> </label>
+                    <input type="text" id="report_email" ngModel name="report_email" placeholder="Enter E-Mail"
+                        #report_email="ngModel" required class="form-control" email [disabled]="viewOnly"
+                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                        [ngClass]="{ 'is-invalid': submitted && report_email.errors }"
+                        [ngClass]="{ 'is-valid': !report_email.errors && report_email.valid}">
+                    <div *ngIf="submitted && !report_email.valid">
+                        <div class="invalid-feedback" *ngIf="report_email.errors.required">E-Mail is
+                            required.
                         </div>
-                    </div>
-
-                    <div *ngIf="submitted &&  metakeyList && metakeyList?.length == 0">
-
-                        <div class="invalid-feedback">
-                            Keyword is required.
-                        </div>
+                        <div class="invalid-feedback" *ngIf="email_address.errors?.pattern">Invalid email</div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-2">
-                    <div class="meta_description">
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="phone">Phone Number <span class="mandatory">*</span></label>
+                    <input type="text" id="phone" ngModel name="phone" #phone="ngModel" required class="form-control"
+                        pattern="^[0-9+\s]+$" maxlength="16" placeholder="Enter Phone Number"
+                        (keypress)="allowOnlyPhoneNumbers($event)" [disabled]="viewOnly"
+                        [ngClass]="{ 'is-invalid': submitted && phone.errors }"
+                        [ngClass]="{ 'is-valid': !phone.errors && phone.valid }">
 
-                        <label for="meta_description">Meta Description&nbsp;<span class="mandatory">*</span></label>
-                        <textarea class="form-control" rows="7" name="meta_description" id="meta_description" ngModel
-                            name="meta_description" placeholder="Enter Description..." #meta_description="ngModel"
-                            required [disabled]="viewOnly"></textarea>
-                        <div *ngIf="submitted && !meta_description.valid">
-                            <div class="invalid-feedback" *ngIf="meta_description.errors?.required">
-                                Meta
-                                Description is required.
-                            </div>
+                    <div *ngIf="submitted && !phone.valid">
+                        <div class="invalid-feedback" *ngIf="phone.errors?.pattern">
+                            Alphabets are not allowed.
+                        </div>
+                        <div class="invalid-feedback" *ngIf="phone.errors?.required">
+                            Phone Number is required.
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="full_page_title"><strong>Currency Settings</strong></div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="currency_code">
-                        <label for="currency_code">Currency Code <span class="mandatory">*</span> </label>
-                        <ng-select [items]="currency" id="currency_code" bindLabel="code" bindValue="code"
-                            (change)="currencyChange($event)" [multiple]="false" ngModel name="currency_code"
-                            #currency_code="ngModel" required placeholder="Select Your currency_code"
-                            [searchable]="true" [clearable]="true" [disabled]="viewOnly"
-                            [ngClass]="{ 'is-invalid': submitted && currency_code.errors }"
-                            [ngClass]="{ 'is-valid': !currency_code.errors && currency_code.valid}">
-                            <ng-template ng-option-tmp let-item="item" let-index="index">
-                                <b>{{ item.code}}</b>
-                            </ng-template>
-                        </ng-select>
-                        <div *ngIf="submitted && !currency_code.valid">
-                            <div class="invalid-feedback" *ngIf="currency_code.errors.required">Currency
-                                Code is required.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="currency_symbol">
-                        <label for="currency_symbol">Currency Symbol <span class="mandatory">*</span>
-                        </label>
-                        <input type="text" id="currency_symbol" ngModel name="currency_symbol"
-                            #currency_symbol="ngModel" required class="form-control" readonly [disabled]="viewOnly"
-                            [ngClass]="{ 'is-invalid': submitted && currency_symbol.errors }"
-                            [ngClass]="{ 'is-valid': !currency_symbol.errors && currency_symbol.valid}">
-                        <div *ngIf="submitted && !currency_symbol.valid">
-                            <div class="invalid-feedback" *ngIf="currency_symbol.errors.required">Currency
-                                Symbol is required.
-                            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="site_address">Site Address <span class="mandatory">*</span> </label>
+                    <input type="text" id="site_address" ngModel name="site_address" #site_address="ngModel" required
+                        class="form-control" placeholder="Enter Site Address"
+                        [ngClass]="{ 'is-invalid': submitted && site_address.errors }" [disabled]="viewOnly"
+                        [ngClass]="{ 'is-valid': !site_address.errors && site_address.valid}">
+                    <div *ngIf="submitted && !site_address.valid">
+                        <div class="invalid-feedback" *ngIf="site_address.errors.required">Site Address
+                            is required.
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="full_page_title"><strong>Site Settings</strong></div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="logo">
-                        <label for="logo">Logo <span class="mandatory">*</span> </label>
-                        <!-- <div class="file-chooser"> -->
-                        <!-- <span class="ste-level" *ngIf="logoName"> {{logoName}} </span>
-                        <span class="ste-level" *ngIf="!logoName"> Choose a file </span>
-                        <span class="ste-levs"> Upload </span> -->
-                        <div class="mychs">
-                            <input [disabled]="viewOnly" type="file" class="form-control" name="logo" id="logo" (change)="logoChange($event)">
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="site_url">Site URL <span class="mandatory">*</span> </label>
+                    <input type="text" id="site_url" ngModel name="site_url" #site_url="ngModel" required
+                        class="form-control" placeholder="Enter Site URL" [disabled]="viewOnly"
+                        [ngClass]="{ 'is-invalid': submitted && site_url.errors }"
+                        [ngClass]="{ 'is-valid': !site_url.errors && site_url.valid}">
+                    <div *ngIf="submitted && !site_url.valid">
+                        <div class="invalid-feedback" *ngIf="site_url.errors.required">Site URL Number
+                            is required.
                         </div>
-                        <!-- </div> -->
-                        <span class="preview" *ngIf="logoPriview">
-                            <img src={{logoPriview}} alt="logo">
-                        </span>
-                        <div class="img_center_call" *ngIf="!logoPriview">
-                            <img src="assets/image/no_images.png" alt="no_images">
-                        </div>
-                        <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
-                            *.png, *.jpg and *.jpeg image files are
-                            accepted</p>
-
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="logo">
-                        <label for="logo">Site Logo <span class="mandatory">*</span> </label>
-                        <!-- <div class="file-chooser"> -->
-                        <!-- <span class="ste-level" *ngIf="logoName"> {{logoName}} </span>
-                        <span class="ste-level" *ngIf="!logoName"> Choose a file </span>
-                        <span class="ste-levs"> Upload </span> -->
-                        <div class="mychs">
-                            <input [disabled]="viewOnly" type="file" class="form-control" name="sitelogo" id="sitelogo"
-                                (change)="siteLogoChange($event)">
-                        </div>
-                        <!-- </div> -->
-                        <span class="preview" *ngIf="sitelogoPriview">
-                            <img src={{sitelogoPriview}} alt="logo">
-                        </span>
-                        <div class="img_center_call" *ngIf="!sitelogoPriview">
-                            <img src="assets/image/no_images.png" alt="no_images">
-                        </div>
-                        <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
-                            *.png, *.jpg and *.jpeg image files are
-                            accepted</p>
-
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="favicon">
-                        <label for="favicon">Favicon <span class="mandatory">*</span> </label>
-                        <!-- <div class="file-chooser"> -->
-                        <!-- <span class="ste-level" *ngIf="faviconName"> {{faviconName}} </span> -->
-                        <!-- <span class="ste-level" *ngIf="!faviconName"> Choose a file </span> -->
-                        <!-- <span class="ste-levs"> Upload </span> -->
-                        <div class="mychs">
-                            <input [disabled]="viewOnly" type="file" class="form-control" name="favicon" id="favicon"
-                                (change)="faviconChange($event)">
-                        </div>
-
-                        <!-- </div> -->
-                        <span class="preview" *ngIf="faviconPriview">
-                            <img src={{faviconPriview}} alt="favicon">
-
-                        </span>
-                        <div class="img_center_call" *ngIf="!faviconPriview">
-                            <img src="assets/image/no_images.png" alt="no_images">
-                        </div>
-                        <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
-                            *.png, *.jpg and *.jpeg image files are
-                            accepted</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="app_icon">
-                        <label for="appicon">App Icon <span class="mandatory">*</span> </label>
-                        <!-- <div class="file-chooser"> -->
-                        <!-- <span class="ste-level" *ngIf="appIconName"> {{appIconName}} </span> -->
-                        <!-- <span class="ste-level" *ngIf="!appIconName"> Choose a file </span> -->
-                        <!-- <span class="ste-levs"> Upload </span> -->
-                        <div class="mychs">
-                            <input type="file" class="form-control" name="appicon" id="appicon"
-                                (change)="appIconChange($event)" [disabled]="viewOnly">
-                        </div>
-                        <span class="preview" *ngIf="appIconPriview">
-                            <img src={{appIconPriview}} alt="appicon">
-                        </span>
-                        <div class="img_center_call" *ngIf="!appIconPriview">
-                            <img src="assets/image/no_images.png" alt="no_images">
-                        </div>
-                        <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
-                            *.png, *.jpg and *.jpeg image files are
-                            accepted</p>
-                        <!-- </div> -->
-                    </div>
-                </div>
-
-
-                <!-- <div class="col-md-4 mt-4">
-                    <div class="web_login_img">
-                        <label for="Aditional Images">Web Login Image</label>
-                        <div class="web_login_img_control">
-                            <input type="file" class="form-control input-file" name="login"
-                                (change)="loginImageChange($event.target.files[0])">
-                            <span class="preview">
-                                <span class="" *ngIf="login_image_preview">
-                                    <img [src]="login_image_preview" onerror="this.src='assets/image/no_images.png'"
-                                        class="img-view rounded-3 mb-3">
-                                </span>
-                            </span>
-                            <div class="img_center_call">
-                                <img src="assets/image/no_images.png" alt="no_images">
-                            </div>
-                        </div>
-
-                        <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
-                            *.png, *.jpg and *.jpeg image files are
-                            accepted</p>
-                    </div>
-                </div> -->
-
-                <!-- <div class="col-md-4 mt-4">
-                    <div class="web_register_img ">
-                        <label for="Aditional Images">Web Register Image</label>
-                        <div class="web_register_img_control">
-                            <input type="file" class="form-control input-file" name="register"
-                                (change)="registerImageChange($event.target.files[0])">
-                            <span class="preview">
-                                <span class="multiple-img position-relative" *ngIf="register_image_preview">
-                                    <img [src]="register_image_preview" onerror="this.src='assets/image/no_images.png'"
-                                        class="img-view rounded-3 mb-3">
-                                </span>
-                            </span>
-                            <div class="img_center_call">
-                                <img src="assets/image/no_images.png" alt="no_images">
-                            </div>
-                        </div>
-                        <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
-                            *.png, *.jpg and *.jpeg image files are
-                            accepted</p>
-                    </div>
-                </div> -->
-
-                <div class="col-md-4 mt-4">
-                    <div class="app_icon">
-                        <label for="appicon">Footer Icon <span class="mandatory">*</span> </label>
-                        <div class="mychs">
-                            <input type="file" class="form-control" name="footericon" id="footericon"
-                                (change)="footerIconChange($event)" [disabled]="viewOnly">
-                        </div>
-                        <span class="preview" *ngIf="footerIconPreview">
-                            <img src={{footerIconPreview}} alt="footericon">
-                        </span>
-                        <div class="img_center_call" *ngIf="!footerIconPreview">
-                            <img src="assets/image/no_images.png" alt="no_images">
-                        </div>
-                        <p class="image_size_filter">Set the Footer icon image. Only <br>
-                            *.png, *.jpg and *.jpeg image files are <br>
-                            accepted</p>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mt-4">
-                    <div class="app_icon">
-                        <label for="appicon">Shipping Banner</label>
-                        <div class="mychs">
-                            <input type="file" class="form-control" name="shipicon" id="shipicon"
-                                (change)="shippingIconChange($event)" [disabled]="viewOnly">
-                        </div>
-                        <span class="preview" *ngIf="shipIconPreview">
-                            <img src={{shipIconPreview}} alt="shipicon">
-                        </span>
-                        <div class="img_center_call" *ngIf="!shipIconPreview">
-                            <img src="assets/image/no_images.png" alt="no_images">
-                        </div>
-                        <p class="image_size_filter">Set the Footer icon image. Only <br>
-                            *.png, *.jpg and *.jpeg image files are <br>
-                            accepted</p>
-                    </div>
-                </div>
-                <!-- <div class="col-md-4 mt-4">
-                    <div class="app_icon">
-                        <label for="appicon">All Category Banner</label>
-                        <div class="mychs">
-                            <input type="file" class="form-control" name="allcaticon" id="allcaticon"
-                                (change)="allcatIconChange($event)" [disabled]="viewOnly">
-                        </div>
-                        <span class="preview" *ngIf="allcatIconPreview">
-                            <img src={{allcatIconPreview}} alt="allcaticon">
-                        </span>
-                        <div class="img_center_call" *ngIf="!allcatIconPreview">
-                            <img src="assets/image/no_images.png" alt="no_images">
-                        </div>
-                        <p class="image_size_filter">Set the Footer icon image. Only <br>
-                            *.png, *.jpg and *.jpeg image files are <br>
-                            accepted</p>
-                    </div>
-                </div> -->
-
-                <!-- <div class="col-md-12 mt-4">
-                    <div class="additional_images">
-                        <label for="Aditional Images">Splash Screen</label>
-                        <div class="additional_thumbnail_limit">
-                            <input type="file" multiple class="form-control input-file" #additionlimage
-                                (change)="detectFiles($event)" [disabled]="viewOnly">
-                            <div class="ad_img_center_call" *ngIf="!isImageSelected"><img
-                                    src="assets/image/upload-file.png" alt="no_images">
-                                <div>
-                                    <h3>Drop files here or click to upload.</h3>
-                                    <p>Upload up to 7 files</p>
-                                </div>
-                            </div>
-
-                            <div class="view_img">
-                                <span class="multiple-img position-relative"
-                                    *ngFor="let url of Preview_files; let i=index">
-                                    <span class="close-icon-multi position-absolute" (click)="closeMultiImage(i,url)">
-                                        <i class="fa fa-times-circle close-icon" aria-hidden="true"></i>
-                                    </span>
-                                    <img [src]="url" onerror="this.src='assets/image/no_images.png'"
-                                        class="img-view rounded-3 mb-3">
-                                </span>
-                            </div>
-                        </div>
-
-
-                        <p class="image_size_filter">Set the product media gallery.</p>
-
-                    </div>
-
-                </div> -->
-                <div  *ngIf="!viewOnly" class="card_footer_btn mt-4">
-                    <button type="button" class="btn btn-sm " (click)="onFormSubmit(gentrelSettingForm)" [disabled]=" submitebtn">
-                        Submit
-                    </button>
                 </div>
             </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="booking_id">Booking Id Prefix <span class="mandatory">*</span> </label>
+                    <input type="text" id="booking_id" ngModel name="booking_id" #booking_id="ngModel" required
+                        class="form-control" pattern="[A-Za-z\s\-.,'&]*" placeholder="Enter Booking ID"
+                        [ngClass]="{ 'is-invalid': submitted && booking_id.errors }" [disabled]="viewOnly"
+                        [ngClass]="{ 'is-valid': !booking_id.errors && booking_id.valid}">
+                    <div *ngIf="submitted && !booking_id.valid">
+                        <div class="invalid-feedback" *ngIf="booking_id.errors?.pattern">
+                            Only alphabetic characters, hyphens, periods, commas, apostrophes,
+                            and ampersands are allowed"
+                        </div>
+                        <div class="invalid-feedback" *ngIf="booking_id.errors.required">Booking Id
+                            Prefix is required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class=" label_input" *ngIf="time_slot === 'disable'">
+                    <label for="exampleSelect">Number of delivery days <span class="mandatory">*</span>
+                    </label>
+                    <input type="number" class="form-control" [(ngModel)]="number_of_days" [min]="1"
+                        name="number_of_days" [disabled]="viewOnly">
+                </div>
+            </div>
+            <h4 class="col-12">Home page Meta Details</h4>
+            <div class="col-md-6 col-sm-12">
+                <div class="label_input">
+                    <label for="">Meta Title
+                        <span class="mandatory">*</span></label>
+                    <input name="meta_title" id="meta_title" class="form-control" ngModel #meta_title="ngModel" required
+                        placeholder="Enter Title" required [disabled]="viewOnly">
+                    <div *ngIf="submitted && !meta_title.valid">
+                        <div class="invalid-feedback" *ngIf="meta_title.errors?.required"> Title
+                            is
+                            required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="label_input">
+                    <label for="">Meta Keyword
+                        <span class="mandatory">*</span></label>
+                    <div class="tags-box">
+                        <input type="text" class="form-control" id="meta_keyword" name="meta_keyword"
+                            [(ngModel)]="metakeyname" ngModel #meta_keyword="ngModel" placeholder="#meta keyword"
+                            (keypress)="addmetamanage($event)" [disabled]="viewOnly">
+                        <ul class="tags-box-list">
+                            <li *ngFor="let item of metakeyList; let i = index">
+                                <span>{{ item }}</span>
+                                <i class="fa fa-times" (click)="removemetaTag(i)" *ngIf="!view"></i>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-        </form>
-    </div>
+                <div *ngIf="submitted &&  metakeyList && metakeyList?.length == 0">
+
+                    <div class="invalid-feedback">
+                        Keyword is required.
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="label_input">
+
+                    <label for="meta_description">Meta Description&nbsp;<span class="mandatory">*</span></label>
+                    <textarea class="form-control" rows="7" name="meta_description" id="meta_description" ngModel
+                        name="meta_description" placeholder="Enter Description..." #meta_description="ngModel" required
+                        [disabled]="viewOnly"></textarea>
+                    <div *ngIf="submitted && !meta_description.valid">
+                        <div class="invalid-feedback" *ngIf="meta_description.errors?.required">
+                            Meta
+                            Description is required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h4 class="col-12">Currency Settings</h4>
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="currency_code">Currency Code <span class="mandatory">*</span> </label>
+                    <ng-select [items]="currency" id="currency_code" bindLabel="code" bindValue="code"
+                        (change)="currencyChange($event)" [multiple]="false" ngModel name="currency_code"
+                        #currency_code="ngModel" required placeholder="Select Your currency_code" [searchable]="true"
+                        [clearable]="true" [disabled]="viewOnly"
+                        [ngClass]="{ 'is-invalid': submitted && currency_code.errors }"
+                        [ngClass]="{ 'is-valid': !currency_code.errors && currency_code.valid}">
+                        <ng-template ng-option-tmp let-item="item" let-index="index">
+                            <b>{{ item.code}}</b>
+                        </ng-template>
+                    </ng-select>
+                    <div *ngIf="submitted && !currency_code.valid">
+                        <div class="invalid-feedback" *ngIf="currency_code.errors.required">Currency
+                            Code is required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="label_input">
+                    <label for="currency_symbol">Currency Symbol <span class="mandatory">*</span>
+                    </label>
+                    <input type="text" id="currency_symbol" ngModel name="currency_symbol" #currency_symbol="ngModel"
+                        required class="form-control" readonly [disabled]="viewOnly"
+                        [ngClass]="{ 'is-invalid': submitted && currency_symbol.errors }"
+                        [ngClass]="{ 'is-valid': !currency_symbol.errors && currency_symbol.valid}">
+                    <div *ngIf="submitted && !currency_symbol.valid">
+                        <div class="invalid-feedback" *ngIf="currency_symbol.errors.required">Currency
+                            Symbol is required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h4 class="col-12">Site Settings</h4>
+            <div class="col-md-4 col-sm-12">
+                <div class="logo">
+                    <label for="logo">Logo <span class="mandatory">*</span> </label>
+                    <div class="mychs">
+                        <input [disabled]="viewOnly" type="file" class="form-control" name="logo" id="logo"
+                            (change)="logoChange($event)">
+                    </div>
+                    <span class="preview" *ngIf="logoPriview">
+                        <img src={{logoPriview}} alt="logo">
+                    </span>
+                    <div class="img_center_call" *ngIf="!logoPriview">
+                        <img src="assets/image/no_images.png" alt="no_images">
+                    </div>
+                    <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
+                        *.png, *.jpg and *.jpeg image files are
+                        accepted</p>
+
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="logo">
+                    <label for="logo">Site Logo <span class="mandatory">*</span> </label>
+                    <div class="mychs">
+                        <input [disabled]="viewOnly" type="file" class="form-control" name="sitelogo" id="sitelogo"
+                            (change)="siteLogoChange($event)">
+                    </div>
+                    <span class="preview" *ngIf="sitelogoPriview">
+                        <img src={{sitelogoPriview}} alt="logo">
+                    </span>
+                    <div class="img_center_call" *ngIf="!sitelogoPriview">
+                        <img src="assets/image/no_images.png" alt="no_images">
+                    </div>
+                    <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
+                        *.png, *.jpg and *.jpeg image files are
+                        accepted</p>
+
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="favicon">
+                    <label for="favicon">Favicon <span class="mandatory">*</span> </label>
+                    <div class="mychs">
+                        <input [disabled]="viewOnly" type="file" class="form-control" name="favicon" id="favicon"
+                            (change)="faviconChange($event)">
+                    </div>
+                    <span class="preview" *ngIf="faviconPriview">
+                        <img src={{faviconPriview}} alt="favicon">
+
+                    </span>
+                    <div class="img_center_call" *ngIf="!faviconPriview">
+                        <img src="assets/image/no_images.png" alt="no_images">
+                    </div>
+                    <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
+                        *.png, *.jpg and *.jpeg image files are
+                        accepted</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="app_icon">
+                    <label for="appicon">App Icon <span class="mandatory">*</span> </label>
+
+                    <div class="mychs">
+                        <input type="file" class="form-control" name="appicon" id="appicon"
+                            (change)="appIconChange($event)" [disabled]="viewOnly">
+                    </div>
+                    <span class="preview" *ngIf="appIconPriview">
+                        <img src={{appIconPriview}} alt="appicon">
+                    </span>
+                    <div class="img_center_call" *ngIf="!appIconPriview">
+                        <img src="assets/image/no_images.png" alt="no_images">
+                    </div>
+                    <p class="image_size_filter">Set the product thumbnail image <b>145X145</b> pixel. Only
+                        *.png, *.jpg and *.jpeg image files are
+                        accepted</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="app_icon">
+                    <label for="appicon">Footer Icon <span class="mandatory">*</span> </label>
+                    <div class="mychs">
+                        <input type="file" class="form-control" name="footericon" id="footericon"
+                            (change)="footerIconChange($event)" [disabled]="viewOnly">
+                    </div>
+                    <span class="preview" *ngIf="footerIconPreview">
+                        <img src={{footerIconPreview}} alt="footericon">
+                    </span>
+                    <div class="img_center_call" *ngIf="!footerIconPreview">
+                        <img src="assets/image/no_images.png" alt="no_images">
+                    </div>
+                    <p class="image_size_filter">Set the Footer icon image. Only <br>
+                        *.png, *.jpg and *.jpeg image files are <br>
+                        accepted</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="app_icon">
+                    <label for="appicon">Shipping Banner</label>
+                    <div class="mychs">
+                        <input type="file" class="form-control" name="shipicon" id="shipicon"
+                            (change)="shippingIconChange($event)" [disabled]="viewOnly">
+                    </div>
+                    <span class="preview" *ngIf="shipIconPreview">
+                        <img src={{shipIconPreview}} alt="shipicon">
+                    </span>
+                    <div class="img_center_call" *ngIf="!shipIconPreview">
+                        <img src="assets/image/no_images.png" alt="no_images">
+                    </div>
+                    <p class="image_size_filter">Set the Footer icon image. Only <br>
+                        *.png, *.jpg and *.jpeg image files are <br>
+                        accepted</p>
+                </div>
+            </div>
+            <div *ngIf="!viewOnly" class="page_footer mb-3 p-3">
+                <button type="submit" class=" bg_green" (click)="onFormSubmit(gentrelSettingForm)"
+                    [disabled]=" submitebtn"> Submit
+                    <div class="icon">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
-
-<!-- <div class="col-md-4">
-    <div class="group-control">
-        <label for="search_radius">Search Radius in Km <span class="mandatory">*</span>
-        </label>
-        <input type="number" id="search_radius" ngModel name="search_radius" #search_radius="ngModel" required
-            class="form-control" placeholder="Enter Site URL"
-            [ngClass]="{ 'is-invalid': submitted && search_radius.errors }"
-            [ngClass]="{ 'is-valid': !search_radius.errors && search_radius.valid}">
-        <div *ngIf="submitebtn && !search_radius.valid">
-            <div class="invalid-feedback" *ngIf="search_radius.errors.required">Search Radius is required.
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- <div class="col-md-4">
-    <div class="group-control">
-        <label for="admin_order">Admin order time out (Minutes) <span class="mandatory">*</span> </label>
-        <input type="number" id="admin_order" ngModel name="admin_order" #admin_order="ngModel" required
-            class="form-control" placeholder="Enter Site URL"
-            [ngClass]="{ 'is-invalid': submitebtn && admin_order.errors }"
-            [ngClass]="{ 'is-valid': !admin_order.errors && admin_order.valid}">
-        <div *ngIf="submitebtn && !admin_order.valid">
-            <div class="invalid-feedback" *ngIf="admin_order.errors.required">Admin order is
-                required.
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- <div class="col-md-4">
-    <div class="group-control">
-        <label for="drivers_order">Driver's order time out (Minutes) <span class="mandatory">*</span> </label>
-        <input type="number" id="drivers_order" ngModel name="drivers_order" #drivers_order="ngModel" required
-            class="form-control" placeholder="Enter Site URL"
-            [ngClass]="{ 'is-invalid': submitebtn && drivers_order.errors }"
-            [ngClass]="{ 'is-valid': !drivers_order.errors && drivers_order.valid}">
-        <div *ngIf="submitebtn && !drivers_order.valid">
-            <div class="invalid-feedback" *ngIf="drivers_order.errors.required">Driver's order is required.
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- <div class="col-md-4">
-    <div class="group-control">
-        <label for="billing_cycle">Billing cycle <span class="mandatory">*</span> </label>
-        <input type="number" id="billing_cycle" ngModel name="billing_cycle" #billing_cycle="ngModel" required
-            class="form-control" placeholder="Enter Site URL"
-            [ngClass]="{ 'is-invalid': submitebtn && billing_cycle.errors }"
-            [ngClass]="{ 'is-valid': !billing_cycle.errors && billing_cycle.valid}">
-        <div *ngIf="submitebtn && !billing_cycle.valid">
-            <div class="invalid-feedback" *ngIf="billing_cycle.errors.required">Billing cycle is required.
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<!-- <div class="col-md-4">
-    <div class="group-control">
-        <label for="mobile_header">Select Mobile Header Menu Category <span class="mandatory">*</span> </label>
-        <ng-select [items]="mobilefoodcategory" id="mobile_header" bindValue="_id" bindLabel="rcatname"
-            [multiple]="true" ngModel name="mobile_header" #mobile_header="ngModel" required
-            placeholder="Select Your mobile_header" [searchable]="true" [clearable]="true"
-            [ngClass]="{ 'is-invalid': submitebtn && mobile_header.errors }"
-            [ngClass]="{ 'is-valid': !mobile_header.errors && mobile_header.valid}">
-            <ng-template ng-option-tmp let-item="item" let-index="index">
-                <b>{{ item.rcatname }}</b>
-            </ng-template>
-        </ng-select>
-        <div *ngIf="submitebtn && !mobile_header.valid">
-            <div class="invalid-feedback" *ngIf="mobile_header.errors.required">Your Mobile Header Menu is required.
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<!-- <div class="col-md-6">
-    <label>Site Publish</label>
-    <label class="checkbox checkbox-custom-alt ">
-        <input name="site_publish" type="radio" ngModel #site_publish="ngModel" value="1" required><i></i> Production
-    </label>
-    <label class="checkbox checkbox-custom-alt ">
-        <input name="site_publish" type="radio" ngModel #site_publish="ngModel" value="0" required><i></i> Development
-    </label>
-</div> -->
-<!-- <div class="col-md-4 date_format">
-    <label>Date Format</label>
-    <label class="checkbox checkbox-custom-alt " *ngFor="let item of date_format">
-        <input name="date_format" type="radio" ngModel #date_format="ngModel" value="{{item}}"
-            required><i></i>{{dateFormat | date:item}}
-    </label>
-</div>
-<div class="col-md-4 time_format">
-    <label>Time Format</label>
-    <label class="checkbox checkbox-custom-alt " *ngFor="let item of time_format">
-        <input name="time_format" type="radio" ngModel #time_format="ngModel" value="{{item}}"
-            required><i></i>{{dateFormat | date:item}}
-    </label>
-</div> -->
-
-<!-- <div class="col-md-6">
-    <label>ETA Buffer Time <span class="mandatory">*</span>
-        <input type="number" name="eta_time" id="eta_time" ngModel #eta_time="ngModel" required>Minutes
-    </label>
-</div> -->
-
-<!-- <div class="col-md-12">
-    <div class="group-control">
-        <label for="footer_logo">Footer Logo <span class="mandatory">*</span> </label>
-        <div class="file-chooser">
-            <span class="ste-level" *ngIf="footerLogoName">{{footerLogoName}} </span>
-            <span class="ste-level" *ngIf="!footerLogoName">Choose a file </span>
-            <span class="ste-levs"> Upload </span>
-            <div class="mychs">
-                <input type="file" class="form-control" name="footer_logo" id="footer_logo"
-                    (change)="footerLogoChange($event)">
-            </div>
-        </div>
-        <span class="setting-image-tag">
-            <img src={{footerLogoPriview}} alt="footer_logo">
-        </span>
-    </div>
-</div> -->

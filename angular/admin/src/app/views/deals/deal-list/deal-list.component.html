@@ -1,8 +1,11 @@
-<app-common-table [settings]="settings" [source]="source" [count]="count" [itemsPerPage]="limit"
-            [tablename]="'Deal List'" [add_btn]="add_btn" [addBtnUrl]="addBtnUrl" [addBtnName]="addBtnName"
-            [editUrl]="editUrl" [viewUrl]="viewUrl" (onDeleteChange)="onDeleteChange($event)"
-            (onitemsPerPageChange)="onitemsPerPageChange($event)" (onPageChange)="onPageChange($event)"
-            [bulk_action]="bulk_action" [deleteApis]="deleteApis" (onheaderCardChange)="onheaderCardChange($event)"
-            (onSearchChange)="onSearchChange($event)" [filter_action]="filter_action"
-            [filter_action_list]="filter_action_list" (onFilterAction)="onFilterAction($event)">
-        </app-common-table>
+<div class="drivers-diver_list_page global_search">
+
+    <app-common-table [settings]="settings" [source]="source" [count]="count" [itemsPerPage]="limit"
+        [tablename]="'Driver List'" [add_btn]="add_btn" [addBtnUrl]="addBtnUrl" [addBtnName]="addBtnName"
+        [editUrl]="editUrl" [viewUrl]="viewUrl" (onDeleteChange)="onDeleteChange($event)"
+        (onitemsPerPageChange)="onitemsPerPageChange($event)" (onPageChange)="onPageChange($event)"
+        [bulk_action]="bulk_action" [deleteApis]="deleteApis" (onheaderCardChange)="onheaderCardChange($event)"
+        (onSearchChange)="onSearchChange($event)" [filter_action]="filter_action"
+        [filter_action_list]="filter_action_list" (onFilterAction)="onFilterAction($event)">
+    </app-common-table>
+</div>

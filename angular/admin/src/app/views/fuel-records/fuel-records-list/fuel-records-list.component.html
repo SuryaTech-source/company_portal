@@ -1,125 +1,192 @@
-<div class="container mt-5 report-container">
-  <div class="d-flex justify-content-between align-items-center my-3">
-    <h5 class="mb-0">Fuel Records Report</h5>
-           <button class="btn btn-sm btn-success" (click)="openModal(fuelForm)">➕ Add Fuel</button>
+<div class="fuel_records_reports_page">
+  <div class="title_sec">
+    <h5 class="page_title">Fuel Records Report</h5>
+    <button class="btn btn-sm btn-success" (click)="openModal(fuelForm)">➕ Add Fuel</button>
+  </div>
+  <div class="d-flex gap-2 align-items-center justify-content-end mb-3">
+    <input type="text" class="" placeholder="🚐 Vehicle No." [(ngModel)]="searchVehicle" />
+    <input type="text" class="" placeholder="👨 Driver" [(ngModel)]="searchDriver" />
+    <input type="text" class="" placeholder="📑 Contract ID" [(ngModel)]="searchContract" />
+    <input type="date" class="date_input" [(ngModel)]="startDate" />
+    <input type="date" class="date_input" [(ngModel)]="endDate" />
+    <select class="page_filter" [(ngModel)]="sortBy">
+      <option value="">Sort ⬍</option>
+      <option value="dateAsc">Date ↑</option>
+      <option value="dateDesc">Date ↓</option>
+      <option value="vehicle">Vehicle</option>
+      <option value="driver">Driver</option>
+      <option value="mileageAsc">Mileage ↑</option>
+      <option value="mileageDesc">Mileage ↓</option>
+    </select>
 
-    <div class="d-flex gap-2 align-items-center">
-      <input type="text" class="form-control form-control-sm" placeholder="🚐 Vehicle No."
-             [(ngModel)]="searchVehicle" />
-      <input type="text" class="form-control form-control-sm" placeholder="👨 Driver"
-             [(ngModel)]="searchDriver" />
-      <input type="text" class="form-control form-control-sm" placeholder="📑 Contract ID"
-             [(ngModel)]="searchContract" />
-      <input type="date" class="form-control form-control-sm" [(ngModel)]="startDate" />
-      <input type="date" class="form-control form-control-sm" [(ngModel)]="endDate" />
-      <select class="form-select form-select-sm" [(ngModel)]="sortBy">
-        <option value="">Sort ⬍</option>
-        <option value="dateAsc">Date ↑</option>
-        <option value="dateDesc">Date ↓</option>
-        <option value="vehicle">Vehicle</option>
-        <option value="driver">Driver</option>
-        <option value="mileageAsc">Mileage ↑</option>
-        <option value="mileageDesc">Mileage ↓</option>
-      </select>
-      <button class="btn btn-sm btn-primary" (click)="downloadPDF()">
-        <i class="bi bi-file-earmark-arrow-down"></i> PDF
+    <button class="export_btn" (click)="downloadPDF()">
+      <span class="folderContainer">
+        <svg class="fileBack" width="146" height="113" viewBox="0 0 146 113" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M0 4C0 1.79086 1.79086 0 4 0H50.3802C51.8285 0 53.2056 0.627965 54.1553 1.72142L64.3303 13.4371C65.2799 14.5306 66.657 15.1585 68.1053 15.1585H141.509C143.718 15.1585 145.509 16.9494 145.509 19.1585V109C145.509 111.209 143.718 113 141.509 113H3.99999C1.79085 113 0 111.209 0 109V4Z"
+            fill="url(#paint0_linear_117_4)"></path>
+          <defs>
+            <linearGradient id="paint0_linear_117_4" x1="0" y1="0" x2="72.93" y2="95.4804"
+              gradientUnits="userSpaceOnUse">
+              <stop stop-color="#8F88C2"></stop>
+              <stop offset="1" stop-color="#5C52A2"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+        <svg class="filePage" width="88" height="99" viewBox="0 0 88 99" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="88" height="99" fill="url(#paint0_linear_117_6)"></rect>
+          <defs>
+            <linearGradient id="paint0_linear_117_6" x1="0" y1="0" x2="81" y2="160.5" gradientUnits="userSpaceOnUse">
+              <stop stop-color="white"></stop>
+              <stop offset="1" stop-color="#686868"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <svg class="fileFront" width="160" height="79" viewBox="0 0 160 79" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M0.29306 12.2478C0.133905 9.38186 2.41499 6.97059 5.28537 6.97059H30.419H58.1902C59.5751 6.97059 60.9288 6.55982 62.0802 5.79025L68.977 1.18034C70.1283 0.410771 71.482 0 72.8669 0H77H155.462C157.87 0 159.733 2.1129 159.43 4.50232L150.443 75.5023C150.19 77.5013 148.489 79 146.474 79H7.78403C5.66106 79 3.9079 77.3415 3.79019 75.2218L0.29306 12.2478Z"
+            fill="url(#paint0_linear_117_5)"></path>
+          <defs>
+            <linearGradient id="paint0_linear_117_5" x1="38.7619" y1="8.71323" x2="66.9106" y2="82.8317"
+              gradientUnits="userSpaceOnUse">
+              <stop stop-color="#C3BBFF"></stop>
+              <stop offset="1" stop-color="#51469A"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <p class="text">Download as PDF</p>
+    </button>
+  </div>
+</div>
+
+<div #fuelTable class="table_section">
+  <table class="table table-bordered table-striped custom-table">
+    <thead>
+      <tr>
+        <th>Vehicle No.</th>
+        <th>Driver Name</th>
+        <th>Contract ID</th>
+        <th>Start Odometer</th>
+        <th>End Odometer</th>
+        <th>Previous Date</th>
+        <th>Amount Paid</th>
+        <th>Issued By</th>
+        <th>Fuel Consumed (L)</th>
+        <th>Mileage (KM/L)</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of filteredRecords">
+        <td>{{ row.vehicleNo }}</td>
+        <td>{{ row.driverName }}</td>
+        <td>{{ row.contractId }}</td>
+        <td>{{ row.startOdometer }}</td>
+        <td>{{ row.endOdometer }}</td>
+        <td>{{ row.prevDate | date:'dd/MM/yyyy' }}</td>
+        <td>{{ row.amountPaid | currency : 'INR':'symbol':'1.0-0' }}</td>
+        <td>{{ row.issuedBy }}</td>
+        <td>{{ row.fuelConsumed }}</td>
+        <td>{{ calcMileage(row) | number:'1.1-2' }}</td>
+        <td>
+          <button class="btn btn-sm btn-warning" (click)="editFuel(row)">✏️ Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #fuelForm>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editingFuelId ? 'Edit Fuel Record' : 'Add Fuel Record' }}</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalRef?.hide()"></button>
+  </div>
+  <div class="modal-body">
+    <form class="row">
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Vehicle</label>
+          <select class="form-select" [(ngModel)]="newFuel.vehicleId" name="vehicleId" [disabled]="editingFuelId"
+            required>
+            <option *ngFor="let v of vehicles" [value]="v._id">{{ v.registrationNo }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Driver</label>
+          <select class="form-select" [(ngModel)]="newFuel.driverId" name="driverId" [disabled]="editingFuelId"
+            required>
+            <option *ngFor="let d of drivers" [value]="d._id">{{ d.fullName }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Contract ID</label>
+          <input type="text" class="form-control" [(ngModel)]="newFuel.contractId" name="contractId"
+            [disabled]="editingFuelId" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Start Odometer</label>
+          <input type="number" class="form-control" [(ngModel)]="newFuel.startOdometer" name="startOdometer"
+            [disabled]="editingFuelId" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>End Odometer</label>
+          <input type="number" class="form-control" [(ngModel)]="newFuel.endOdometer" name="endOdometer" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Previous Date</label>
+          <input type="date" class="form-control" [(ngModel)]="newFuel.prevDate" name="prevDate" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Amount Paid</label>
+          <input type="number" class="form-control" [(ngModel)]="newFuel.amountPaid" name="amountPaid" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Issued By</label>
+          <input type="text" class="form-control" [(ngModel)]="newFuel.issuedBy" name="issuedBy" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="label_input">
+          <label>Fuel Consumed (L)</label>
+          <input type="number" class="form-control" [(ngModel)]="newFuel.fuelConsumed" name="fuelConsumed" />
+        </div>
+      </div>
+    </form>
+    <div class="page_footer mb-3 p-3">
+      <button type="button" (click)="modalRef?.hide()" class="close_btn">
+        Cancel
+      </button>
+      <button type="submit" class=" bg_green" (click)="saveFuel()"> {{ editingFuelId ? 'Update' : 'Save' }}
+        <div class="icon">
+          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+              fill="currentColor"></path>
+          </svg>
+        </div>
       </button>
     </div>
   </div>
 
-  <div #fuelTable>
-    <table class="table table-bordered table-striped custom-table">
-      <thead>
-        <tr>
-          <th>Vehicle No.</th>
-          <th>Driver Name</th>
-          <th>Contract ID</th>
-          <th>Start Odometer</th>
-          <th>End Odometer</th>
-          <th>Previous Date</th>
-          <th>Amount Paid</th>
-          <th>Issued By</th>
-          <th>Fuel Consumed (L)</th>
-          <th>Mileage (KM/L)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let row of filteredRecords">
-          <td>{{ row.vehicleNo }}</td>
-          <td>{{ row.driverName }}</td>
-          <td>{{ row.contractId }}</td>
-          <td>{{ row.startOdometer }}</td>
-          <td>{{ row.endOdometer }}</td>
-          <td>{{ row.prevDate | date:'dd/MM/yyyy' }}</td>
-          <td>{{ row.amountPaid | currency : 'INR':'symbol':'1.0-0' }}</td>
-          <td>{{ row.issuedBy }}</td>
-          <td>{{ row.fuelConsumed }}</td>
-          <td>{{ calcMileage(row) | number:'1.1-2' }}</td>
-          <td>
-            <button class="btn btn-sm btn-warning" (click)="editFuel(row)">✏️ Edit</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 
-  <ng-template #fuelForm>
-    <div class="modal-header">
-      <h5 class="modal-title">{{ editingFuelId ? 'Edit Fuel Record' : 'Add Fuel Record' }}</h5>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modalRef?.hide()"></button>
-    </div>
-    <div class="modal-body">
-      <form>
-        <div class="row">
-         <div class="col-md-6">
-  <label>Vehicle</label>
-  <select class="form-select" [(ngModel)]="newFuel.vehicleId" name="vehicleId" [disabled]="editingFuelId" required>
-    <option *ngFor="let v of vehicles" [value]="v._id">{{ v.registrationNo }}</option>
-  </select>
-</div>
-
-<div class="col-md-6">
-  <label>Driver</label>
-  <select class="form-select" [(ngModel)]="newFuel.driverId" name="driverId" [disabled]="editingFuelId" required>
-    <option *ngFor="let d of drivers" [value]="d._id">{{ d.fullName }}</option>
-  </select>
-</div>
-
-          <div class="col-md-6">
-            <label>Contract ID</label>
-            <input type="text" class="form-control" [(ngModel)]="newFuel.contractId" name="contractId" [disabled]="editingFuelId" />
-          </div>
-          <div class="col-md-6">
-            <label>Start Odometer</label>
-            <input type="number" class="form-control" [(ngModel)]="newFuel.startOdometer" name="startOdometer" [disabled]="editingFuelId" />
-          </div>
-          <div class="col-md-6">
-            <label>End Odometer</label>
-            <input type="number" class="form-control" [(ngModel)]="newFuel.endOdometer" name="endOdometer" />
-          </div>
-          <div class="col-md-6">
-            <label>Previous Date</label>
-            <input type="date" class="form-control" [(ngModel)]="newFuel.prevDate" name="prevDate" />
-          </div>
-          <div class="col-md-6">
-            <label>Amount Paid</label>
-            <input type="number" class="form-control" [(ngModel)]="newFuel.amountPaid" name="amountPaid" />
-          </div>
-          <div class="col-md-6">
-            <label>Issued By</label>
-            <input type="text" class="form-control" [(ngModel)]="newFuel.issuedBy" name="issuedBy" />
-          </div>
-          <div class="col-md-6">
-            <label>Fuel Consumed (L)</label>
-            <input type="number" class="form-control" [(ngModel)]="newFuel.fuelConsumed" name="fuelConsumed" />
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="modalRef?.hide()">Cancel</button>
-      <button class="btn btn-primary" (click)="saveFuel()">{{ editingFuelId ? 'Update' : 'Save' }}</button>
-    </div>
-  </ng-template>
-</div>
+</ng-template>
