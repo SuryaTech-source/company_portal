@@ -8,25 +8,5 @@
       "source": "/admin",
       "destination": "/admin/index.html"
     }
-  ],
-  "headers": [
-    {
-      "source": "/admin/(.*)\\.(js|mjs)",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript"
-        }
-      ]
-    },
-    {
-      "source": "/admin/(.*)\\.(css)",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/css"
-        }
-      ]
-    }
   ]
 }
