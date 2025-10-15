@@ -1,4 +1,7 @@
 "use strict";
+
+const { log } = require("async");
+
 module.exports = function () {
   var db = require("../../controller/adaptor/mongodb.js");
   var mongoose = require("mongoose");
@@ -60,37 +63,62 @@ module.exports = function () {
 //   };
 controller.saveAttendance = async function (req, res) {
   try {
-    const body = req.body;
-    console.log(body, "body");
-    
-    if (!body.employee || !body.date || !body.status) {
+    const { employee, date, status, remarks = "" } = req.body;
+    console.log(req.body, "body");
+
+    if (!employee || !date || !status) {
       return res.send({ status: false, message: "Missing required fields" });
     }
 
-    const data = {
-      employee: new mongoose.Types.ObjectId(body.employee),
-      date: new Date(body.date),
-      status: body.status,
-      remarks: body.remarks || "",
-    };
+    const employeeId = new mongoose.Types.ObjectId(employee);
+    const targetDate = new Date(date);
 
-    let result;
-    if (body._id) {
-      result = await db.UpdateDocument("attendance", { _id: body._id }, data);
-    } else {
-      result = await db.InsertDocument("attendance", data);
+    // Check if attendance document exists for employee
+    let existingAttendance = await db.GetOneDocument("attendance", { employee: employeeId }, {}, {});
+    console.log(existingAttendance, "existingAttendance");
+    
+    if (!existingAttendance.status) {
+      // Create new document for this employee
+      const newDoc = {
+        employee: employeeId,
+        records: [{ date: targetDate, status, remarks }],
+      };
+      const result = await db.InsertDocument("attendance", newDoc);
+      return res.send({ status: true, message: "Attendance created successfully", data: result });
     }
 
-    return res.send({
-      status: true,
-      message: body._id ? "Attendance updated" : "Attendance saved",
-      data: result,
-    });
+    // If it exists, update or replace record for same date
+    const recordExists = existingAttendance.doc.records.some(
+      (r) => r.date.toISOString().slice(0, 10) === targetDate.toISOString().slice(0, 10)
+    );
+
+    let updateQuery;
+    if (recordExists) {
+      // Replace record for same date
+      updateQuery = {
+        $set: {
+          "records.$[elem].status": status,
+          "records.$[elem].remarks": remarks,
+        },
+      };
+      const options = {
+        arrayFilters: [{ "elem.date": targetDate }],
+        new: true,
+      };
+      await db.UpdateDocumentWithOptions("attendance", { employee: employeeId }, updateQuery, options);
+      return res.send({ status: true, message: "Attendance updated successfully" });
+    } else {
+      // Push new record for new date
+      await db.UpdateDocument("attendance", { employee: employeeId }, { $push: { records: { date: targetDate, status, remarks } } });
+      return res.send({ status: true, message: "Attendance added successfully" });
+    }
+
   } catch (err) {
     console.log("ERROR saveAttendance", err);
     return res.send({ status: false, message: "Error saving attendance" });
   }
 };
+
   
 /**
    * @route POST /attendance/list
@@ -235,7 +263,7 @@ controller.bulkMarkAttendance = async function (req, res) {
     }));
 
     // Run $pull pass (remove duplicates)
-    await db.BulkWriteDocument("attendance", operations);
+    await db.BulkWrite("attendance", operations);
 
     // Run $push pass (insert new record)
     const pushOps = employeeIds.map(empId => ({
@@ -249,7 +277,7 @@ controller.bulkMarkAttendance = async function (req, res) {
       }
     }));
 
-    await db.BulkWriteDocument("attendance", pushOps);
+    await db.BulkWrite("attendance", pushOps);
 
     return res.send({ status: true, message: "Bulk attendance updated successfully" });
   } catch (err) {

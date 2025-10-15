@@ -227,7 +227,7 @@ loadAttendanceByDate() {
 updateAttendance(row: any) {
 
   const payload = {
-    employee: row._id,
+    employee: row.employeeRefId,
     date: this.selectedDate,
     status: row.status,
     remarks: row.remarks,
