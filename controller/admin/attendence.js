@@ -61,7 +61,8 @@ module.exports = function () {
 controller.saveAttendance = async function (req, res) {
   try {
     const body = req.body;
-
+    console.log(body, "body");
+    
     if (!body.employee || !body.date || !body.status) {
       return res.send({ status: false, message: "Missing required fields" });
     }

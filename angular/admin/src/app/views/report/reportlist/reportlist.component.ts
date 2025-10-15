@@ -225,8 +225,9 @@ loadAttendanceByDate() {
 
 // mark/update single attendance
 updateAttendance(row: any) {
+
   const payload = {
-    employeeId: row.employeeId,
+    employee: row._id,
     date: this.selectedDate,
     status: row.status,
     remarks: row.remarks,
