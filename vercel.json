@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "dist/admin/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "dist/site/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/admin/(.*)",
+      "dest": "/dist/admin/$1"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/app.js"
+    },
+    {
+      "src": "/uploads/(.*)",
+      "dest": "/app.js"
+    },
+    {
+      "src": "/socket.io/(.*)",
+      "dest": "/app.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/site/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
