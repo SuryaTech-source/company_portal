@@ -22,7 +22,8 @@ var express = require('express') // $ npm install express
 var app = express(); // Initializing ExpressJS
 var server = require('http').createServer(app);
 // const session = require('express-session')
-
+const fs = require('fs');
+// const path = require('path');
 // var io = require('socket.io')(server);
 const io = require('socket.io')(server, {
     cors: {
@@ -32,6 +33,22 @@ const io = require('socket.io')(server, {
     allowEIO3: true
 });
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+const languagesDir = path.join(__dirname, 'uploads/languages');
+
+// Create uploads directory
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('✅ Created uploads directory');
+}
+
+// Create languages subdirectory
+if (!fs.existsSync(languagesDir)) {
+    fs.mkdirSync(languagesDir, { recursive: true });
+    console.log('✅ Created uploads/languages directory');
+}
+
 
 /** Global Configuration*/
 global.GLOBAL_CONFIG = CONFIG.GLOBAL;
@@ -39,8 +56,25 @@ mongoose.Promise = global.Promise;
 
 /** Middleware Configuration */
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
-i18n.configure({ locales: ['th', 'en'], defaultLocale: 'en', autoReload: true, directory: __dirname + '/uploads/languages', syncFiles: true });
+// i18n.configure({ locales: ['th', 'en'], defaultLocale: 'en', autoReload: true, directory: __dirname + '/uploads/languages', syncFiles: true });
 
+// Updated i18n configuration with error handling
+try {
+    i18n.configure({ 
+        locales: ['th', 'en'], 
+        defaultLocale: 'en', 
+        autoReload: true, 
+        directory: path.join(__dirname, 'uploads/languages'),
+        syncFiles: true 
+    });
+} catch (error) {
+    console.warn('⚠️ i18n configuration warning:', error.message);
+    // Fallback configuration without directory
+    i18n.configure({ 
+        locales: ['th', 'en'], 
+        defaultLocale: 'en'
+    });
+}
 
 app.disable('x-powered-by');
 app.use(bodyParser.json({ limit: '100mb' }));
@@ -120,7 +154,7 @@ mongoose.connect(CONFIG.DB_URL, function (error) {
 
 (async () => {
   try {
-    const conn = await mongoose.connect("mongodb://127.0.0.1:27017/pillais");
+    const conn = await mongoose.connect("mongodb://127.0.0.1:27017/live-pillais-25j24");
     console.log("✅ Connected to MongoDB:", conn.connection.host);
   } catch (err) {
     console.error("❌ Connection failed:", err.message);

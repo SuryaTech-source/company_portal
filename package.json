@@ -6,7 +6,8 @@
   "license": "ISC",
   "scripts": {
     "start": "nodemon app.js",
-    "test": "mocha"
+    "test": "mocha",
+    "build": "npm install --f"
   },
   "dependencies": {
     "angular-multiple-select": "^1.1.3",
