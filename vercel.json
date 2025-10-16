@@ -2,14 +2,44 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.js",
+      "src": "app.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "dist/admin/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "dist/site/**", 
+      "use": "@vercel/static"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/admin/(.*)",
+      "destination": "/dist/admin/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/app.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dist/site/$1"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/api"
+      "src": "/admin$",
+      "dest": "/dist/admin/index.html"
+    },
+    {
+      "src": "/admin/(?!.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|map)).*",
+      "dest": "/dist/admin/index.html"
+    },
+    {
+      "src": "/((?!api|admin|dist).*)",
+      "dest": "/app.js"
     }
   ]
 }
