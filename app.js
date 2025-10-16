@@ -1,5 +1,5 @@
 //"use strict";
-
+require('dotenv').config();
 /** Dependency Injection */
 var express = require('express') // $ npm install express
     , path = require('path') // Node In-Build Module
@@ -23,6 +23,8 @@ var app = express(); // Initializing ExpressJS
 var server = require('http').createServer(app);
 // const session = require('express-session')
 const fs = require('fs');
+
+
 // const path = require('path');
 // var io = require('socket.io')(server);
 const io = require('socket.io')(server, {
@@ -152,9 +154,22 @@ mongoose.connect(CONFIG.DB_URL, function (error) {
 //     console.error('Error in MongoDb connection: ' + error);
 // });
 
+// (async () => {
+//   try {
+//     const conn = await mongoose.connect("mongodb://127.0.0.1:27017/live-pillais-25j24");
+//     console.log("✅ Connected to MongoDB:", conn.connection.host);
+//   } catch (err) {
+//     console.error("❌ Connection failed:", err.message);
+//   }
+// })();
+
+const mongoUrl = process.env.MONGODB_URI || 
+  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER}/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`;
+
+// Update your connection code
 (async () => {
   try {
-    const conn = await mongoose.connect("mongodb://127.0.0.1:27017/live-pillais-25j24");
+    const conn = await mongoose.connect(mongoUrl);
     console.log("✅ Connected to MongoDB:", conn.connection.host);
   } catch (err) {
     console.error("❌ Connection failed:", err.message);

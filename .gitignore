@@ -8,3 +8,4 @@ uploads
 dist
 db
 uploads_old
+.env
