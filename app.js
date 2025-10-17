@@ -29,7 +29,7 @@ const fs = require('fs');
 // var io = require('socket.io')(server);
 const io = require('socket.io')(server, {
     cors: {
-        origin: ["http://localhost:4200", "http://localhost:4201", 'http://localhost:4000', '*'],
+        origin: ["http://localhost:4200", "http://localhost:4201", 'http://localhost:4000',"https://companyportal-production.up.railway.app", '*'],
         credentials: true
     },
     allowEIO3: true
@@ -99,7 +99,7 @@ app.use(compression()); //use compression middleware to compress and serve the s
 app.use(function (req, res, next) {
     console.log('orginal urlll------', req.originalUrl);
     res.header('Access-Control-Allow-Credentials', true);
-    const allowedOrigins = ['*', 'http://localhost:4201', 'http://localhost:4000', 'http://localhost:4200'];
+    const allowedOrigins = ['*', 'http://localhost:4201', 'http://localhost:4000', 'http://localhost:4200',"https://companyportal-production.up.railway.app"];
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
