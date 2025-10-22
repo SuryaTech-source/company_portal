@@ -149,10 +149,10 @@ mongoose.connect(CONFIG.DB_URL, function (error) {
 
 /** MongoDB Connection */
 
-mongoose.connect(CONFIG.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 10000 });
-mongoose.connection.on('error', function (error) {
-    console.error('Error in MongoDb connection: ' + error);
-});
+// mongoose.connect(CONFIG.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 10000 });
+// mongoose.connection.on('error', function (error) {
+//     console.error('Error in MongoDb connection: ' + error);
+// });
 
 // (async () => {
 //   try {
