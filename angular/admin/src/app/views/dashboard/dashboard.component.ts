@@ -103,6 +103,12 @@ export class DashboardComponent implements OnInit {
   // years: number[] = [];
   // selectedMonth: number;
   // selectedYear: number;
+fuelChartOptions: Partial<ApexOptions>;
+fuelChartType: 'daily' | 'monthly' | 'yearly' = 'monthly';
+fuelStartDate: string;
+fuelEndDate: string;
+
+
 
   public chartOptionschart: Partial<ApexOptions> = {
     series: [
@@ -610,6 +616,118 @@ export class DashboardComponent implements OnInit {
     { backgroundColor: Colors.getColors().themeColor7 },
   ];
 
+
+ loadFuelChart(): void {
+    const payload = {
+      type: this.fuelChartType,
+      startDate: this.fuelStartDate,
+      endDate: this.fuelEndDate
+    };
+
+    this.apiService
+      .CommonApi(Apiconfig.fuelUsageAnalytics.method, Apiconfig.fuelUsageAnalytics.url, payload)
+      .subscribe((res: any) => {
+        if (res.status && res.data?.length) {
+          const labels = res.data.map((item: any) => item.label);
+          const fuelData = res.data.map((item: any) => item.totalFuelConsumed);
+          const amountData = res.data.map((item: any) => item.totalAmountPaid);
+
+          this.setFuelChart(labels, fuelData, amountData);
+        } else {
+          this.fuelChartOptions = { series: [] };
+        }
+      });
+  }
+
+  setFuelChart(labels: string[], fuel: number[], amount: number[]): void {
+    this.fuelChartOptions = {
+      series: [
+        {
+          name: 'Fuel Consumed (Litres)',
+          type: 'column',
+          data: fuel
+        },
+        {
+          name: 'Amount Paid (₹)',
+          type: 'line',
+          data: amount
+        }
+      ],
+      chart: {
+        height: 380,
+        type: 'line',
+        toolbar: {
+          show: true
+        },
+        zoom: {
+          enabled: true
+        }
+      },
+      stroke: {
+        width: [0, 3],
+        curve: 'smooth'
+      },
+      dataLabels: {
+        enabled: true,
+        enabledOnSeries: [1],
+        style: {
+          fontSize: '12px'
+        }
+      },
+      fill: {
+        type: ['solid', 'gradient'],
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.6,
+          opacityTo: 0.9
+        }
+      },
+      colors: ['#2E93fA', '#FF4560'],
+      xaxis: {
+        categories: labels,
+        title: { text: 'Period' },
+        labels: {
+          rotate: -45,
+          style: { fontSize: '12px' }
+        }
+      },
+      yaxis: [
+        {
+          title: {
+            text: 'Fuel (Litres)'
+          },
+          labels: {
+            formatter: (val) => val.toFixed(0)
+          }
+        },
+        {
+          opposite: true,
+          title: {
+            text: 'Amount (₹)'
+          },
+          labels: {
+            formatter: (val) => `₹${val.toFixed(0)}`
+          }
+        }
+      ],
+      tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+          formatter: (val, { seriesIndex }) =>
+            seriesIndex === 0 ? `${val} L` : `₹${val.toFixed(2)}`
+        }
+      },
+      title: {
+        text: 'Fuel Usage Analytics',
+        align: 'center',
+        style: { fontWeight: '600', fontSize: '16px' }
+      }
+    };
+  }
+
+
+
   populateYears() {
     const startYear = 2018;
     const currentYear = new Date().getFullYear();
@@ -861,6 +979,17 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     // console.log('asdasdasdddd  dashboard');
     //getDashboard
+ const today = new Date();
+  const sixMonthsAgo = new Date(today);
+  sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+  this.fuelChartType = 'monthly';
+  this.fuelStartDate = sixMonthsAgo.toISOString().split('T')[0];
+  this.fuelEndDate = today.toISOString().split('T')[0];
+
+  this.loadFuelChart();
+
+
  this.apiService.CommonApi(Apiconfig.getDashboard.method, Apiconfig.getDashboard.url, {}).subscribe(
       (result) => {
 

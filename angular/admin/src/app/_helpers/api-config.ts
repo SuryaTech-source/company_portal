@@ -92,7 +92,10 @@ export const Apiconfig = {
         "url": "admin/fuel/save",
         "method": "post"
     },
-
+   fuelUsageAnalytics:{
+        "url": "admin/fuel/fuel-stats",
+        "method": "post"
+    },
 
     saveContract:{
         "url": "admin/contract/save",

@@ -70,7 +70,7 @@ export class FuelRecordsListComponent {
   prevDate: item.lastRechargeDate || '',
   amountPaid: item.amountPaid || 0,
   issuedBy: item.issuedBy || '',
-  fuelConsumed: item.actualUsage || 0
+  fuelConsumed: item.fuelConsumed || 0
 }));
 
           console.log(this.records);
@@ -113,7 +113,7 @@ export class FuelRecordsListComponent {
     // Update
     this.apiService.CommonApi(
       Apiconfig.saveFuel.method,
-      Apiconfig.saveFuel.url + '/' + this.editingFuelId,
+      Apiconfig.saveFuel.url ,
       this.newFuel
     ).subscribe((res: any) => {
       if (res.status) {

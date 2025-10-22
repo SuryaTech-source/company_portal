@@ -18,7 +18,7 @@ module.exports = function () {
       contractId: body.contractId || "",                 // <-- added field
       monthlyAllowance: Number(body.monthlyAllowance) || 0,
       actualUsage: Number(body.actualUsage) || 0,
-      lastRechargeDate: body.lastRechargeDate ? new Date(body.lastRechargeDate) : null,
+      lastRechargeDate: body.prevDate ? new Date(body.prevDate) : null,
       remarks: body.remarks || "",
       startOdometer: Number(body.startOdometer) || 0,
       endOdometer: Number(body.endOdometer) || 0,
@@ -172,6 +172,121 @@ module.exports = function () {
     });
   }
 };
+
+
+controller.fuelUsageAnalytics = async function (req, res) {
+  try {
+    const { vehicle, driver, startDate, endDate, type = "monthly" } = req.body; 
+    // type = "daily" | "monthly" | "yearly"
+
+    let match = {};
+    if (vehicle) match.vehicle = new mongoose.Types.ObjectId(vehicle);
+    if (driver) match.driver = new mongoose.Types.ObjectId(driver);
+    if (startDate && endDate) {
+      match.lastRechargeDate = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    let groupStage = {};
+    let dateFormat = "";
+
+    // 📊 Group based on the selected type
+    if (type === "daily") {
+      groupStage = {
+        _id: {
+          year: { $year: "$lastRechargeDate" },
+          month: { $month: "$lastRechargeDate" },
+          day: { $dayOfMonth: "$lastRechargeDate" },
+        },
+        totalFuelConsumed: { $sum: "$fuelConsumed" },
+        totalAmountPaid: { $sum: "$amountPaid" },
+        count: { $sum: 1 },
+      };
+      dateFormat = "%Y-%m-%d";
+    } else if (type === "monthly") {
+      groupStage = {
+        _id: {
+          year: { $year: "$lastRechargeDate" },
+          month: { $month: "$lastRechargeDate" },
+        },
+        totalFuelConsumed: { $sum: "$fuelConsumed" },
+        totalAmountPaid: { $sum: "$amountPaid" },
+        count: { $sum: 1 },
+      };
+      dateFormat = "%Y-%m";
+    } else if (type === "yearly") {
+      groupStage = {
+        _id: { year: { $year: "$lastRechargeDate" } },
+        totalFuelConsumed: { $sum: "$fuelConsumed" },
+        totalAmountPaid: { $sum: "$amountPaid" },
+        count: { $sum: 1 },
+      };
+      dateFormat = "%Y";
+    }
+
+    // 📦 Pipeline for aggregation
+    const pipeline = [
+      { $match: match },
+      { $group: groupStage },
+      {
+        $project: {
+          _id: 0,
+          label: {
+            $dateToString: { format: dateFormat, date: "$_id.date" }
+          },
+          year: "$_id.year",
+          month: "$_id.month",
+          day: "$_id.day",
+          totalFuelConsumed: 1,
+          totalAmountPaid: 1,
+          count: 1
+        }
+      },
+      { $sort: { year: 1, month: 1, day: 1 } },
+    ];
+
+    // Fix dateToString field for each grouping type
+    if (type === "daily") {
+      pipeline[2].$project.label = {
+        $concat: [
+          { $toString: "$year" },
+          "-",
+          { $cond: [{ $lt: ["$month", 10] }, { $concat: ["0", { $toString: "$month" }] }, { $toString: "$month" }] },
+          "-",
+          { $cond: [{ $lt: ["$day", 10] }, { $concat: ["0", { $toString: "$day" }] }, { $toString: "$day" }] }
+        ]
+      };
+    } else if (type === "monthly") {
+      pipeline[2].$project.label = {
+        $concat: [
+          { $toString: "$year" },
+          "-",
+          { $cond: [{ $lt: ["$month", 10] }, { $concat: ["0", { $toString: "$month" }] }, { $toString: "$month" }] }
+        ]
+      };
+    } else if (type === "yearly") {
+      pipeline[2].$project.label = { $toString: "$year" };
+    }
+  console.log(pipeline,'pipeline');
+  
+    const result = await db.GetAggregation("fuel", pipeline);
+     
+    return res.send({
+      status: true,
+      message: "Fuel usage analytics fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error("ERROR fuelUsageAnalytics", error);
+    return res.send({
+      status: false,
+      message: "Error while fetching fuel usage analytics",
+    });
+  }
+};
+
 
 
   return controller;
