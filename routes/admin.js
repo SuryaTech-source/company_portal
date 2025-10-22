@@ -553,6 +553,7 @@ module.exports = function (app, io) {
         app.post('/dashboard/forgotsave', ensureAuthorized, admins.forgotpassave);
         app.post('/dashboard/earningsDetails', ensureAuthorized, admins.earningsDetails);
         app.post('/get/all/data', ensureAuthorized, admins.getAllDetails);
+        app.post('/get/dashboard', ensureAuthorized, admins.getusersrole);
         app.post('/ratings/resturantlist', ensureAuthorized, ratings.RestaurantList);
         app.post('/ratings/ResturantRatingList', ensureAuthorized, ratings.ResturantRatingList);
         app.post('/ratings/driverlist', ensureAuthorized, ratings.DriverList);

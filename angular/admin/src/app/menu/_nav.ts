@@ -50,12 +50,12 @@ export const navItems: INavData[] = [
   },
    {
     id: "Feet",
-    name: 'Feet',
+    name: 'Fleet',
     url: '/app/testimonial',
     icon: 'assets/image/offer.png',
     children: [
       {
-        name: 'New Feet',
+        name: 'New Fleet',
         url: '/app/fleet/add',
         icon: '',
         id: 'add'

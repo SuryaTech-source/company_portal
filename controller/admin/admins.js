@@ -1201,6 +1201,43 @@ module.exports = function (io) {
     }
 
 
+router.getusersrole = async function (req, res) {
+  try {
+    // 1️⃣ Get all totals concurrently
+    const [vendorDocs, driverCount, contractCount, employeeCount] = await Promise.all([
+      db.GetDocument('vendor', { status: 1 }, {}, {}), // vendor docs
+      db.GetCount('deals', { status: 1 }),             // driver total
+      db.GetCount('contract', { status: 1 }),          // contract total
+      db.GetCount('employee', { status: 1 })           // employee total
+    ]);
+
+    // 2️⃣ Calculate vendor totals
+    const vendorTotal = vendorDocs.doc.length;
+    const totalNoOfBuses = vendorDocs.doc.reduce(
+      (sum, v) => sum + (v.noOfBuses || 0),
+      0
+    );
+
+    // 3️⃣ Combine all results
+    const result = {
+      totals: {
+        vendorTotal,
+        totalNoOfBuses,
+        driverTotal: driverCount,
+        contractTotal: contractCount,
+        employeeTotal: employeeCount
+      }
+    };
+
+    return res.status(200).send(result);
+  } catch (err) {
+    console.error('Error in getusersrole:', err);
+    return res.status(500).send({ message: 'Internal server error', error: err });
+  }
+};
+
+
+
     router.AfterFilter = function (req, res) {
 
         var request = {};
@@ -1415,6 +1452,9 @@ module.exports = function (io) {
             }
         });
     }
+
+
+    
     router.changeStatus = async (req, res) => {
         var request = {};
         request.id = req.body.id;

@@ -1,663 +1,3 @@
-// import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-// import { Apiconfig } from 'src/app/_helpers/api-config';
-// import { ApiService } from 'src/app/_services/api.service';
-// import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
-// import { Colors } from "src/app/_helpers/colors.service";
-// import { environment } from 'src/environments/environment';
-// import { DatePipe } from '@angular/common';
-// import * as moment from 'moment';
-// // import { ChartComponent } from "ng-apexcharts";
-// // import {
-// //   ApexNonAxisChartSeries,
-// //   ApexResponsive,
-// //   ApexChart
-// // } from "ng-apexcharts";
-// import {
-//   ChartComponent,
-//   ApexAxisChartSeries,
-//   ApexNonAxisChartSeries,
-//   ApexResponsive,
-//   ApexChart,
-//   ApexXAxis,
-//   ApexDataLabels,
-//   ApexTitleSubtitle,
-//   ApexStroke,
-//   ApexGrid,
-//   ApexFill,
-//   ApexMarkers,
-//   ApexYAxis,
-//   ApexOptions
-// } from "ng-apexcharts";
-// export type ChartOptionss = {
-//   series: ApexNonAxisChartSeries;
-//   chart: ApexChart;
-//   responsive: ApexResponsive[];
-//   labels: any;
-// };
-// export type ChartOptioncard = {
-//   series: ApexAxisChartSeries;
-//   chart: ApexChart;
-//   xaxis: ApexXAxis;
-//   dataLabels: ApexDataLabels;
-//   grid: ApexGrid;
-//   fill: ApexFill;
-//   markers: ApexMarkers;
-//   yaxis: ApexYAxis;
-//   stroke: ApexStroke;
-//   title: ApexTitleSubtitle;
-// };
-
-
-// @Component({
-//   selector: 'app-dashboard',
-//   templateUrl: './dashboard.component.html',
-//   styleUrls: ['./dashboard.component.scss']
-// })
-// export class DashboardComponent implements OnInit {
-//   @ViewChild("chart") chart: ChartComponent;
-//   public chartOptionss: Partial<ChartOptions>;
-
-//   @ViewChild("chartcard") chartcard: ChartComponent;
-//   // public chartOptionscard: Partial<ChartOptions>;
-//   public chartOptionscard: Partial<ApexOptions>;
-//   @ViewChild("totalamntchart") totalamntchart: ChartComponent;
-//   public chartOptionsamount: Partial<ApexOptions>;
-//   @ViewChild("usercharts") usercharts: ChartComponent;
-//   public chartOptionsuser: Partial<ApexOptions>;
-//   @ViewChild("productcharts") productcharts: ChartComponent;
-//   public chartOptionsprod: Partial<ApexOptions>;
-//   last7daysAmount: any[] = []
-//   last7DaysUsers: any[] = []
-//   last7daysProduct: any[] = []
-
-
-//   public chartOptionschart: Partial<ApexOptions> = {
-//     series: [
-//       {
-//         name: "Orders",
-//         data: []
-//       }
-//     ],
-//     chart: {
-//       // height: 350,
-//       type: "area",
-
-//       // width: 200,   // Set the width here
-//       height: 100,
-//     },
-//     stroke: {
-//       width: 3,
-//       curve: "smooth"
-//     },
-//     xaxis: {
-//       labels: {
-//         show: false
-//       },
-//       axisBorder: {
-//         show: false
-//       },
-//       axisTicks: {
-//         show: false
-//       }
-//       // type: "datetime",
-//       // categories: ["1", "2", "3", "4", "5", "6", "7"] 
-//       // show: false
-//     },
-
-//     yaxis: {
-//       show: false
-//     },
-//     dataLabels: {
-//       enabled: false
-//     },
-//     colors: ['#00E396'], // Start color of the gradient
-//     fill: {
-//       type: 'gradient',
-//       gradient: {
-//         shade: 'dark',
-//         type: 'horizontal', // Can be 'horizontal' or 'vertical'
-//         shadeIntensity: 0.5,
-//         gradientToColors: ['#F9D423'], // End color of the gradient
-//         inverseColors: true,
-//         opacityFrom: 1,
-//         opacityTo: 1,
-//         stops: [0, 100]
-//       }
-//     }
-//   };
-//   public chartOptionsTotalamount: Partial<ApexOptions> = {
-//     series: [
-//       {
-//         name: "Amount",
-//         data: []
-//       }
-//     ],
-//     chart: {
-//       // height: 350,
-//       type: "area",
-
-//       // width: 200,   // Set the width here
-//       height: 100,
-//     },
-//     stroke: {
-//       width: 3,
-//       curve: "smooth"
-//     },
-//     xaxis: {
-//       labels: {
-//         show: false
-//       },
-//       axisBorder: {
-//         show: false
-//       },
-//       axisTicks: {
-//         show: false
-//       }
-//       // type: "datetime",
-//       // categories: ["1", "2", "3", "4", "5", "6", "7"] 
-//     },
-
-//     yaxis: {
-//       show: false
-//     },
-//     dataLabels: {
-//       enabled: false
-//     },
-//     colors: ['#00E396'], // Start color of the gradient
-//     fill: {
-//       type: 'gradient',
-//       gradient: {
-//         shade: 'dark',
-//         type: 'horizontal', // Can be 'horizontal' or 'vertical'
-//         shadeIntensity: 0.5,
-//         gradientToColors: ['#F9D423'], // End color of the gradient
-//         inverseColors: true,
-//         opacityFrom: 1,
-//         opacityTo: 1,
-//         stops: [0, 100]
-//       }
-//     }
-//   };
-//   public chartOptionsUsers: Partial<ApexOptions> = {
-//     series: [
-//       {
-//         name: "User",
-//         data: []
-//       }
-//     ],
-//     chart: {
-//       // height: 350,
-//       type: "area",
-
-//       // width: 200,   // Set the width here
-//       height: 100,
-//     },
-//     stroke: {
-//       width: 3,
-//       curve: "smooth"
-//     },
-//     xaxis: {
-//       labels: {
-//         show: false
-//       },
-//       axisBorder: {
-//         show: false
-//       },
-//       axisTicks: {
-//         show: false
-//       }
-//       // type: "datetime",
-//       // categories: ["1", "2", "3", "4", "5", "6", "7"] 
-//     },
-
-//     yaxis: {
-//       show: false
-//     },
-//     dataLabels: {
-//       enabled: false
-//     },
-//     colors: ['#00E396'], // Start color of the gradient
-//     fill: {
-//       type: 'gradient',
-//       gradient: {
-//         shade: 'dark',
-//         type: 'horizontal', // Can be 'horizontal' or 'vertical'
-//         shadeIntensity: 0.5,
-//         gradientToColors: ['#F9D423'], // End color of the gradient
-//         inverseColors: true,
-//         opacityFrom: 1,
-//         opacityTo: 1,
-//         stops: [0, 100]
-//       }
-//     }
-//   };
-//   public chartOptionsProduct: Partial<ApexOptions> = {
-//     series: [
-//       {
-//         name: "Product",
-//         data: []
-//       }
-//     ],
-//     chart: {
-//       // height: 350,
-//       type: "area",
-
-//       // width: 200,   // Set the width here
-//       height: 100,
-//     },
-//     stroke: {
-//       width: 3,
-//       curve: "smooth"
-//     },
-//     xaxis: {
-//       labels: {
-//         show: false
-//       },
-//       axisBorder: {
-//         show: false
-//       },
-//       axisTicks: {
-//         show: false
-//       }
-//       // type: "datetime",
-//       // categories: ["1", "2", "3", "4", "5", "6", "7"] 
-//     },
-
-//     yaxis: {
-//       show: false
-//     },
-//     dataLabels: {
-//       enabled: false
-//     },
-//     colors: ['#00E396'], // Start color of the gradient
-//     fill: {
-//       type: 'gradient',
-//       gradient: {
-//         shade: 'dark',
-//         type: 'horizontal', // Can be 'horizontal' or 'vertical'
-//         shadeIntensity: 0.5,
-//         gradientToColors: ['#F9D423'], // End color of the gradient
-//         inverseColors: true,
-//         opacityFrom: 1,
-//         opacityTo: 1,
-//         stops: [0, 100]
-//       }
-//     }
-//   };
-
-//   orderstatics: any = 7;
-//   dates: any;
-//   from: any;
-//   to: any;
-//   month: any;
-//   categoryName: any;
-//   orderCount: any
-//   day: any;
-//   date: any;
-//   last7DaysOrders: any[] = []
-//   labelcategories: any[] = []
-//   todate: any;
-//   todayOrder: any = {
-//     total_orders: 0 as Number,
-//     completedOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//     newOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//     restaurantAcceptOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//     driverAcceptedOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//     driverPickedUpOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//     userRejectedOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//     driverRejectedOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//     adminRejectedOrderDetails: {
-//       count: 0 as Number,
-//       orderDetails: [] as any,
-//     },
-//   }
-//   grand_total: any;
-//   restaurant_total: any;
-//   tax_total: any;
-//   delivery_amount: any;
-//   coupon_total: any;
-//   dashBoardDetails: any = {
-//     orders: 0 as Number,
-//     completedOrders: 0 as Number,
-//     inprogressOrders: 0 as Number,
-//     users: 0 as Number,
-//     activeUsers: 0 as Number,
-//     inactiveUsers: 0 as Number,
-//     subscription: 0 as Number,
-//     approvedDrivers: 0 as Number,
-//     unapprovedDrivers: 0 as Number,
-//     onlineDrivers: 0 as Number,
-//     oflineDrivers: 0 as Number,
-//     products: 0 as Number,
-//     allReport: 0 as Number,
-//     unrecommended: 0 as Number,
-//     activeproducts: 0 as Number,
-//     inactiveproducts: 0 as Number,
-//   };
-
-//   constructor(
-//     private apiService: ApiService,
-//     public datepipe: DatePipe,
-//     private cdr: ChangeDetectorRef
-//   ) {
-
-
-
-//   }
-
-
-
-
-
-//   public chartOptions: ChartOptionss = {
-//     series: [],
-//     chart: {
-//       type: "donut",
-//       width: 500,   // Set the width here
-//       height: 500,
-//       redrawOnParentResize: false
-//     },
-//     labels: [],
-//     responsive: [
-//       {
-//         breakpoint: 480,
-//         options: {
-//           chart: {
-//             width: 100
-//           },
-//           legend: {
-//             position: "bottom"
-//           }
-//         }
-//       }
-//     ]
-
-//   };
-
-//   public barChartOptions: ChartOptions = {
-//     responsive: true,
-//     devicePixelRatio: 2.2,
-//     scales: {
-//       x: {
-//         ticks: {
-//           display: true,
-//           maxTicksLimit: 20,
-//         },
-//         grid: {
-//           tickLength: 15,
-//           color: '#9da0a2',
-//           drawOnChartArea: false,
-//         },
-//         title: {
-//           display: true,
-//           text: '',
-//         },
-//       },
-//       y: {
-//         ticks: {
-//           display: true,
-//         },
-//         title: {
-//           display: true,
-//           text: '',
-//         },
-//         grid: {
-//           tickLength: 0,
-//           color: '#9da0a2',
-//           drawOnChartArea: false,
-//         },
-//       },
-//     },
-//     plugins: {
-//       legend: {
-//         display: true,
-//         position: 'right',
-//         reverse: true,
-//         labels: {
-//           color: 'black',
-//           font: {
-//             size: 15,
-//           },
-//           padding: 20,
-//           usePointStyle: true,
-//           boxWidth: 9,
-//         },
-//       },
-//     },
-//     animation: false
-//   };
-//   public barChartLabels: any = [];
-//   public barChartType: ChartType = 'bar';
-//   public barChartLegend = false;
-//   public barChartData: ChartDataset[] = [
-//     { barPercentage: 0.3, data: [], label: 'Orders', },
-//   ];
-//   public barChartColors: any[] = [
-//     { backgroundColor: Colors.getColors().themeColor7 },
-//   ];
-
-
-
-
-//   ngOnInit(): void {
-//     // console.log('asdasdasdddd  dashboard');
-//     var date = new Date();
-//     let dataFrom = new Date(new Date().setDate(date.getDate() - 6));
-//     var from_date = date.setUTCHours(0, 0, 0, 0);
-//     var to_date = date.setUTCHours(23, 59, 59, 0);
-//     this.from = dataFrom.toISOString();
-//     this.to = date.toISOString();
-//     this.month = true;
-//     this.day = false;
-//     this.getDays(new Date(dataFrom), new Date(date))
-//     this.barChartLabels = this.dates;
-//     this.apiService.CommonApi(Apiconfig.dashboard_get.method, Apiconfig.dashboard_get.url, {}).subscribe(
-//       (result) => {
-
-//         this.dashBoardDetails = result.statistics;
-//         console.log(this.dashBoardDetails,"this.dashBoardDetailsthis.dashBoardDetailsthis.dashBoardDetails");
-//         this.labelcategories = this.dashBoardDetails.subCategoryDoc.forEach((category) => {
-//           console.log(category, "categorycategorycategorycategory");
-//           this.chartOptions.labels = this.dashBoardDetails.subCategoryDoc.map((category) => category.categoryName);
-//           this.chartOptions.series = this.dashBoardDetails.subCategoryDoc.map((category) => category.orderCount);
-//           this.categoryName = category.categoryName;
-//           this.orderCount = category.orderCount
-//           this.last7DaysOrders = result.statistics.last7DaysOrders
-//           this.last7daysAmount = result.statistics.last7DaysAmounts
-//             this.last7DaysUsers = result.statistics.last7DaysUsers
-//             this.last7daysProduct = result.statistics.last7DaysProducts
-//             // this.chartOptionschart.series.map((category) => 
-//             //   console.log(category,"subCategoryDoc"),
-//             //    category.data) 
-//             this.chartOptionschart.series.forEach((ele) => {
-//               ele.data = this.last7DaysOrders
-//             })
-
-//           this.chartOptionsTotalamount.series.forEach((ele) => {
-//             ele.data = this.last7daysAmount
-//           })
-//           this.chartOptionsUsers.series.forEach((ele) => {
-//             ele.data = this.last7DaysUsers
-//           })
-//           this.chartOptionsProduct.series.forEach((ele) => {
-//             ele.data = this.last7daysProduct
-//           })
-
-//           console.log(this.last7DaysOrders, "this.last7DaysOrdersthis.last7DaysOrders");
-
-//           this.cdr.detectChanges();
-//           // return { name: category.categoryName, count: category.orderCount };
-//         })
-//         // this.chartOptions.labels = this.labelcategories.map(category => category.name);
-//       }, (error) => {
-//         console.log(error);
-//       }
-
-//     );
-//     var today_orders = {
-//       from_date: from_date,
-//       to_date: to_date,
-//       month: false,
-//       day: true
-//     }
-//     this.apiService.CommonApi(Apiconfig.dashboard_today_Order.method, Apiconfig.dashboard_today_Order.url + '?from_date=' + from_date + '&to_date=' + to_date, {}).subscribe(
-//       (result) => {
-//         this.todayOrder = result;
-//         this.grand_total = result.grand_total.toFixed(2);
-//         this.restaurant_total = result.restaurant_total.toFixed(2);
-//         this.tax_total = result.tax_total.toFixed(2);
-//         this.delivery_amount = result.delivery_amount.toFixed(2);
-//         this.coupon_total = result.coupon_total.toFixed(2);
-//       }, (error) => {
-//         console.log(error);
-//       }
-//     );
-//     this.getOrderStatics()
-//     // var url = 'dashboard/orderstats?from=' + this.from + '&to=' + this.to + '&month=' + this.month + '&day=' + this.day;
-//     // this.apiService.CommonApi(Apiconfig.dashboard_orderstats.method, url, {}).subscribe(
-//     //   (result) => {
-//     //     let dataset = result.map(x => x.count);
-//     //     this.barChartData[0].data = dataset.reverse();
-//     //   }, (error) => {
-//     //     console.log(error);
-//     //   }
-//     // );
-//   }
-
-//   onChangeOrderStatics(value) {
-//     if (value == '7') {
-//       var date = new Date();
-//       let dataFrom = new Date(new Date().setDate(date.getDate() - 6));
-//       this.from = dataFrom.toISOString()
-//       this.to = date.toISOString()
-//       this.month = false;
-//       this.day = true;
-//       this.getOrderStatics()
-//       this.getDays(new Date(dataFrom), new Date(date))
-//       this.barChartLabels = this.dates;
-//     }
-//     if (value == '30') {
-//       var date = new Date();
-//       let dataFrom = new Date(new Date().setMonth(date.getMonth() - 1));
-//       this.from = dataFrom.toISOString()
-//       this.to = date.toISOString()
-//       this.month = true;
-//       this.day = true;
-//       this.getMonth(new Date(this.from), new Date(this.to))
-//       this.getOrderStatics();
-//       this.barChartLabels = this.dates;
-//     }
-//     if (value == '180') {
-//       var date = new Date();
-//       let dataFrom = new Date(new Date().setMonth(date.getMonth() - 5));
-//       this.from = dataFrom.toISOString()
-//       this.to = date.toISOString()
-//       this.month = true;
-//       this.day = false;
-//       this.getMonths(this.from, this.to)
-//       this.getOrderStatics()
-//       this.barChartLabels = this.dates;
-//     }
-//     if (value == '365') {
-//       var date = new Date();
-//       let dataFrom = new Date(new Date().setMonth(date.getMonth() - 11));
-//       this.from = dataFrom.toISOString()
-//       this.to = date.toISOString()
-//       this.month = true;
-//       this.day = false;
-//       this.getMonths(this.from, this.to)
-//       this.getOrderStatics()
-//       this.barChartLabels = this.dates;
-//     }
-//   }
-
-//   getDays(startdate, enddate) {
-//     const date = new Date(startdate.getTime());
-//     this.dates = [];
-//     while (date <= enddate) {
-//       var data = this.datepipe.transform(date, 'dd-MM-yyyy')
-//       this.dates.push(data);
-//       date.setDate(date.getDate() + 1);
-//     }
-//     return this.dates;
-//   }
-//   getMonth(startdate, enddate) {
-//     const date = new Date(startdate.getTime());
-//     this.dates = [];
-//     while (date <= enddate) {
-//       var data = this.datepipe.transform(date, 'dd-MM-yyyy')
-//       this.dates.push(data);
-//       date.setDate(date.getDate() + 1);
-//     }
-//     return this.dates;
-//   }
-//   getMonths(startdate, enddate) {
-//     var start = startdate.split('-');
-//     var end = enddate.split('-');
-//     var startYear = parseInt(start[0]);
-//     var endYear = parseInt(end[0]);
-//     this.dates = [];
-//     for (var i = startYear; i <= endYear; i++) {
-//       var endMonth = i != endYear ? 11 : parseInt(end[1]) - 1;
-//       var startMon = i === startYear ? parseInt(start[1]) - 1 : 0;
-//       for (var j = startMon; j <= endMonth; j = j > 12 ? j % 12 || 11 : j + 1) {
-//         var month = j + 1;
-//         var displayMonth = month < 10 ? '0' + month : month;
-//         var data = moment(displayMonth, 'MM').format('MMM')
-//         this.dates.push([data, i].join('-'));
-//       }
-//     }
-//     return this.dates;
-//   }
-//   getOrderStatics() {
-//     this.barChartData[0].data = []
-//     var url = 'dashboard/orderstats?from=' + this.from + '&to=' + this.to + '&month=' + this.month + '&day=' + this.day;
-//     this.apiService.CommonApi("get", url, {}).subscribe(
-//       (result) => {
-//         let dataset = result.map(x => x.count);
-//         for (let index = 0; index < result.length; index++) {
-//           for (let i = 0; i < this.barChartLabels.length; i++) {
-//             if ((this.barChartLabels[i] == this.datepipe.transform(result[index].Date, 'dd-MM-yyyy')) || (this.barChartLabels[i] == this.datepipe.transform(result[index].Date, 'MMM-yyyy'))) {
-//               this.barChartData[0].data[i] = result[index].count
-//               console.log("data", result[index].count)
-//             } else if (!this.barChartData[0].data[i]) {
-//               this.barChartData[0].data[i] = 0
-//             }
-//           }
-//         }
-//         // this.barChartData[0].data = dataset.reverse();
-//       }, (error) => {
-//         console.log(error);
-//       }
-//     );
-//   }
-// }
-
-
-
-
-
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { ApiService } from 'src/app/_services/api.service';
@@ -727,6 +67,7 @@ export class DashboardComponent implements OnInit {
   to: string;
   month: boolean;
   day: boolean;
+  dashboardDetails: any;
   dates: string[];
   year: any
   @ViewChild("chartcard") chartcard: ChartComponent;
@@ -1519,103 +860,116 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log('asdasdasdddd  dashboard');
-    this.populateYears();
-    this.setCurrentMonthAndYear();
-    var date = new Date();
-    let dataFrom = new Date(new Date().setDate(date.getDate() - 6));
-    var from_date = date.setUTCHours(0, 0, 0, 0);
-    var to_date = date.setUTCHours(23, 59, 59, 0);
-    if (this.selectedMonth == 0) {
-      this.from = "0";
-      this.to = "0";
-    } else {
-      this.from = dataFrom.toISOString();
-      this.to = date.toISOString();
-    }
-    this.month = true;
-    this.day = false;
-    if(this.selectedMonth != 0){
-      this.getDays(dataFrom.toString(), date.toString())
-    }else{
-      console.log(this.selectedYear,"kkkk");
+    //getDashboard
+ this.apiService.CommonApi(Apiconfig.getDashboard.method, Apiconfig.getDashboard.url, {}).subscribe(
+      (result) => {
+
+        console.log(result,"result");
+        this.dashboardDetails = result.totals
+        
+
+      })
+
+
+
+
+    // this.populateYears();
+    // this.setCurrentMonthAndYear();
+    // var date = new Date();
+    // let dataFrom = new Date(new Date().setDate(date.getDate() - 6));
+    // var from_date = date.setUTCHours(0, 0, 0, 0);
+    // var to_date = date.setUTCHours(23, 59, 59, 0);
+    // if (this.selectedMonth == 0) {
+    //   this.from = "0";
+    //   this.to = "0";
+    // } else {
+    //   this.from = dataFrom.toISOString();
+    //   this.to = date.toISOString();
+    // }
+    // this.month = true;
+    // this.day = false;
+    // if(this.selectedMonth != 0){
+    //   this.getDays(dataFrom.toString(), date.toString())
+    // }else{
+    //   console.log(this.selectedYear,"kkkk");
       
-      const fromDate = new Date(this.selectedYear, 0, 1).toISOString();
-      const toDate = new Date(this.selectedYear, 11, 31).toISOString();
-      // if (this.selectedMonth == 0) {
-      //   this.from = '0';
-      //   this.to = '0';
-      // } else {
-        this.from = fromDate;
-        this.to = toDate;
-      // }
-      this.month = true;
-      this.day = false;
-      this.year = this.selectedYear
-      this.getMonths(this.from, this.to);
-    }
-    this.barChartLabels = this.dates;
-    this.apiService.CommonApi(Apiconfig.dashboard_get.method, Apiconfig.dashboard_get.url, {}).subscribe(
-      (result) => {
+    //   const fromDate = new Date(this.selectedYear, 0, 1).toISOString();
+    //   const toDate = new Date(this.selectedYear, 11, 31).toISOString();
+    //   // if (this.selectedMonth == 0) {
+    //   //   this.from = '0';
+    //   //   this.to = '0';
+    //   // } else {
+    //     this.from = fromDate;
+    //     this.to = toDate;
+    //   // }
+    //   this.month = true;
+    //   this.day = false;
+    //   this.year = this.selectedYear
+    //   this.getMonths(this.from, this.to);
+    // }
+    // this.barChartLabels = this.dates;
+    // this.apiService.CommonApi(Apiconfig.dashboard_get.method, Apiconfig.dashboard_get.url, {}).subscribe(
+    //   (result) => {
 
-        this.dashBoardDetails = result.statistics;
-        console.log(this.dashBoardDetails, "this.dashBoardDetailsthis.dashBoardDetailsthis.dashBoardDetails");
-        this.labelcategories = this.dashBoardDetails.subCategoryDoc.forEach((category) => {
-          console.log(category, "categorycategorycategorycategory");
-          this.chartOptions.labels = this.dashBoardDetails.subCategoryDoc.map((category) => category.categoryName);
-          this.chartOptions.series = this.dashBoardDetails.subCategoryDoc.map((category) => category.orderCount);
-          this.categoryName = category.categoryName;
-          this.orderCount = category.orderCount
-          this.last7DaysOrders = result.statistics.last7DaysOrders
-          this.last7daysAmount = result.statistics.last7DaysAmounts
-          this.last7DaysUsers = result.statistics.last7DaysUsers
-          this.last7daysProduct = result.statistics.last7DaysProducts
-          // this.chartOptionschart.series.map((category) => 
-          //   console.log(category,"subCategoryDoc"),
-          //    category.data) 
-          this.chartOptionschart.series.forEach((ele) => {
-            ele.data = this.last7DaysOrders
-          })
+    //     this.dashBoardDetails = result.statistics;
+    //     console.log(this.dashBoardDetails, "this.dashBoardDetailsthis.dashBoardDetailsthis.dashBoardDetails");
+    //     this.labelcategories = this.dashBoardDetails.subCategoryDoc.forEach((category) => {
+    //       console.log(category, "categorycategorycategorycategory");
+    //       this.chartOptions.labels = this.dashBoardDetails.subCategoryDoc.map((category) => category.categoryName);
+    //       this.chartOptions.series = this.dashBoardDetails.subCategoryDoc.map((category) => category.orderCount);
+    //       this.categoryName = category.categoryName;
+    //       this.orderCount = category.orderCount
+    //       this.last7DaysOrders = result.statistics.last7DaysOrders
+    //       this.last7daysAmount = result.statistics.last7DaysAmounts
+    //       this.last7DaysUsers = result.statistics.last7DaysUsers
+    //       this.last7daysProduct = result.statistics.last7DaysProducts
+    //       // this.chartOptionschart.series.map((category) => 
+    //       //   console.log(category,"subCategoryDoc"),
+    //       //    category.data) 
+    //       this.chartOptionschart.series.forEach((ele) => {
+    //         ele.data = this.last7DaysOrders
+    //       })
 
-          this.chartOptionsTotalamount.series.forEach((ele) => {
-            ele.data = this.last7daysAmount
-          })
-          this.chartOptionsUsers.series.forEach((ele) => {
-            ele.data = this.last7DaysUsers
-          })
-          this.chartOptionsProduct.series.forEach((ele) => {
-            ele.data = this.last7daysProduct
-          })
+    //       this.chartOptionsTotalamount.series.forEach((ele) => {
+    //         ele.data = this.last7daysAmount
+    //       })
+    //       this.chartOptionsUsers.series.forEach((ele) => {
+    //         ele.data = this.last7DaysUsers
+    //       })
+    //       this.chartOptionsProduct.series.forEach((ele) => {
+    //         ele.data = this.last7daysProduct
+    //       })
 
-          console.log(this.last7DaysOrders, "this.last7DaysOrdersthis.last7DaysOrders");
+    //       console.log(this.last7DaysOrders, "this.last7DaysOrdersthis.last7DaysOrders");
 
-          this.cdr.detectChanges();
-          // return { name: category.categoryName, count: category.orderCount };
-        })
-        // this.chartOptions.labels = this.labelcategories.map(category => category.name);
-      }, (error) => {
-        console.log(error);
-      }
+    //       this.cdr.detectChanges();
+    //       // return { name: category.categoryName, count: category.orderCount };
+    //     })
+    //     // this.chartOptions.labels = this.labelcategories.map(category => category.name);
+    //   }, (error) => {
+    //     console.log(error);
+    //   }
 
-    );
-    var today_orders = {
-      from_date: from_date,
-      to_date: to_date,
-      month: false,
-      day: true
-    }
-    this.apiService.CommonApi(Apiconfig.dashboard_today_Order.method, Apiconfig.dashboard_today_Order.url + '?from_date=' + from_date + '&to_date=' + to_date, {}).subscribe(
-      (result) => {
-        this.todayOrder = result;
-        this.grand_total = result.grand_total.toFixed(2);
-        this.restaurant_total = result.restaurant_total.toFixed(2);
-        this.tax_total = result.tax_total.toFixed(2);
-        this.delivery_amount = result.delivery_amount.toFixed(2);
-        this.coupon_total = result.coupon_total.toFixed(2);
-      }, (error) => {
-        console.log(error);
-      }
-    );
-    this.getOrderStatics()
+    // );
+    // var today_orders = {
+    //   from_date: from_date,
+    //   to_date: to_date,
+    //   month: false,
+    //   day: true
+    // }
+    // this.apiService.CommonApi(Apiconfig.dashboard_today_Order.method, Apiconfig.dashboard_today_Order.url + '?from_date=' + from_date + '&to_date=' + to_date, {}).subscribe(
+    //   (result) => {
+    //     this.todayOrder = result;
+    //     this.grand_total = result.grand_total.toFixed(2);
+    //     this.restaurant_total = result.restaurant_total.toFixed(2);
+    //     this.tax_total = result.tax_total.toFixed(2);
+    //     this.delivery_amount = result.delivery_amount.toFixed(2);
+    //     this.coupon_total = result.coupon_total.toFixed(2);
+    //   }, (error) => {
+    //     console.log(error);
+    //   }
+    // );
+    // this.getOrderStatics()
     // var url = 'dashboard/orderstats?from=' + this.from + '&to=' + this.to + '&month=' + this.month + '&day=' + this.day;
     // this.apiService.CommonApi(Apiconfig.dashboard_orderstats.method, url, {}).subscribe(
     //   (result) => {

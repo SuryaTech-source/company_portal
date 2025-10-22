@@ -1447,6 +1447,10 @@ export const Apiconfig = {
         "url": "tags/save",
         "method": "post"
     },
+    getDashboard: {
+        "url": "get/dashboard",
+        "method": "post"
+    },
     dealsSave: {
         "url": "deals/save",
         "method": "post"
