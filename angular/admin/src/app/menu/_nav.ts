@@ -5,8 +5,8 @@ export const navItems: INavData[] = [
     id: "Dashboard",
     name: 'Dashboard',
     url: '/app/dashboard',
-    icon: 'assets/image/menu.png',
-
+    // icon: 'assets/image/menu.png'
+ icon: 'fi fi-rr-dashboard-monitor',
   },
   {
     id: "administrator",

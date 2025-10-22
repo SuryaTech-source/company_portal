@@ -1,5 +1,5 @@
 //"use strict";
-
+require('dotenv').config();
 /** Dependency Injection */
 var express = require('express') // $ npm install express
     , path = require('path') // Node In-Build Module
@@ -22,15 +22,34 @@ var express = require('express') // $ npm install express
 var app = express(); // Initializing ExpressJS
 var server = require('http').createServer(app);
 // const session = require('express-session')
+const fs = require('fs');
 
+
+// const path = require('path');
 // var io = require('socket.io')(server);
 const io = require('socket.io')(server, {
     cors: {
-        origin: ["http://localhost:4200", "http://localhost:4201", 'http://localhost:4000', '*'],
+        origin: ["http://localhost:4200", "http://localhost:4201", 'http://localhost:4000',"https://company-portal-three.vercel.app", '*'],
         credentials: true
     },
     allowEIO3: true
 });
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+const languagesDir = path.join(__dirname, 'uploads/languages');
+
+// Create uploads directory
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('✅ Created uploads directory');
+}
+
+// Create languages subdirectory
+if (!fs.existsSync(languagesDir)) {
+    fs.mkdirSync(languagesDir, { recursive: true });
+    console.log('✅ Created uploads/languages directory');
+}
 
 
 /** Global Configuration*/
@@ -39,8 +58,25 @@ mongoose.Promise = global.Promise;
 
 /** Middleware Configuration */
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
-i18n.configure({ locales: ['th', 'en'], defaultLocale: 'en', autoReload: true, directory: __dirname + '/uploads/languages', syncFiles: true });
+// i18n.configure({ locales: ['th', 'en'], defaultLocale: 'en', autoReload: true, directory: __dirname + '/uploads/languages', syncFiles: true });
 
+// Updated i18n configuration with error handling
+try {
+    i18n.configure({ 
+        locales: ['th', 'en'], 
+        defaultLocale: 'en', 
+        autoReload: true, 
+        directory: path.join(__dirname, 'uploads/languages'),
+        syncFiles: true 
+    });
+} catch (error) {
+    console.warn('⚠️ i18n configuration warning:', error.message);
+    // Fallback configuration without directory
+    i18n.configure({ 
+        locales: ['th', 'en'], 
+        defaultLocale: 'en'
+    });
+}
 
 app.disable('x-powered-by');
 app.use(bodyParser.json({ limit: '100mb' }));
@@ -63,7 +99,7 @@ app.use(compression()); //use compression middleware to compress and serve the s
 app.use(function (req, res, next) {
     console.log('orginal urlll------', req.originalUrl);
     res.header('Access-Control-Allow-Credentials', true);
-    const allowedOrigins = ['*', 'http://localhost:4201', 'http://localhost:4000', 'http://localhost:4200'];
+    const allowedOrigins = ['*', 'http://localhost:4201', 'http://localhost:4000', 'http://localhost:4200',"https://company-portal-three.vercel.app"];
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -120,12 +156,25 @@ mongoose.connection.on('error', function (error) {
 
 // (async () => {
 //   try {
-//     const conn = await mongoose.connect("mongodb://127.0.0.1:27017/pillais");
+//     const conn = await mongoose.connect("mongodb://127.0.0.1:27017/live-pillais-25j24");
 //     console.log("✅ Connected to MongoDB:", conn.connection.host);
 //   } catch (err) {
 //     console.error("❌ Connection failed:", err.message);
 //   }
 // })();
+
+const mongoUrl = process.env.MONGODB_URI || 
+  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER}/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`;
+
+// Update your connection code
+(async () => {
+  try {
+    const conn = await mongoose.connect(mongoUrl);
+    console.log("✅ Connected to MongoDB:", conn.connection.host);
+  } catch (err) {
+    console.error("❌ Connection failed:", err.message);
+  }
+})();
 
 /* var mongooseOptions = {
    useNewUrlParser: true,

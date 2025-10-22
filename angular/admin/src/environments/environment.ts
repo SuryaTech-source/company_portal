@@ -5,8 +5,9 @@
 export const environment = {
   production: false,
 
-  // apiUrl: "https://clickkart.zoproduct.com/",
+  // apiUrl: "https://companyportal-production.up.railway.app/",
   apiUrl: "http://localhost:2023/",
+
   // apiUrl: "https://ecommerce-dev.quickiz.com/",
   // apiUrl: "https://pillais.quickiz.com/",
   // apiUrl: 'https://ecommerce-testing.quickiz.com/',

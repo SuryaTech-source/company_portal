@@ -129,7 +129,7 @@
                   (change)="toggleEmployee(row._id, $event)" />
               </td>
               <td>{{ row.employeeName }}</td>
-              <td>{{ row.idNo }}</td>
+              <td>{{ row.employeeId }}</td>
               <td>
                 <select class="form-select form-select-sm" [(ngModel)]="row.status" (change)="updateAttendance(row)">
                   <option value="P">Present</option>
