@@ -687,6 +687,7 @@ module.exports = function (app, io) {
     app.post('/admin/fuel/list', ensureAuthorized, fuel.listFuels);
     app.post('/admin/fuel/fuel-stats', ensureAuthorized, fuel.fuelUsageAnalytics);
     app.post('/admin/fuel/fuel-efficieny', ensureAuthorized, fuel.fuelEfficiencyAnalytics);
+    app.post('/admin/fuel/cost-per-km', ensureAuthorized, fuel.costPerKmAnalytics);
 
     //maintenance management
     app.post('/admin/maintenance/save', ensureAuthorized, maintance.saveMaintenance);

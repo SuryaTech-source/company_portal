@@ -3,50 +3,51 @@
   <div class="dashboard_chart" id="widget1">
     <div class="db_card">
       <h6>Buses</h6>
-      <div class="dash_title"><span>{{dashboardDetails.totalNoOfBuses}}</span>
+      <div class="dash_title">
+        <span>{{ dashboardDetails.totalNoOfBuses }}</span>
         <i class="fi fi-rr-bus-alt"></i>
-
       </div>
     </div>
     <div class="db_card">
       <h6>Drivers</h6>
       <div class="dash_title">
-        <span>{{dashboardDetails.driverTotal}}</span>
+        <span>{{ dashboardDetails.driverTotal }}</span>
         <i class="fi fi-br-driver-man"></i>
       </div>
     </div>
 
     <div class="db_card">
       <h6>Contracts</h6>
-      <div class="dash_title"><span>{{dashboardDetails.contractTotal}}</span>
+      <div class="dash_title">
+        <span>{{ dashboardDetails.contractTotal }}</span>
         <i class="fi fi-rs-contract"></i>
       </div>
     </div>
 
     <div class="db_card">
       <h6>Vendors</h6>
-      <div class="dash_title"><span>{{dashboardDetails.vendorTotal}}</span>
+      <div class="dash_title">
+        <span>{{ dashboardDetails.vendorTotal }}</span>
         <i class="fi fi-rs-seller"></i>
       </div>
     </div>
 
     <div class="db_card">
       <h6>Alerts</h6>
-      <div class="dash_title"><span>02</span>
+      <div class="dash_title">
+        <span>02</span>
         <i class="fi fi-sr-engine-warning"></i>
       </div>
     </div>
 
     <div class="db_card">
       <h6>Employees</h6>
-      <div class="dash_title"><span>{{dashboardDetails.employeeTotal}}</span>
+      <div class="dash_title">
+        <span>{{ dashboardDetails.employeeTotal }}</span>
         <i class="fi fi-rs-employees"></i>
       </div>
     </div>
   </div>
-
-
-
 
   <div class="row mt-4">
     <div class="col-md-6 mb-3">
@@ -57,94 +58,189 @@
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509508!2d144.95373631531593!3d-37.81627944202148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf0727f4f2a2b5f9a!2sVictoria!5e0!3m2!1sen!2sau!4v1634125792045!5m2!1sen!2sau">
         </iframe>
       </div> -->
-    <div class="row mt-4">
-  <div class="col-md-12 mb-3">
-    <div class="bg_sw p-3 shadow rounded">
-      <h5 class="sec_title">Fuel Usage Analytics</h5>
+      <div class="row mt-4">
+        <div class="col-md-12 mb-3">
+          <div class="bg_sw p-3 shadow rounded">
+            <h5 class="sec_title">Fuel Usage Analytics</h5>
 
-      <!-- Filter Row -->
-      <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
-        <label class="fw-semibold me-2">Type:</label>
-        <select class="form-select form-select-sm w-auto" [(ngModel)]="fuelChartType">
-          <option value="daily">Daily</option>
-          <option value="monthly" selected>Monthly</option>
-          <option value="yearly">Yearly</option>
-        </select>
+            <!-- Filter Row -->
+            <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+              <label class="fw-semibold me-2">Type:</label>
+              <select
+                class="form-select form-select-sm w-auto"
+                [(ngModel)]="fuelChartType"
+              >
+                <option value="daily">Daily</option>
+                <option value="monthly" selected>Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
 
-        <label class="fw-semibold ms-3 me-2">From:</label>
-        <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelStartDate">
+              <label class="fw-semibold ms-3 me-2">From:</label>
+              <input
+                type="date"
+                class="form-control form-control-sm w-auto"
+                [(ngModel)]="fuelStartDate"
+              />
 
-        <label class="fw-semibold ms-3 me-2">To:</label>
-        <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEndDate">
+              <label class="fw-semibold ms-3 me-2">To:</label>
+              <input
+                type="date"
+                class="form-control form-control-sm w-auto"
+                [(ngModel)]="fuelEndDate"
+              />
 
-        <button class="btn btn-sm btn-primary ms-3" (click)="loadFuelChart()">Apply</button>
+              <button
+                class="btn btn-sm btn-primary ms-3"
+                (click)="loadFuelChart()"
+              >
+                Apply
+              </button>
+            </div>
+
+            <!-- Chart Display -->
+            <apx-chart
+              *ngIf="fuelChartOptions"
+              [series]="fuelChartOptions.series"
+              [chart]="fuelChartOptions.chart"
+              [xaxis]="fuelChartOptions.xaxis"
+              [stroke]="fuelChartOptions.stroke"
+              [dataLabels]="fuelChartOptions.dataLabels"
+              [fill]="fuelChartOptions.fill"
+              [colors]="fuelChartOptions.colors"
+              [yaxis]="fuelChartOptions.yaxis"
+              [title]="fuelChartOptions.title"
+            ></apx-chart>
+
+            <div
+              *ngIf="!fuelChartOptions?.series?.length"
+              class="text-center text-muted py-4"
+            >
+              No data available for the selected range.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+          <div class="bg_sw p-3 shadow rounded">
+            <h5 class="sec_title">Fuel Efficiency</h5>
+
+            <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+              <label class="fw-semibold me-2">Type:</label>
+              <select
+                class="form-select form-select-sm w-auto"
+                [(ngModel)]="fuelEfficiencyType"
+              >
+                <option value="daily">Daily</option>
+                <option value="monthly" selected>Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+
+              <label class="fw-semibold ms-3 me-2">From:</label>
+              <input
+                type="date"
+                class="form-control form-control-sm w-auto"
+                [(ngModel)]="fuelEfficiencyStart"
+              />
+
+              <label class="fw-semibold ms-3 me-2">To:</label>
+              <input
+                type="date"
+                class="form-control form-control-sm w-auto"
+                [(ngModel)]="fuelEfficiencyEnd"
+              />
+
+              <button
+                class="btn btn-sm btn-primary ms-3"
+                (click)="loadFuelEfficiencyChart()"
+              >
+                Apply
+              </button>
+            </div>
+
+            <apx-chart
+              *ngIf="fuelEfficiencyChartOptions"
+              [series]="fuelEfficiencyChartOptions.series"
+              [chart]="fuelEfficiencyChartOptions.chart"
+              [xaxis]="fuelEfficiencyChartOptions.xaxis"
+              [yaxis]="fuelEfficiencyChartOptions.yaxis"
+              [dataLabels]="fuelEfficiencyChartOptions.dataLabels"
+              [stroke]="fuelEfficiencyChartOptions.stroke"
+              [fill]="fuelEfficiencyChartOptions.fill"
+              [tooltip]="fuelEfficiencyChartOptions.tooltip"
+              [colors]="fuelEfficiencyChartOptions.colors"
+            ></apx-chart>
+
+            <div
+              *ngIf="!fuelEfficiencyChartOptions?.series?.length"
+              class="text-center text-muted py-4"
+            >
+              No data available for the selected range.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+          <div class="bg_sw p-3 shadow rounded">
+            <h5 class="sec_title">Cost per Kilometer</h5>
+
+            <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+              <label class="fw-semibold me-2">Type:</label>
+              <select
+                class="form-select form-select-sm w-auto"
+                [(ngModel)]="costPerKmType"
+              >
+                <option value="daily">Daily</option>
+                <option value="monthly" selected>Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+
+              <label class="fw-semibold ms-3 me-2">From:</label>
+              <input
+                type="date"
+                class="form-control form-control-sm w-auto"
+                [(ngModel)]="costPerKmStart"
+              />
+
+              <label class="fw-semibold ms-3 me-2">To:</label>
+              <input
+                type="date"
+                class="form-control form-control-sm w-auto"
+                [(ngModel)]="costPerKmEnd"
+              />
+
+              <button
+                class="btn btn-sm btn-primary ms-3"
+                (click)="loadCostPerKmChart()"
+              >
+                Apply
+              </button>
+            </div>
+
+            <apx-chart
+              *ngIf="costPerKmChartOptions"
+              [series]="costPerKmChartOptions.series"
+              [chart]="costPerKmChartOptions.chart"
+              [xaxis]="costPerKmChartOptions.xaxis"
+              [yaxis]="costPerKmChartOptions.yaxis"
+              [dataLabels]="costPerKmChartOptions.dataLabels"
+              [stroke]="costPerKmChartOptions.stroke"
+              [fill]="costPerKmChartOptions.fill"
+              [tooltip]="costPerKmChartOptions.tooltip"
+              [colors]="costPerKmChartOptions.colors"
+            ></apx-chart>
+
+            <div
+              *ngIf="!costPerKmChartOptions?.series?.length"
+              class="text-center text-muted py-4"
+            >
+              No data available for the selected range.
+            </div>
+          </div>
+        </div>
+        
       </div>
-
-      <!-- Chart Display -->
-      <apx-chart
-        *ngIf="fuelChartOptions"
-        [series]="fuelChartOptions.series"
-        [chart]="fuelChartOptions.chart"
-        [xaxis]="fuelChartOptions.xaxis"
-        [stroke]="fuelChartOptions.stroke"
-        [dataLabels]="fuelChartOptions.dataLabels"
-        [fill]="fuelChartOptions.fill"
-        [colors]="fuelChartOptions.colors"
-        [yaxis]="fuelChartOptions.yaxis"
-        [title]="fuelChartOptions.title"
-      ></apx-chart>
-
-      <div *ngIf="!fuelChartOptions?.series?.length" class="text-center text-muted py-4">
-        No data available for the selected range.
-      </div>
-    </div>
-  </div>
-
-
-  <div class="col-md-12 mb-3">
-  <div class="bg_sw p-3 shadow rounded">
-    <h5 class="sec_title">Fuel Efficiency</h5>
-
-    <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
-      <label class="fw-semibold me-2">Type:</label>
-      <select class="form-select form-select-sm w-auto" [(ngModel)]="fuelEfficiencyType">
-        <option value="daily">Daily</option>
-        <option value="monthly" selected>Monthly</option>
-        <option value="yearly">Yearly</option>
-      </select>
-
-      <label class="fw-semibold ms-3 me-2">From:</label>
-      <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEfficiencyStart">
-
-      <label class="fw-semibold ms-3 me-2">To:</label>
-      <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEfficiencyEnd">
-
-      <button class="btn btn-sm btn-primary ms-3" (click)="loadFuelEfficiencyChart()">Apply</button>
     </div>
 
-    <apx-chart
-      *ngIf="fuelEfficiencyChartOptions"
-      [series]="fuelEfficiencyChartOptions.series"
-      [chart]="fuelEfficiencyChartOptions.chart"
-      [xaxis]="fuelEfficiencyChartOptions.xaxis"
-      [yaxis]="fuelEfficiencyChartOptions.yaxis"
-      [dataLabels]="fuelEfficiencyChartOptions.dataLabels"
-      [stroke]="fuelEfficiencyChartOptions.stroke"
-      [fill]="fuelEfficiencyChartOptions.fill"
-      [tooltip]="fuelEfficiencyChartOptions.tooltip"
-      [colors]="fuelEfficiencyChartOptions.colors"
-    ></apx-chart>
-
-    <div *ngIf="!fuelEfficiencyChartOptions?.series?.length" class="text-center text-muted py-4">
-      No data available for the selected range.
-    </div>
-  </div>
-</div>
-
-</div>
-
-  
-    </div>
     <!-- <div class="col-md-6 mb-3">
       <div class="bg_sw">
         <h5 class="sec_title">Bus Status</h5>

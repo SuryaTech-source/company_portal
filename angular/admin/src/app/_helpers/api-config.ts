@@ -101,6 +101,10 @@ export const Apiconfig = {
         "url": "admin/fuel/fuel-efficieny",
         "method": "post"
     },
+    costPerKmAnalytics:{
+        "url": "admin/fuel/cost-per-km",
+        "method": "post"
+    },
 
     saveContract:{
         "url": "admin/contract/save",

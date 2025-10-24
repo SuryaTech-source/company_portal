@@ -108,10 +108,17 @@ fuelChartType: 'daily' | 'monthly' | 'yearly' = 'monthly';
 fuelStartDate: string;
 fuelEndDate: string;
 
-fuelEfficiencyType = 'monthly';
+fuelEfficiencyType = 'daily';
 fuelEfficiencyStart: string = '';
 fuelEfficiencyEnd: string = '';
 fuelEfficiencyChartOptions: any;
+
+
+costPerKmType = 'daily';
+costPerKmStart: string = '';
+costPerKmEnd: string = '';
+costPerKmChartOptions: any;
+
 
 
   public chartOptionschart: Partial<ApexOptions> = {
@@ -782,6 +789,56 @@ loadFuelEfficiencyChart() {
   });
 }
 
+
+loadCostPerKmChart() {
+  const payload = {
+    type: this.costPerKmType,
+    startDate: this.costPerKmStart,
+    endDate: this.costPerKmEnd,
+  };
+
+  this.apiService
+      .CommonApi(Apiconfig.costPerKmAnalytics.method, Apiconfig.costPerKmAnalytics.url, payload).subscribe((res: any) => {
+    if (res.status && res.data.length) {
+      const labels = res.data.map((x: any) => x.label);
+      const costPerKm = res.data.map((x: any) => +(x.costPerKm.toFixed(2)));
+
+      this.costPerKmChartOptions = {
+        series: [
+          {
+            name: 'Cost per Kilometer (₹/km)',
+            data: costPerKm,
+          },
+        ],
+        chart: {
+          type: 'bar',
+          height: 350,
+          toolbar: { show: false },
+        },
+        xaxis: {
+          categories: labels,
+          title: { text: 'Date' },
+          labels: { rotate: -45 },
+        },
+        yaxis: {
+          title: { text: 'Cost (₹/km)' },
+          decimalsInFloat: 2,
+        },
+        tooltip: {
+          y: {
+            formatter: (val: number) => `₹${val.toFixed(2)} per km`,
+          },
+        },
+        stroke: { curve: 'smooth', width: 2 },
+        fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical' } },
+        colors: ['#00C49F'],
+        dataLabels: { enabled: true },
+      };
+    } else {
+      this.costPerKmChartOptions = { series: [] };
+    }
+  });
+}
   populateYears() {
     const startYear = 2018;
     const currentYear = new Date().getFullYear();
@@ -1044,6 +1101,7 @@ loadFuelEfficiencyChart() {
   this.loadFuelChart();
 
   this.loadFuelEfficiencyChart()
+  this.loadCostPerKmChart()
  this.apiService.CommonApi(Apiconfig.getDashboard.method, Apiconfig.getDashboard.url, {}).subscribe(
       (result) => {
 

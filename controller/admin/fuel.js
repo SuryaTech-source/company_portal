@@ -386,6 +386,99 @@ controller.fuelEfficiencyAnalytics = async function (req, res) {
   }
 };
 
+controller.costPerKmAnalytics = async function (req, res) {
+  try {
+    const { vehicle, driver, startDate, endDate, type = "monthly" } = req.body;
+
+    let match = {};
+    if (vehicle) match.vehicle = new mongoose.Types.ObjectId(vehicle);
+    if (driver) match.driver = new mongoose.Types.ObjectId(driver);
+    if (startDate && endDate) {
+      match.lastRechargeDate = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // --- Grouping logic ---
+    let groupId = {};
+    if (type === "daily") {
+      groupId = {
+        year: { $year: "$lastRechargeDate" },
+        month: { $month: "$lastRechargeDate" },
+        day: { $dayOfMonth: "$lastRechargeDate" },
+      };
+    } else if (type === "monthly") {
+      groupId = {
+        year: { $year: "$lastRechargeDate" },
+        month: { $month: "$lastRechargeDate" },
+      };
+    } else if (type === "yearly") {
+      groupId = { year: { $year: "$lastRechargeDate" } };
+    }
+
+    const pipeline = [
+      { $match: match },
+      {
+        $addFields: {
+          distance: { $subtract: ["$endOdometer", "$startOdometer"] },
+        },
+      },
+      {
+        $group: {
+          _id: groupId,
+          totalDistance: { $sum: "$distance" },
+          totalAmountPaid: { $sum: "$amountPaid" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          month: "$_id.month",
+          day: "$_id.day",
+          totalDistance: 1,
+          totalAmountPaid: 1,
+          costPerKm: {
+            $cond: [
+              { $eq: ["$totalDistance", 0] },
+              0,
+              { $divide: ["$totalAmountPaid", "$totalDistance"] },
+            ],
+          },
+        },
+      },
+      { $sort: { year: 1, month: 1, day: 1 } },
+    ];
+
+    const result = await db.GetAggregation("fuel", pipeline);
+
+    // Add readable labels
+    const formatted = result.map((r) => {
+      let label = "";
+      if (type === "daily") {
+        label = `${r.year}-${String(r.month).padStart(2, "0")}-${String(r.day).padStart(2, "0")}`;
+      } else if (type === "monthly") {
+        label = `${r.year}-${String(r.month).padStart(2, "0")}`;
+      } else {
+        label = `${r.year}`;
+      }
+      return { ...r, label };
+    });
+
+    return res.send({
+      status: true,
+      message: "Cost per kilometer analytics fetched successfully",
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("ERROR costPerKmAnalytics", error);
+    return res.send({
+      status: false,
+      message: "Error while fetching cost per kilometer analytics",
+    });
+  }
+};
 
 
 
