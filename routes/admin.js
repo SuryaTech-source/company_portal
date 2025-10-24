@@ -686,6 +686,7 @@ module.exports = function (app, io) {
     app.post('/admin/fuel/view', ensureAuthorized, fuel.viewFuel);
     app.post('/admin/fuel/list', ensureAuthorized, fuel.listFuels);
     app.post('/admin/fuel/fuel-stats', ensureAuthorized, fuel.fuelUsageAnalytics);
+    app.post('/admin/fuel/fuel-efficieny', ensureAuthorized, fuel.fuelEfficiencyAnalytics);
 
     //maintenance management
     app.post('/admin/maintenance/save', ensureAuthorized, maintance.saveMaintenance);
@@ -723,6 +724,7 @@ module.exports = function (app, io) {
     app.post('/admin/fleet/assignment/list', ensureAuthorized, fleetAssignment.listFleetAssignments);
     app.post('/admin/fleet/assignment/unassign', ensureAuthorized, fleetAssignment.unassignFleet);
     app.post('/admin/fleet/assignment/assignment-stats', ensureAuthorized, fleetAssignment.fleetAssignmentCounts);
+    
     } catch (e) {
         console.log('erroe in index.js---------->>>>', e);
     }

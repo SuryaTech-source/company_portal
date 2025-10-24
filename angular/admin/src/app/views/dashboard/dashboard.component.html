@@ -99,6 +99,48 @@
       </div>
     </div>
   </div>
+
+
+  <div class="col-md-12 mb-3">
+  <div class="bg_sw p-3 shadow rounded">
+    <h5 class="sec_title">Fuel Efficiency</h5>
+
+    <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+      <label class="fw-semibold me-2">Type:</label>
+      <select class="form-select form-select-sm w-auto" [(ngModel)]="fuelEfficiencyType">
+        <option value="daily">Daily</option>
+        <option value="monthly" selected>Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+
+      <label class="fw-semibold ms-3 me-2">From:</label>
+      <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEfficiencyStart">
+
+      <label class="fw-semibold ms-3 me-2">To:</label>
+      <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEfficiencyEnd">
+
+      <button class="btn btn-sm btn-primary ms-3" (click)="loadFuelEfficiencyChart()">Apply</button>
+    </div>
+
+    <apx-chart
+      *ngIf="fuelEfficiencyChartOptions"
+      [series]="fuelEfficiencyChartOptions.series"
+      [chart]="fuelEfficiencyChartOptions.chart"
+      [xaxis]="fuelEfficiencyChartOptions.xaxis"
+      [yaxis]="fuelEfficiencyChartOptions.yaxis"
+      [dataLabels]="fuelEfficiencyChartOptions.dataLabels"
+      [stroke]="fuelEfficiencyChartOptions.stroke"
+      [fill]="fuelEfficiencyChartOptions.fill"
+      [tooltip]="fuelEfficiencyChartOptions.tooltip"
+      [colors]="fuelEfficiencyChartOptions.colors"
+    ></apx-chart>
+
+    <div *ngIf="!fuelEfficiencyChartOptions?.series?.length" class="text-center text-muted py-4">
+      No data available for the selected range.
+    </div>
+  </div>
+</div>
+
 </div>
 
   

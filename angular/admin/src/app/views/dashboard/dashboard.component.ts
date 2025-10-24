@@ -108,6 +108,10 @@ fuelChartType: 'daily' | 'monthly' | 'yearly' = 'monthly';
 fuelStartDate: string;
 fuelEndDate: string;
 
+fuelEfficiencyType = 'monthly';
+fuelEfficiencyStart: string = '';
+fuelEfficiencyEnd: string = '';
+fuelEfficiencyChartOptions: any;
 
 
   public chartOptionschart: Partial<ApexOptions> = {
@@ -639,6 +643,8 @@ fuelEndDate: string;
       });
   }
 
+  
+
   setFuelChart(labels: string[], fuel: number[], amount: number[]): void {
     this.fuelChartOptions = {
       series: [
@@ -726,7 +732,55 @@ fuelEndDate: string;
     };
   }
 
+loadFuelEfficiencyChart() {
+  const payload = {
+    type: this.fuelEfficiencyType,
+    startDate: this.fuelEfficiencyStart,
+    endDate: this.fuelEfficiencyEnd,
+  };
 
+    this.apiService
+      .CommonApi(Apiconfig.fuelEfficiencyAnalytics.method, Apiconfig.fuelEfficiencyAnalytics.url, payload).subscribe((res: any) => {
+    if (res.status && res.data.length) {
+      const labels = res.data.map((x: any) => x.label);
+      const efficiency = res.data.map((x: any) => +(x.fuelEfficiency.toFixed(2)));
+
+      this.fuelEfficiencyChartOptions = {
+        series: [
+          {
+            name: 'Fuel Efficiency (L/km)',
+            data: efficiency,
+          },
+        ],
+        chart: {
+          type: 'line',
+          height: 350,
+          toolbar: { show: false },
+        },
+        xaxis: {
+          categories: labels,
+          title: { text: 'Date' },
+          labels: { rotate: -45 },
+        },
+        yaxis: {
+          title: { text: 'Fuel Efficiency (L/km)' },
+          decimalsInFloat: 2,
+        },
+        tooltip: {
+          y: {
+            formatter: (val: number) => `${val.toFixed(2)} L/km`,
+          },
+        },
+        stroke: { curve: 'smooth', width: 2 },
+        fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical' } },
+        colors: ['#1E90FF'],
+        dataLabels: { enabled: true },
+      };
+    } else {
+      this.fuelEfficiencyChartOptions = { series: [] };
+    }
+  });
+}
 
   populateYears() {
     const startYear = 2018;
@@ -989,7 +1043,7 @@ fuelEndDate: string;
 
   this.loadFuelChart();
 
-
+  this.loadFuelEfficiencyChart()
  this.apiService.CommonApi(Apiconfig.getDashboard.method, Apiconfig.getDashboard.url, {}).subscribe(
       (result) => {
 

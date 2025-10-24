@@ -97,6 +97,11 @@ export const Apiconfig = {
         "method": "post"
     },
 
+    fuelEfficiencyAnalytics:{
+        "url": "admin/fuel/fuel-efficieny",
+        "method": "post"
+    },
+
     saveContract:{
         "url": "admin/contract/save",
         "method": "post"
