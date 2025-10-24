@@ -45,10 +45,10 @@ export class ListTestimonialComponent {
   edit_btn: boolean = true;
   view_btn: boolean = false;
   delete_btn: boolean = true;
-  addBtnUrl: string = '/app/testimonial/add';
+  addBtnUrl: string = '/app/fleet/add';
   addBtnName: string = 'Add New Asset';
-  editUrl: string = `/app/testimonial/edit/`;
-  viewUrl: string = `/app/testimonial/view/`;
+  editUrl: string = `/app/fleet/edit/`;
+  viewUrl: string = `/app/fleet/view/`;
   global_status: number = 0;
   global_search: string;
   bulk_action: boolean = false;

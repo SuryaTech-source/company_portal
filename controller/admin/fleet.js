@@ -49,7 +49,7 @@ if (body.documentType && req.uploadedFiles && req.uploadedFiles.webp) {
         // --- Update Fleet ---
         result = await db.UpdateDocument(
           "fleet",
-          { _id: mongoose.Types.ObjectId(body._id) },
+          { _id: new  mongoose.Types.ObjectId(body._id) },
           fleetData
         );
         return res.send({

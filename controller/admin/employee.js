@@ -226,6 +226,8 @@ controller.viewemployee = async function (req, res) {
             nationality: 1,
             dateOfJoining: 1,
             visaExpiry: 1,
+            nominee: 1,
+            licenseNo: 1,
             role: 1,
             status: 1,
           },

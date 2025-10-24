@@ -17,7 +17,7 @@ const routes: Routes = [
     path: 'edit/:id',
     component: AddEditTestimonialComponent,
     data: {
-      title: 'Add',
+      title: 'Edit',
     },
   },
   {

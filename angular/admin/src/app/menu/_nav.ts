@@ -60,6 +60,7 @@ export const navItems: INavData[] = [
         icon: '',
         id: 'add'
       },
+      
       {
         name: 'Active List',
         url: '/app/fleet/list',
@@ -223,26 +224,26 @@ export const navItems: INavData[] = [
   //   ]
   // },
   
-  {
-    id: "deals",
-    name: 'Drivers',
-    url: '/app/deals',
-    icon: 'assets/image/deal.png',
-    children: [
-      {
-        name: 'Drivers List',
-        url: '/app/deals/list',
-        icon: '',
-        id: 'list'
-      },
-      {
-        name: 'Add Drivers',
-        url: '/app/deals/add',
-        icon: '',
-        id: "add"
-      },
-    ]
-  },
+  // {
+  //   id: "deals",
+  //   name: 'Drivers',
+  //   url: '/app/deals',
+  //   icon: 'assets/image/deal.png',
+  //   children: [
+  //     {
+  //       name: 'Drivers List',
+  //       url: '/app/deals/list',
+  //       icon: '',
+  //       id: 'list'
+  //     },
+  //     {
+  //       name: 'Add Drivers',
+  //       url: '/app/deals/add',
+  //       icon: '',
+  //       id: "add"
+  //     },
+  //   ]
+  // },
   {
     id: "reports",
     name: 'Reports',

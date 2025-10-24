@@ -177,10 +177,10 @@ export class ActiveEmployeesComponent implements OnInit {
   }
 
   viewDriver(driver: any): void {
-    this.router.navigate(['/app/drivers/view', driver._id]);
+    this.router.navigate(['/app/employees/view', driver._id]);
   }
 
   editDriver(driver: any): void {
-    this.router.navigate(['/app/drivers/edit', driver._id]);
+    this.router.navigate(['/app/employees/edit', driver._id]);
   }
 }

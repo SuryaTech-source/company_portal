@@ -1,87 +1,258 @@
 <div class="feet-new_feet_page">
-  <h2 class="page_title">ADD NEW ASSET</h2>
-  <form #testimonialForm="ngForm" (ngSubmit)="submitForm(testimonialForm)">
+  <h2 class="page_title">{{ id ? 'EDIT ASSET' : 'ADD NEW ASSET' }}</h2>
+
+  <form #testimonialForm="ngForm" (ngSubmit)="submitForm(testimonialForm)" novalidate>
     <div class="row">
+      <!-- Vehicle Name -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>VEHICLE NAME</label>
-          <input type="text" class="form-control" name="vehicleName" ngModel required maxlength="30">
+          <input
+            type="text"
+            class="form-control"
+            name="vehicleName"
+            ngModel
+            #vehicleName="ngModel"
+            required
+            maxlength="30"
+          />
+          <small *ngIf="submitted && vehicleName.invalid" class="text-danger">
+            Vehicle name is required
+          </small>
         </div>
       </div>
+
+      <!-- Cubic Capacity -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>CUBIC CAPACITY</label>
-          <input type="number" class="form-control" name="cubicCapacity" ngModel required>
+          <input
+            type="number"
+            class="form-control"
+            name="cubicCapacity"
+            ngModel
+            #cubicCapacity="ngModel"
+            required
+          />
+          <small *ngIf="submitted && cubicCapacity.invalid" class="text-danger">
+            Cubic capacity is required
+          </small>
         </div>
       </div>
+
+      <!-- Registration No -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>REGISTRATION NO.</label>
-          <input type="text" class="form-control" name="registrationNo" ngModel required>
+          <input
+            type="text"
+            class="form-control"
+            name="registrationNo"
+            ngModel
+            #registrationNo="ngModel"
+            required
+          />
+          <small *ngIf="submitted && registrationNo.invalid" class="text-danger">
+            Registration number is required
+          </small>
         </div>
       </div>
+
+      <!-- Colour -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>COLOUR</label>
-          <input type="text" class="form-control" name="colour" ngModel required>
+          <input
+            type="text"
+            class="form-control"
+            name="colour"
+            ngModel
+            #colour="ngModel"
+            required
+          />
+          <small *ngIf="submitted && colour.invalid" class="text-danger">
+            Colour is required
+          </small>
         </div>
       </div>
+
+      <!-- Insurance No -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>INSURANCE NO.</label>
-          <input type="text" class="form-control" name="insuranceNo" ngModel required>
+          <input
+            type="text"
+            class="form-control"
+            name="insuranceNo"
+            ngModel
+            #insuranceNo="ngModel"
+            required
+          />
+          <small *ngIf="submitted && insuranceNo.invalid" class="text-danger">
+            Insurance number is required
+          </small>
         </div>
       </div>
+
+      <!-- Seating Capacity -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>SEATING CAPACITY</label>
-          <input type="number" class="form-control" name="seatingCapacity" ngModel required>
+          <input
+            type="number"
+            class="form-control"
+            name="seatingCapacity"
+            ngModel
+            #seatingCapacity="ngModel"
+            required
+          />
+          <small *ngIf="submitted && seatingCapacity.invalid" class="text-danger">
+            Seating capacity is required
+          </small>
         </div>
       </div>
+
+      <!-- Month & Year -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>MONTH & YR OF</label>
-          <input type="month" class="form-control" name="monthYrOf" ngModel required>
+          <input
+            type="month"
+            class="form-control"
+            name="monthYrOf"
+            ngModel
+            #monthYrOf="ngModel"
+            required
+          />
+          <small *ngIf="submitted && monthYrOf.invalid" class="text-danger">
+            Manufacture month & year is required
+          </small>
         </div>
       </div>
+
+      <!-- Next Passing Due -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>NEXT PASSING DUE</label>
-          <input type="date" class="form-control" name="nextPassingDue" ngModel required>
+          <input
+            type="date"
+            class="form-control"
+            name="nextPassingDue"
+            ngModel
+            #nextPassingDue="ngModel"
+            required
+          />
+          <small *ngIf="submitted && nextPassingDue.invalid" class="text-danger">
+            Next passing due date is required
+          </small>
         </div>
       </div>
+
+      <!-- Maker's Name -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
           <label>MAKER'S NAME</label>
-          <input type="text" class="form-control" name="makersName" ngModel>
+          <input
+            type="text"
+            class="form-control"
+            name="makersName"
+            ngModel
+          />
         </div>
       </div>
-      <h5 class="col-12 ">DOCUMENTS</h5>
-      <div class="col-md-4 col-sm-12">
-        <div class="label_input">
-          <label for="document">ADD NEW DOCUMENT</label>
-          <input type="file" class="form-control" name="document" (change)="onDocumentSelected($event)">
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-12">
-        <div class="label_input">
-          <label>DOCUMENT TYPE</label>
-          <select class="form-control" name="documentType" [(ngModel)]="documentType" required>
-            <option value="" disabled selected>Select type</option>
-            <option *ngFor="let option of documentTypeOptions" [value]="option">{{option}}</option>
-          </select>
-        </div>
-      </div>
+
+      <!-- Documents Section -->
+<h5 class="col-12 mt-3">DOCUMENTS</h5>
+
+<!-- Add New Document -->
+<div class="col-md-4 col-sm-12">
+  <div class="label_input">
+    <label for="document">ADD NEW DOCUMENT</label>
+    <input
+      type="file"
+      class="form-control"
+      name="document"
+      (change)="onDocumentSelected($event)"
+    />
+  </div>
+</div>
+
+<div class="col-md-4 col-sm-12">
+  <div class="label_input">
+    <label>DOCUMENT TYPE</label>
+    <select
+      class="form-control"
+      name="documentType"
+      [(ngModel)]="documentType"
+      #documentTypeCtrl="ngModel"
+      required
+    >
+      <option value="" disabled selected>Select type</option>
+      <option *ngFor="let option of documentTypeOptions" [value]="option">
+        {{ option }}
+      </option>
+    </select>
+    <small *ngIf="submitted && documentTypeCtrl.invalid" class="text-danger">
+      Please select document type
+    </small>
+  </div>
+</div>
+
+<!-- Existing Documents List -->
+<div class="col-12 mt-3" *ngIf="getFleet?.documents?.length">
+  <div class="existing-docs">
+    <h6>Existing Uploaded Documents:</h6>
+
+    <table class="table table-bordered mt-2">
+      <thead>
+        <tr>
+          <th>Document Type</th>
+          <th>File</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let doc of getFleet.documents">
+          <td>{{ doc.documentType }}</td>
+          <td>
+            <span class="text-primary text-break">{{ doc.fileUrl.split('/').pop() }}</span>
+          </td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary me-2"
+              (click)="previewDocument(doc.fileUrl)"
+            >
+              Preview
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-success"
+              (click)="downloadDocument(doc.fileUrl)"
+            >
+              Download
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
     </div>
+
     <div class="page_footer">
       <button type="button" class="close_btn" (click)="cancel()">Cancel</button>
-
-      <button type="submit" class=" bg_green"> Submit
+      <button type="submit" class="bg_green">
+        {{ id ? 'Update' : 'Submit' }}
         <div class="icon">
           <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
-              fill="currentColor"></path>
+            <path
+              d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+              fill="currentColor"
+            ></path>
           </svg>
         </div>
       </button>
