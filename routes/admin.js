@@ -701,7 +701,7 @@ module.exports = function (app, io) {
     //attenance management
     app.post('/admin/attendance/save', ensureAuthorized, attendence.saveAttendance);
     app.post('/admin/attendance/list',ensureAuthorized , attendence.listAttendance)
-    app.post('admin/vendor/payment/save', ensureAuthorized, attendence.saveVendorPayment);
+    app.post('/admin/vendor/payment/save', ensureAuthorized, attendence.saveVendorPayment);
     app.post ('/admin/customer/payment/save', ensureAuthorized, attendence.saveCustomerPayment);
     app.post('/admin/vendor/payment/list', ensureAuthorized, attendence.listVendorPayment);
     app.post('/admin/customer/payment/list', ensureAuthorized, attendence.listCustomerPayment);

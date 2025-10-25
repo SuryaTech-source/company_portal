@@ -484,7 +484,7 @@ controller.listCustomerPayment = async function (req, res) {
     if (sortField) sortObj[sortField] = sortOrder;
     else sortObj.createdAt = -1;
 
-    const result = await db.GetAggregation("customerpayment", [
+    const result = await db.GetAggregation("customerPayment", [
       { $match: query },
       {
         $lookup: {
@@ -500,7 +500,7 @@ controller.listCustomerPayment = async function (req, res) {
       { $limit: pagesize },
     ]);
 
-    const count = await db.GetCount("customerpayment", query);
+    const count = await db.GetCount("customerPayment", query);
 
     return res.send({ status: true, count, data: result });
   } catch (err) {
@@ -535,7 +535,7 @@ controller.listVendorPayment = async function (req, res) {
     if (sortField) sortObj[sortField] = sortOrder;
     else sortObj.createdAt = -1;
 
-    const result = await db.GetAggregation("vendorpayment", [
+    const result = await db.GetAggregation("vendorPayment", [
       { $match: query },
       {
         $lookup: {
@@ -551,7 +551,7 @@ controller.listVendorPayment = async function (req, res) {
       { $limit: pagesize },
     ]);
 
-    const count = await db.GetCount("vendorpayment", query);
+    const count = await db.GetCount("vendorPayment", query);
 
     return res.send({ status: true, count, data: result });
   } catch (err) {
