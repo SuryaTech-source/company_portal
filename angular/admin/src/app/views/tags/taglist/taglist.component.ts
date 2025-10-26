@@ -623,12 +623,12 @@ export class TaglistComponent  {
             return value;
           }
         },
-        contractId: {
+        contractDetails: {
           title: 'Contract ID',
           filter: true,
           type: 'html',
           valuePrepareFunction: (value, row) => {
-            return value;
+            return value.contractId;
           }
         },
         startDate: {
@@ -729,12 +729,12 @@ export class TaglistComponent  {
             return value;
           }
         },
-        contractId: {
+        contractDetails: {
           title: 'Contract ID',
           filter: true,
           type: 'html',
           valuePrepareFunction: (value, row) => {
-            return value;
+            return value.contractId;
           }
         },
         startDate: {

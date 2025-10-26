@@ -136,6 +136,31 @@ module.exports = function () {
     }
   };
 
+
+  controller.listActiveContracts = async function (req, res) {
+  try {
+    const result = await db.GetDocument(
+      "contract",
+      { status: 1 },
+      { _id: 1, clientName: 1, contractId: 1, contractType: 1 },
+      { createdAt: -1 }
+    );
+
+    return res.send({
+      status: true,
+      count: result.length,
+      data: result
+    });
+  } catch (error) {
+    console.log(error, "ERROR listActiveContracts");
+    return res.send({
+      status: false,
+      message: "Something went wrong while fetching active contracts."
+    });
+  }
+};
+
+
   /**
    * @route POST /contract/view
    * @desc Get contract details by ID

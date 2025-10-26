@@ -26,15 +26,20 @@
     </div>
 
     <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>Contract ID <span class="mandatory">*</span></label>
-        <input type="text" class="form-control" name="contractId" [(ngModel)]="userDetails.contractId" required
-          maxlength="30" #contractId="ngModel">
-        <div *ngIf="tagAddEditForm.submitted && contractId.errors" class="text-danger">
-          Contract ID is required (max 30 chars).
-        </div>
-      </div>
+  <div class="label_input">
+    <label>Contract <span class="mandatory">*</span></label>
+    <select class="form-control" name="contractId" [(ngModel)]="userDetails.contractId" required #contractId="ngModel">
+      <option value="" disabled selected>Select Contract</option>
+      <option *ngFor="let c of contracts" [value]="c._id">
+        {{ c.contractId }} - {{ c.clientName }}
+      </option>
+    </select>
+    <div *ngIf="tagAddEditForm.submitted && contractId.errors" class="text-danger">
+      Contract is required.
     </div>
+  </div>
+</div>
+
 
     <div class="col-md-4 col-sm-12">
       <div class="label_input">

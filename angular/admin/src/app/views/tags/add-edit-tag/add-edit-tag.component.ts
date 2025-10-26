@@ -17,6 +17,8 @@ export class AddEditTagComponent  implements OnInit {
  id: string | null = null;
   contractTypes = ['Yes', 'No'];
   documentTypes = ['PDF', 'DOC'];
+  contracts: any[] = [];
+
 
   constructor(
     private apiService: ApiService,
@@ -28,6 +30,7 @@ export class AddEditTagComponent  implements OnInit {
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
     const path = this.route.snapshot.routeConfig?.path;
+      this.loadContracts();
     if (path?.includes('view')) {
       this.viewpage = true;
       this.getVendor();
@@ -43,6 +46,12 @@ export class AddEditTagComponent  implements OnInit {
     }
   }
 
+  loadContracts() {
+  this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
+    .subscribe((res: any) => {
+      if (res.status) this.contracts = res.data.doc;
+    });
+}
   onFormSubmit(tagAddEditForm: UntypedFormGroup) {
     console.log(tagAddEditForm.value);
 
@@ -114,14 +123,34 @@ export class AddEditTagComponent  implements OnInit {
     }
   }
 
-  getVendor(){
-    this.apiService.CommonApi(Apiconfig.viewVendor.method, Apiconfig.viewVendor.url, {id: this.id})
+getVendor() {
+  this.apiService
+    .CommonApi(Apiconfig.viewVendor.method, Apiconfig.viewVendor.url, { id: this.id })
     .subscribe((res: any) => {
-      if (res && res.status) {
-        this.userDetails = res.data;
+      if (res && res.status && res.data) {
+        const v = res.data;
+
+        // Map backend fields to your form fields
+        this.userDetails = {
+          id: v._id,
+          carrierName: v.vendorName || '',
+          noOfDrivers: v.noOfDrivers || '',
+          contractId: v.contractDetails?._id || '',
+          contractType: v.contractType || '',
+          startDate: v.startDate ? v.startDate.split('T')[0] : '',
+          endDate: v.endDate ? v.endDate.split('T')[0] : '',
+          noOfBuses: v.noOfBuses || '',
+          contactOfficer: v.contactOfficer || '',
+          documentType: v.documents?.[0]?.type || '',
+          documentFile: v.documents?.[0]?.file || ''
+        };
+
+        // Log to confirm mapping
+        console.log("Mapped userDetails:", this.userDetails);
       } else {
         this.notifyService.showError(res.message || 'An error occurred');
       }
-    }); 
-  }
+    });
+}
+
 }

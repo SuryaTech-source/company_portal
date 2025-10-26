@@ -110,6 +110,10 @@ export const Apiconfig = {
         "url": "admin/contract/save",
         "method": "post"
     },
+    contractListActive: {
+  method: 'post',
+  url: 'admin/contract/active-list'
+},
 
 
     listContracts:{

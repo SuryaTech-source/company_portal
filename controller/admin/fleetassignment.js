@@ -130,78 +130,86 @@ module.exports = function () {
    * @desc Paginated list with driver/fleet info
    */
   controller.listFleetAssignments = async function (req, res) {
-    try {
-      const { page = 1, limit = 10, search = "", sortBy = "dateAssigned", sortOrder = "desc" } = req.body;
-      const skip = (page - 1) * limit;
+  try {
+    const { page = 1, limit = 10, search = "", sortBy = "dateAssigned", sortOrder = "desc" } = req.body;
+    const skip = (page - 1) * limit;
 
-      const match = { status: { $in: [1, 2] } };
+    const match = { status: { $in: [1, 2] } };
 
-      if (search) {
-        match.$or = [
-          { "fleet.vehicleName": { $regex: search, $options: "i" } },
-          { "fleet.registrationNo": { $regex: search, $options: "i" } },
-          { "driver.fullName": { $regex: search, $options: "i" } },
-          { contractId: { $regex: search, $options: "i" } }
-        ];
-      }
-
-      const pipeline = [
-        {
-          $lookup: {
-            from: "fleet",
-            localField: "fleetId",
-            foreignField: "_id",
-            as: "fleet"
-          }
-        },
-        { $unwind: "$fleet" },
-        {
-          $lookup: {
-            from: "employee",
-            localField: "driverId",
-            foreignField: "_id",
-            as: "driver"
-          }
-        },
-        { $unwind: "$driver" },
-        { $match: match },
-        {
-          $project: {
-            vehicleName: "$fleet.vehicleName",
-            registrationNo: "$fleet.registrationNo",
-            assetCode: "$fleet.assetCode",
-            assignedTo: "$driver.fullName",
-            driverId: "$driver._id",
-            dateAssigned: 1,
-            dateUnassigned: 1,
-            odometerReadingStart: 1,
-            odometerReadingEnd: 1,
-            contractId: 1,
-            remarks: 1,
-            status: 1
-          }
-        },
-        { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
-        { $skip: skip },
-        { $limit: parseInt(limit) }
+    if (search) {
+      match.$or = [
+        { "fleet.vehicleName": { $regex: search, $options: "i" } },
+        { "fleet.registrationNo": { $regex: search, $options: "i" } },
+        { "driver.fullName": { $regex: search, $options: "i" } },
+        { "contract.contractId": { $regex: search, $options: "i" } } // updated to search in contract details
       ];
-
-      const data = await db.GetAggregation("fleetAssignment", pipeline);
-      console.log(data, "data");
-      
-      const totalCount = await db.GetCount("fleetAssignment", { status: { $in: [1, 2] } });
-
-      return res.send({
-        status: true,
-        count: totalCount,
-        page,
-        data
-      });
-    } catch (err) {
-      console.log("ERROR listFleetAssignments", err);
-      return res.send({ status: false, message: "Error while listing assignments" });
     }
-  };
+
+    const pipeline = [
+      {
+        $lookup: {
+          from: "fleet",
+          localField: "fleetId",
+          foreignField: "_id",
+          as: "fleet"
+        }
+      },
+      { $unwind: "$fleet" },
+      {
+        $lookup: {
+          from: "employee",
+          localField: "driverId",
+          foreignField: "_id",
+          as: "driver"
+        }
+      },
+      { $unwind: "$driver" },
+      {
+        $lookup: {
+          from: "contract", // join with contract collection
+          localField: "contractId",
+          foreignField: "_id",
+          as: "contract"
+        }
+      },
+      { $unwind: { path: "$contract", preserveNullAndEmptyArrays: true } },
+      { $match: match },
+      {
+        $project: {
+          vehicleName: "$fleet.vehicleName",
+          registrationNo: "$fleet.registrationNo",
+          assetCode: "$fleet.assetCode",
+          assignedTo: "$driver.fullName",
+          driverId: "$driver._id",
+          contractId: "$contract.contractId", // ✅ show actual contractId string
+          clientName: "$contract.clientName", // optional extra field
+          dateAssigned: 1,
+          dateUnassigned: 1,
+          odometerReadingStart: 1,
+          odometerReadingEnd: 1,
+          remarks: 1,
+          status: 1
+        }
+      },
+      { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+    ];
+
+    const data = await db.GetAggregation("fleetAssignment", pipeline);
+    const totalCount = await db.GetCount("fleetAssignment", { status: { $in: [1, 2] } });
+
+    return res.send({
+      status: true,
+      count: totalCount,
+      page,
+      data
+    });
+  } catch (err) {
+    console.log("ERROR listFleetAssignments", err);
+    return res.send({ status: false, message: "Error while listing assignments" });
+  }
+};
 
   /**
    * @route POST /fleet/assignment-stats

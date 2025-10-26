@@ -12,6 +12,7 @@ import * as html2pdf from 'html2pdf.js';
 export class AssignmentComponent implements OnInit {
   fleets: any[] = [];
   drivers: any[] = [];
+  contracts: any[] = [];
   totalVehicles = 0;
   deployedVehicles = 0;
   vehiclesOnMaintenance = 0;
@@ -69,6 +70,12 @@ export class AssignmentComponent implements OnInit {
       });
   }
 
+  loadContracts() {
+  this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
+    .subscribe((res: any) => {
+      if (res.status) this.contracts = res.data.doc;
+    });
+}
   /** 🔹 Load top counts */
   loadCounts() {
     this.apiService.CommonApi(Apiconfig.fleetassignmentcount.method, Apiconfig.fleetassignmentcount.url, {})
@@ -110,6 +117,7 @@ export class AssignmentComponent implements OnInit {
       remarks: ''
     };
     this.loadFleets();
+    this.loadContracts();
     this.showAssignModal = true;
   }
 
@@ -132,6 +140,9 @@ export class AssignmentComponent implements OnInit {
         }
       });
   }
+
+
+
 
   /** 🔹 Open Unassign Modal */
   openUnassignModal(assignment: any) {

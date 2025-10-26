@@ -6,20 +6,16 @@ var FLEET_ASSIGNMENT_SCHEMA = {};
 FLEET_ASSIGNMENT_SCHEMA.FLEET_ASSIGNMENT = {
   fleetId: { type: Schema.Types.ObjectId, ref: "Fleet", required: true },
   driverId: { type: Schema.Types.ObjectId, ref: "Employee", required: true },
+  contractId: { type: Schema.Types.ObjectId, ref: "Contract" }, // ✅ updated to ObjectId reference
 
   dateAssigned: { type: Date, default: Date.now },
-  dateUnassigned: { type: Date }, // when driver was unassigned
+  dateUnassigned: { type: Date },
+
   odometerReadingStart: { type: Number, default: 0 },
   odometerReadingEnd: { type: Number, default: 0 },
 
-  contractId: { type: String },
   remarks: { type: String },
-
-  status: {
-    type: Number,
-    enum: [1, 2, 0], // 1 = Active, 2 = Unassigned/Completed, 0 = Deleted
-    default: 1
-  },
+  status: { type: Number, enum: [1, 2, 0], default: 1 },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
