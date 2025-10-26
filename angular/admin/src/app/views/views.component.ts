@@ -38,6 +38,8 @@ export class ViewsComponent implements OnInit, AfterViewInit {
   privileges: any;
   modalLogoutRef: BsModalRef;
   logo: string = '';
+  profile : string;
+
   constructor(
     private authService: AuthenticationService,
     private router: Router,
@@ -54,6 +56,16 @@ export class ViewsComponent implements OnInit, AfterViewInit {
     private modalService: BsModalService,
 
   ) {
+    let userObj
+     if(localStorage.getItem('currentAdmin')){
+
+      let user = localStorage.getItem('currentAdmin');
+       userObj = JSON.parse(user);
+     }
+
+     let userName = userObj.doc.name||"User";
+        this.profile =this.generateDefaultImage(userName)
+
     this.apiService.CommonApi(Apiconfig.landingData.method, Apiconfig.landingData.url, {}).subscribe(
       (result) => {
         if (result && result.site_url) {
@@ -274,6 +286,58 @@ export class ViewsComponent implements OnInit, AfterViewInit {
       })
   }
 
+generateDefaultImage(name: string) {
+    // Create a canvas element
+    const canvas = document.createElement("canvas");
+    canvas.style.display = "none";
+    canvas.width = 32;
+    canvas.height = 32;
+    document.body.appendChild(canvas);
+    const context = canvas.getContext("2d")!;
+    
+    // Generate a color based on the initials
+    const initials = this.getInitials(name);
+    const color = this.getColorFromInitials(initials);
+  
+    // Fill the canvas with the generated color
+    context.fillStyle = color;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  
+    // Set font and text color
+    context.font = "14px Helvetica";
+    context.fillStyle = "#fff";
+  
+    // Draw the initials on the canvas
+    if (initials.length > 1) {
+      context.fillText(initials.toUpperCase(), 6, 22);
+    } else {
+      context.fillText(initials.toUpperCase(), 11, 22);
+    }
+  
+    // Convert the canvas to a data URL
+    const data = canvas.toDataURL();
+    document.body.removeChild(canvas);
+    return data;
+  }
+  
+  // Function to extract initials from a name
+  getInitials(name: string): string {
+    const nameArray = name.split(" ");
+    let initials = "";
+    for (let i = 0; i < nameArray.length; i++) {
+      if (i <= 1) {
+        initials = initials + nameArray[i][0];
+      }
+    }
+    return initials;
+  }
+  
+  // Function to generate a dark color based on initials
+  getColorFromInitials(initials: string): string {
+    const hash = initials.charCodeAt(0) + (initials.length > 1 ? initials.charCodeAt(1) : 0);
+    const hue = hash % 360; 
+    return `hsl(${hue}, 70%, 20%)`; // Darker shade with lightness set to 20%
+  }
 
 
   sidebarFunction() {

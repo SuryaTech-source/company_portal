@@ -1,23 +1,23 @@
-<app-header *ngIf="logo" [navbarBrandRouterLink]="['/app']" [fixed]="true"
-    [navbarBrandFull]="{src: logo, width: 89, height: 25, alt: 'Logo',style: { 'max-width.px': 89,'max-height.px': 25 }}"
-    [navbarBrandMinimized]="{src: 'assets/image/icon.png', width: 30, height: 30,  alt: 'Logo-icon'}"
+<app-header [navbarBrandRouterLink]="['/app']" [fixed]="true"
+    [navbarBrandFull]="{src: 'assets/img/complogo.png', width: 100, height: 10, alt: 'Logo'}"
+    [navbarBrandMinimized]="{src: 'assets/img/complogo.png', width: 40, height: 30, alt: 'Logo-icon'}"
     [sidebarToggler]="'lg'" [asideMenuToggler]="'lg'">
 
-    <ul class="nav navbar-nav ml-auto top_bar_profile_bell">
-        <li class="nav-item dropdown" dropdown placement="bottom right">
-            <a routerLink="/app/orders/neworders" class="nav-link" data-toggle="dropdown" href="javascript:void(0)"
-                role="button" aria-haspopup="true" aria-expanded="false" dropdownToggle (click)="false"><i
-                    class="fa fa-bell-o"></i><span class="badge badge-pill badge-danger"></span>
+    <ul class="nav navbar-nav ml-auto">
+        <!-- <li class="nav-item dropdown" dropdown placement="bottom right">
+            <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="true"
+                aria-expanded="false" dropdownToggle (click)="false"><i class="fa fa-bell-o"></i><span
+                    class="badge badge-pill badge-danger"></span>
                 <span ng-if="pendingDriverLength != 0" class="badge bg-lightred">{{total}} </span>
             </a>
-            <!-- <div class="dropdown-menu dropdown-menu-right" role="menu" *dropdownMenu aria-labelledby="simple-dropdown"> -->
-            <!-- <div class="">Notification<strong>{{total}}</strong></div>
-                <ul slimscroll="{height: '100%'}" class="list-group header-scroll" id="table-scroll"> -->
-            <!-- <div class="panel-body">
+            <div class="dropdown-menu dropdown-menu-right" role="menu" *dropdownMenu aria-labelledby="simple-dropdown">
+                <div class="dropdown-header text-center"> You have <strong> {{total}}</strong> new notifications.</div>
+                <ul slimscroll="{height: '100%'}" class="list-group header-scroll" id="table-scroll">
+                    <div class="panel-body">
                         <a class="dropdown-item"><strong>Orders List : {{pendingOrderlength}} </strong>
                         </a>
-                    </div> -->
-            <!-- <li class="dropdown-item" *ngFor="let ptasker of pendingOrders">
+                    </div>
+                    <li class="dropdown-item" *ngFor="let ptasker of pendingOrders">
                         <a routerLink="/app/orders/vieworders/{{ptasker._id}}" class="media">
                             <div class="media-left">
                             </div>
@@ -26,9 +26,9 @@
                                 <div><small class="text-muted">{{ptasker.createdAt| timeago:live}}</small></div>
                             </div>
                         </a>
-                    </li> -->
-            <!-- <a routerLink="/app/orders/neworders">Show all orders >> </a> -->
-            <!-- <br>
+                    </li>
+                    <a routerLink="/app/orders/neworders" style="margin-left:13px;">Show all orders >> </a>
+                    <br>
                     <div class="panel-body">
                         <a class="dropdown-item"><strong>New Drivers List : {{pendingDriverlength}}</strong>
                         </a>
@@ -45,46 +45,28 @@
                             </div>
                         </a>
                     </li>
-                    <a routerLink="/app/drivers/driverslist" style="margin-left:13px;">Show all orders >> </a> -->
-            <!-- </ul> -->
-            <!-- </div> -->
+                    <a routerLink="/app/drivers/driverslist" style="margin-left:13px;">Show all orders >> </a>
+                </ul>
+            </div>
 
-            <!-- </li> -->
+        </li> -->
 
-            <!-- <li class="nav-item d-md-down-none"> 
+        <!-- <li class="nav-item d-md-down-none"> 
             <a class="nav-link" href="javascript:void(0)"><i class="fa fa-list"></i></a>
         </li> -->
-        <li class="nav-item dropdown admin_user_profile" dropdown placement="bottom right">
-            <div class="admin_profile">
-                <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="true"
-                    aria-expanded="false" dropdownToggle (click)="false">
-                    <img src="assets/image/user.jpg" class="img-avatar" alt="user image" />
-                    <div>
-                        <!-- <h5>Prem</h5> -->
-                        <p><b>Admin</b></p>
-                    </div>
-                </a>
-
-            </div>
+        <li class="nav-item dropdown" dropdown placement="bottom right">
+            <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="true"
+                aria-expanded="false" dropdownToggle (click)="false">
+                <img [src]="profile" class="img-avatar" alt="user image" />
+            </a>
             <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
-                <div class="admin_profile_dd">
-                    <!-- <div class="admin_profile_post">
-                        <img src="" alt="">
-                        <div>
-                            <h5>Prem</h5>
-                            <p>admin@mail.com</p>
-                        </div>
-                    </div> -->
-
-                    <div class="profile_setting_logout">
-                        <a class="dropdown-item" routerLink="/app/settings"><img src="assets/image/profile.png"
-                                alt="">&nbsp;My Profile</a>
-                        <a class="dropdown-item" routerLink="/app/settings"><img src="assets/image/setting.png"
-                                alt="">&nbsp;Setting</a>
-                        <a class="dropdown-item" href="javascript:void(0)" (click)="logOutPop(logOutPopup)"><img
-                                src="assets/image/logout.png" alt="">&nbsp;Logout</a>
-                    </div>
-                </div>
+                <div class="dropdown-header text-center"><strong>My Profile</strong></div>
+                <!-- <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-user"></i> Profile</a> -->
+                <!-- <a class="dropdown-item" routerLink="/app/settings"><i class="fa fa-wrench"></i> Setting</a> -->
+                <a  class="dropdown-item" routerLink="/app/settings/change-password"><i class="fa fa-key" aria-hidden="true"></i>Change Password</a>
+                <a  class="dropdown-item" routerLink="/app/settings/profile"><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
+                <a class="dropdown-item" href="javascript:void(0)" (click)="logOutPop(logOutPopup)"><i class="fa fa-lock"></i>
+                    Logout</a>
             </div>
         </li>
     </ul>
