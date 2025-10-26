@@ -391,25 +391,28 @@ controller.getMonthlyReport = async function (req, res) {
 };
 
 
-  controller.saveCustomerPayment = async function (req, res) {
+controller.saveCustomerPayment = async function (req, res) {
   try {
     const body = req.body;
 
     const data = {
-      client: body.client, // ref to Client
-      contractId: body.contractId,
-      invoiceNo: body.invoiceNo,
-      dueDate: new Date(body.dueDate),
-      amountPaid: body.amountPaid,
-      status: body.status,
-      balance: body.balance,
-      remarks: body.remarks || "",
+      client: body.client ? new mongoose.Types.ObjectId(body.client) : null,
+      contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null,
+      invoiceNo: body.invoiceNo || '',
+      invoiceRef: body.invoiceRef ? new mongoose.Types.ObjectId(body.invoiceRef) : null,
+      dueDate: body.dueDate ? new Date(body.dueDate) : null,
+      amountPaid: Number(body.amountPaid) || 0,
+      status: body.status || 'Unpaid',
+      balance: Number(body.balance) || 0,
+      remarks: body.remarks || '',
+      updatedAt: new Date()
     };
 
     let result;
     if (body._id) {
-      result = await db.UpdateDocument("customerPayment", { _id: body._id }, data);
+      result = await db.UpdateDocument("customerPayment", { _id: new mongoose.Types.ObjectId(body._id) }, data);
     } else {
+      data.createdAt = new Date();
       result = await db.InsertDocument("customerPayment", data);
     }
 
@@ -430,20 +433,23 @@ controller.saveVendorPayment = async function (req, res) {
     const body = req.body;
 
     const data = {
-      vendor: body.vendor, // ref to Vendor
-      contractId: body.contractId,
-      invoiceNo: body.invoiceNo,
-      dueDate: new Date(body.dueDate),
-      amountPaid: body.amountPaid,
-      status: body.status,
-      balance: body.balance,
-      remarks: body.remarks || "",
+      vendor: body.vendor ? new mongoose.Types.ObjectId(body.vendor) : null,
+      contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null,
+      invoiceNo: body.invoiceNo || '',
+      invoiceRef: body.invoiceRef ? new mongoose.Types.ObjectId(body.invoiceRef) : null,
+      dueDate: body.dueDate ? new Date(body.dueDate) : null,
+      amountPaid: Number(body.amountPaid) || 0,
+      status: body.status || 'Unpaid',
+      balance: Number(body.balance) || 0,
+      remarks: body.remarks || '',
+      updatedAt: new Date()
     };
 
     let result;
     if (body._id) {
-      result = await db.UpdateDocument("vendorPayment", { _id: body._id }, data);
+      result = await db.UpdateDocument("vendorPayment", { _id: new mongoose.Types.ObjectId(body._id) }, data);
     } else {
+      data.createdAt = new Date();
       result = await db.InsertDocument("vendorPayment", data);
     }
 
@@ -459,107 +465,166 @@ controller.saveVendorPayment = async function (req, res) {
 };
 
 
-controller.listCustomerPayment = async function (req, res) {
+controller.listCustomerPayments = async function (req, res) {
   try {
-    let { page, pagesize, search, status, startDate, endDate, sortField, sortOrder } = req.query;
+    const { page = 1, limit = 10, search = "", status, startDate, endDate, sortBy = 'createdAt', sortOrder = 'desc' } = req.body;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    page = parseInt(page) || 1;
-    pagesize = parseInt(pagesize) || 10;
-    sortOrder = sortOrder === "desc" ? -1 : 1;
+    let match = {};
+    if (status) match.status = status;
+    if (startDate && endDate) match.dueDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
 
-    let query = {};
-    if (status) query.status = status;
-    if (startDate && endDate) {
-      query.dueDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
-    }
     if (search) {
-      query.$or = [
-        { invoiceNo: { $regex: search, $options: "i" } },
-        { contractId: { $regex: search, $options: "i" } },
-        { remarks: { $regex: search, $options: "i" } },
+      match.$or = [
+        { invoiceNo: { $regex: search, $options: 'i' } },
+        { 'clientDetails.clientName': { $regex: search, $options: 'i' } },
+        { 'contractDetails.contractId': { $regex: search, $options: 'i' } }
       ];
     }
 
-    let sortObj = {};
-    if (sortField) sortObj[sortField] = sortOrder;
-    else sortObj.createdAt = -1;
-
-    const result = await db.GetAggregation("customerPayment", [
-      { $match: query },
+    const pipeline = [
+      { $match: match },
       {
         $lookup: {
-          from: "customers",
+          from: "customer",
           localField: "client",
           foreignField: "_id",
-          as: "clientData",
-        },
+          as: "clientDetails"
+        }
       },
-      { $unwind: { path: "$clientData", preserveNullAndEmptyArrays: true } },
-      { $sort: sortObj },
-      { $skip: (page - 1) * pagesize },
-      { $limit: pagesize },
+      { $unwind: { path: "$clientDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "contract",
+          localField: "contractId",
+          foreignField: "_id",
+          as: "contractDetails"
+        }
+      },
+      { $unwind: { path: "$contractDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "invoice",
+          localField: "invoiceRef",
+          foreignField: "_id",
+          as: "invoiceDetails"
+        }
+      },
+      { $unwind: { path: "$invoiceDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          client: "$clientDetails._id",
+          clientName: "$clientDetails.clientName",
+          contractId: "$contractDetails.contractId",
+          contractClientName: "$contractDetails.clientName",
+          invoiceNo: 1,
+          invoiceRef: "$invoiceDetails._id",
+          dueDate: 1,
+          amountPaid: 1,
+          balance: 1,
+          status: 1,
+          remarks: 1,
+          createdAt: 1
+        }
+      },
+      { $sort: { [sortBy]: sortOrder === 'asc' ? 1 : -1 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+    ];
+
+    const [data, totalA] = await Promise.all([
+      db.GetAggregation("customerPayment", pipeline),
+      db.GetAggregation("customerPayment", [{ $match: match }, { $count: "total" }])
     ]);
 
-    const count = await db.GetCount("customerPayment", query);
+    const total = (totalA && totalA[0]) ? totalA[0].total : 0;
 
-    return res.send({ status: true, count, data: result });
+    return res.send({ status: true, page: parseInt(page), limit: parseInt(limit), count: total, data });
   } catch (err) {
-    console.log(err, "ERROR listCustomerPayment");
-    return res.send({ status: false, message: "Error fetching customer payments" });
+    console.log(err, "ERROR listCustomerPayments");
+    return res.send({ status: false, message: "Error while listing customer payments" });
   }
 };
 
 // 🔹 List Vendor Payments
-controller.listVendorPayment = async function (req, res) {
+controller.listVendorPayments = async function (req, res) {
   try {
-    let { page, pagesize, search, status, startDate, endDate, sortField, sortOrder } = req.query;
-
-    page = parseInt(page) || 1;
-    pagesize = parseInt(pagesize) || 10;
-    sortOrder = sortOrder === "desc" ? -1 : 1;
-
-    let query = {};
-    if (status) query.status = status;
-    if (startDate && endDate) {
-      query.dueDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
-    }
+    const { page = 1, limit = 10, search = "", status, startDate, endDate, sortBy = 'createdAt', sortOrder = 'desc' } = req.body;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    let match = {};
+    if (status) match.status = status;
+    if (startDate && endDate) match.dueDate = { $gte: new Date(startDate), $lte: new Date(endDate) };
     if (search) {
-      query.$or = [
-        { invoiceNo: { $regex: search, $options: "i" } },
-        { contractId: { $regex: search, $options: "i" } },
-        { remarks: { $regex: search, $options: "i" } },
+      match.$or = [
+        { invoiceNo: { $regex: search, $options: 'i' } },
+        { 'vendorDetails.vendorName': { $regex: search, $options: 'i' } },
+        { 'contractDetails.contractId': { $regex: search, $options: 'i' } }
       ];
     }
 
-    let sortObj = {};
-    if (sortField) sortObj[sortField] = sortOrder;
-    else sortObj.createdAt = -1;
-
-    const result = await db.GetAggregation("vendorPayment", [
-      { $match: query },
+    const pipeline = [
+      { $match: match },
       {
         $lookup: {
-          from: "vendors",
+          from: "vendor",
           localField: "vendor",
           foreignField: "_id",
-          as: "vendorData",
-        },
+          as: "vendorDetails"
+        }
       },
-      { $unwind: { path: "$vendorData", preserveNullAndEmptyArrays: true } },
-      { $sort: sortObj },
-      { $skip: (page - 1) * pagesize },
-      { $limit: pagesize },
+      { $unwind: { path: "$vendorDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "contract",
+          localField: "contractId",
+          foreignField: "_id",
+          as: "contractDetails"
+        }
+      },
+      { $unwind: { path: "$contractDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "invoice",
+          localField: "invoiceRef",
+          foreignField: "_id",
+          as: "invoiceDetails"
+        }
+      },
+      { $unwind: { path: "$invoiceDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          vendor: "$vendorDetails._id",
+          vendorName: "$vendorDetails.vendorName",
+          contractId: "$contractDetails.contractId",
+          contractClientName: "$contractDetails.clientName",
+          invoiceNo: "$invoiceDetails.invoiceNo",
+          invoiceRef: "$invoiceDetails._id",
+          dueDate: 1,
+          amountPaid: 1,
+          balance: 1,
+          status: 1,
+          remarks: 1,
+          createdAt: 1
+        }
+      },
+      { $sort: { [sortBy]: sortOrder === 'asc' ? 1 : -1 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+    ];
+
+    const [data, totalA] = await Promise.all([
+      db.GetAggregation("vendorPayment", pipeline),
+      db.GetAggregation("vendorPayment", [{ $match: match }, { $count: "total" }])
     ]);
 
-    const count = await db.GetCount("vendorPayment", query);
+    const total = (totalA && totalA[0]) ? totalA[0].total : 0;
 
-    return res.send({ status: true, count, data: result });
+    return res.send({ status: true, page: parseInt(page), limit: parseInt(limit), count: total, data });
   } catch (err) {
-    console.log(err, "ERROR listVendorPayment");
-    return res.send({ status: false, message: "Error fetching vendor payments" });
+    console.log(err, "ERROR listVendorPayments");
+    return res.send({ status: false, message: "Error while listing vendor payments" });
   }
 };
-
 
 
   return controller;

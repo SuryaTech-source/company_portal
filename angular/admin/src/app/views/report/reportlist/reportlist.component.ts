@@ -23,7 +23,10 @@ export class ReportlistComponent implements OnInit {
   attendanceData: any[] = [];
   customerPayments: any[] = [];
   vendorPayments: any[] = [];
-
+  clients: any[] = [];
+vendors: any[] = [];
+contracts: any[] = [];
+invoices: any[] = [];
   // Modal
   showModal = false;
   form: any = {};
@@ -59,8 +62,26 @@ selectedEmployees: string[] = []; // for bulk
           if (res.status) this.vendorPayments = res.data;
         });
     }
+
+  this.loadInvoices()
+  this.loadContracts()
+  this.loadVendors()
   }
 
+  loadInvoices() {
+  this.apiService.CommonApi(Apiconfig.listInvoices.method, Apiconfig.listInvoices.url, { limit: 100 })
+    .subscribe((res: any) => { if (res.status) this.invoices = res.data || []; });
+}
+loadVendors() {
+  this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, {})
+    .subscribe((res: any) => { if (res.status) this.vendors = res.data || []; });
+}
+
+
+loadContracts() {
+  this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
+    .subscribe((res: any) => { if (res.status) this.contracts = res.data.doc || []; });
+}
   // 🔹 Dynamic Filters & Sort
   get filterOptions() {
     if (this.activeTab === 'attendance') {
@@ -148,18 +169,41 @@ selectedEmployees: string[] = []; // for bulk
   }
 
   // 🔹 Modal
-  openModal(row: any = null) {
-    this.showModal = true;
-    this.editData = row;
+openModal(row: any = null) {
+  this.showModal = true;
+  this.editData = row;
 
-    if (this.activeTab === 'attendance') {
-      this.form = row ? { ...row } : { employee: '', date: '', status: 'P', remarks: '' };
-    } else if (this.activeTab === 'customers') {
-      this.form = row ? { ...row } : { client: '', contractId: '', invoiceNo: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
-    } else {
-      this.form = row ? { ...row } : { vendor: '', contractId: '', invoiceNo: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
-    }
-  }
+  if (this.activeTab === 'customers') {
+    this.form = row ? {
+      _id: row._id,
+      client: row.client || row.clientId || '',             // must be client _id
+      contractId: row.contractId || '',                     // contractId (string from API) or _id if you provided both
+      contractRef: row.contractRef?._id || row.contractRef || row.contractRefId || '', // prefer _id of contract
+      invoiceNo: row.invoiceNo || '',
+      invoiceRef: row.invoiceRef || '',
+      dueDate: row.dueDate ? row.dueDate.split('T')[0] : '',
+      amountPaid: row.amountPaid || 0,
+      status: row.status || 'Unpaid',
+      balance: row.balance || 0,
+      remarks: row.remarks || ''
+    } : { client: '', contractId: '', invoiceNo: '', invoiceRef: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
+  } else if (this.activeTab === 'vendors') {
+    this.form = row ? {
+      _id: row._id,
+      vendor: row.vendor || '',
+      contractId: row.contractId || '',
+      contractRef: row.contractRef || '',
+      invoiceNo: row.invoiceNo || '',
+      invoiceRef: row.invoiceRef || '',
+      dueDate: row.dueDate ? row.dueDate.split('T')[0] : '',
+      amountPaid: row.amountPaid || 0,
+      status: row.status || 'Unpaid',
+      balance: row.balance || 0,
+      remarks: row.remarks || ''
+    } : { vendor: '', contractId: '', invoiceNo: '', invoiceRef: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
+  } else { /* attendance form remains same */ }
+}
+
 
   closeModal() {
     this.showModal = false;

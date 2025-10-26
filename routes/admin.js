@@ -703,8 +703,8 @@ module.exports = function (app, io) {
     app.post('/admin/attendance/list',ensureAuthorized , attendence.listAttendance)
     app.post('/admin/vendor/payment/save', ensureAuthorized, attendence.saveVendorPayment);
     app.post ('/admin/customer/payment/save', ensureAuthorized, attendence.saveCustomerPayment);
-    app.post('/admin/vendor/payment/list', ensureAuthorized, attendence.listVendorPayment);
-    app.post('/admin/customer/payment/list', ensureAuthorized, attendence.listCustomerPayment);
+    app.post('/admin/vendor/payment/list', ensureAuthorized, attendence.listVendorPayments);
+    app.post('/admin/customer/payment/list', ensureAuthorized, attendence.listCustomerPayments);
     app.post('/admin/attendance/bulk-mark', ensureAuthorized, attendence.bulkMarkAttendance);
     app.post('/admin/attendance/mark-all', ensureAuthorized, attendence.markAllPresentToday);
 

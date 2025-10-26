@@ -66,85 +66,82 @@ module.exports = function () {
    * @desc List invoices with filters + pagination
    */
   controller.listInvoices = async function (req, res) {
-    try {
-      const {
-        page = 1,
-        limit = 10,
-        search = "",
-        status,
-        startDate,
-        endDate,
-        sortBy = "date",
-        sortOrder = "desc",
-      } = req.body;
+  try {
+    const {
+      page = 1, limit = 10, search = "", status, startDate, endDate, sortBy = "date", sortOrder = "desc"
+    } = req.body;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-      const skip = (parseInt(page) - 1) * parseInt(limit);
+    let match = {};
+    if (status) match.status = status;
+    if (startDate && endDate) match.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
 
-      let match = {};
-
-      if (status) match.status = status;
-
-      if (startDate && endDate) {
-        match.date = {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate),
-        };
-      }
-
-      if (search) {
-        match.$or = [
-          { clientName: { $regex: search, $options: "i" } },
-          { invoiceNo: { $regex: search, $options: "i" } },
-        ];
-      }
-
-      let sort = {};
-      if (sortBy === "date") sort.date = sortOrder === "asc" ? 1 : -1;
-      else if (sortBy === "client") sort.clientName = sortOrder === "asc" ? 1 : -1;
-      else sort.date = -1;
-
-      let pipeline = [
-        { $match: match },
-        {
-          $project: {
-            clientName: 1,
-            invoiceNo: 1,
-            date: 1,
-            dueDate: 1,
-            status: 1,
-            remarks: 1,
-            totalAmount: 1,
-            items: 1,
-          },
-        },
-        { $sort: sort },
-        { $skip: skip },
-        { $limit: parseInt(limit) },
+    if (search) {
+      match.$or = [
+        { clientName: { $regex: search, $options: "i" } },
+        { invoiceNo: { $regex: search, $options: "i" } },
+        { 'contractDetails.contractId': { $regex: search, $options: 'i' } }
       ];
-
-      const [data, total] = await Promise.all([
-        db.GetAggregation("invoice", pipeline),
-        db.GetAggregation("invoice", [
-          { $match: match },
-          { $count: "total" },
-        ]),
-      ]);
-
-      return res.send({
-        status: true,
-        count: total.length > 0 ? total[0].total : 0,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        data,
-      });
-    } catch (error) {
-      console.log(error, "ERROR listInvoices");
-      return res.send({
-        status: false,
-        message: "Something went wrong while fetching invoices.",
-      });
     }
-  };
+
+    let sort = {};
+    if (sortBy === "date") sort.date = sortOrder === "asc" ? 1 : -1;
+    else if (sortBy === "client") sort.clientName = sortOrder === "asc" ? 1 : -1;
+    else sort.date = -1;
+
+    const pipeline = [
+      { $match: match },
+      {
+        $lookup: {
+          from: "contract",
+          localField: "contractId",
+          foreignField: "_id",
+          as: "contractDetails"
+        }
+      },
+      { $unwind: { path: "$contractDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          clientName: 1,
+          invoiceNo: 1,
+          date: 1,
+          dueDate: 1,
+          status: 1,
+          remarks: 1,
+          totalAmount: 1,
+          items: 1,
+          'contractDetails.contractId': 1,
+          'contractDetails.clientName': 1
+        }
+      },
+      { $sort: sort },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+    ];
+
+    const [data, totalA] = await Promise.all([
+      db.GetAggregation("invoice", pipeline),
+      db.GetAggregation("invoice", [{ $match: match }, { $count: "total" }])
+    ]);
+
+    const total = (totalA && totalA[0]) ? totalA[0].total : 0;
+
+    return res.send({
+      status: true,
+      count: total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      data,
+    });
+  } catch (error) {
+    console.log(error, "ERROR listInvoices");
+    return res.send({
+      status: false,
+      message: "Something went wrong while fetching invoices.",
+    });
+  }
+};
+
 
   /**
    * @route GET /invoice/view/:id
