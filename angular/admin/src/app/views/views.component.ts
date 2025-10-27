@@ -354,7 +354,7 @@ generateDefaultImage(name: string) {
         if (settings.time_slot == 'disable') {
           this.navItems.forEach((value) => {
             console.log(value, 'this isvalue');
-            var checkmodule = ["Administrators","Employees", "Vendors","Contracts", "Drivers", "Combo Offers", "Banners", "Customers", "Categories", "Products", "Coupon Management", "Coupons", "Email Template", "Orders", 'Walkthrough Images', "Reviews & Ratings", "Settings", "Site Earnings", "Payment Gateway", "Units/Metrics", "Page List", "language", "Layout Control", "Reports", "Fuel Records","Spare Parts", "Maintenance", "Performance Analysis", "Shipping", "Banner Types", "Offer Management", "Fleet", "Invoice"];
+            var checkmodule = ["Administrators","Employees","Operations", "Resources","Finance","Support","Vendors","Contracts", "Drivers", "Combo Offers", "Banners", "Customers", "Categories", "Products", "Coupon Management", "Coupons", "Email Template", "Orders", 'Walkthrough Images', "Reviews & Ratings", "Settings", "Site Earnings", "Payment Gateway", "Units/Metrics", "Page List", "language", "Layout Control", "Reports", "Fuel Records","Spare Parts", "Maintenance", "Performance Analysis", "Shipping", "Banner Types", "Offer Management", "Fleet", "Invoice"];
             if (value.name && checkmodule.includes(value.name)) {
               menu.push(value);
             }
@@ -363,7 +363,7 @@ generateDefaultImage(name: string) {
         } else {
           this.navItems.forEach((value) => {
             console.log(value, 'this isvalue');
-            var checkmodule = ["Administrators","Employees", "Vendors","Contracts", "Drivers", "Combo Offers", "Banners", "Customers", "Categories", "Products", "Coupon Management", "Coupons", "Email Template", "Orders", 'Walkthrough Images', "Reviews & Ratings", "Settings", "Site Earnings", "Payment Gateway", "Units/Metrics", "Page List", "language", "Time Slots", "Layout Control", "Reports", "Fuel Records","Spare Parts", "Maintenance", "Performance Analysis", "Shipping", "Banner Types", "Offer Management", "Fleet", "Invoice"];
+            var checkmodule = ["Administrators","Employees","Operations","Resources","Finance","Support", "Vendors","Contracts", "Drivers", "Combo Offers", "Banners", "Customers", "Categories", "Products", "Coupon Management", "Coupons", "Email Template", "Orders", 'Walkthrough Images', "Reviews & Ratings", "Settings", "Site Earnings", "Payment Gateway", "Units/Metrics", "Page List", "language", "Time Slots", "Layout Control", "Reports", "Fuel Records","Spare Parts", "Maintenance", "Performance Analysis", "Shipping", "Banner Types", "Offer Management", "Fleet", "Invoice"];
             if (value.name && checkmodule.includes(value.name)) {
               menu.push(value);
             }

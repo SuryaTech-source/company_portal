@@ -47,7 +47,7 @@ export class TaglistComponent  {
   view_btn: boolean = false;
   delete_btn: boolean = true;
   addBtnUrl: string = '/app/tags/add';
-  addBtnName: string = 'Add New Vendor';
+  addBtnName: string = 'Add new vendor';
   editUrl: string = `/app/tags/edit/`;
   viewUrl: string = `/app/tags/view/`;
   global_status: number = 0;

@@ -248,6 +248,30 @@ const data: PrivilagesData[] = [
 			delete: false
 		}
 	},
+	{
+		name:'operations',
+		url:'/app/operations',
+		icon:'assets/image/category.png',
+		children:[
+			{
+				name:'Contracts',
+				url:'/app/operations/contracts',
+				icon:''
+
+			},
+			{
+				name:'vendors',
+				url:'/app/operations/vendors',
+				icon:''
+			},
+		],
+		status:{
+			add:false,
+			edit:false,
+			view:false,
+			delete:false
+		}
+	},
 	// general settings
 	{
 		alias: "settings",
