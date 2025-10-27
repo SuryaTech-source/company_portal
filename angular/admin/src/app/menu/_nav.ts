@@ -167,7 +167,7 @@ export const navItems: INavData[] = [
         id: 'list'
       },
       {
-        name: 'Add spare parts',
+        name: 'Add spare Parts',
         url: '/app/spare-parts/add',
         icon: '',
         id: "add"
@@ -423,24 +423,24 @@ export const navItems: INavData[] = [
     name: 'Reports',
     url: '/app/report/reported-list',
     icon: 'assets/image/category.png',
-    children: [
-      // {
-      //   name: 'Drivers List',
-      //   url: '/app/deals/list',
-      //   icon: '',
-      //   id: 'list'
-      // },
-      // {
-      //   name: 'Add Drivers',
-      //   url: '/app/deals/add',
-      //   icon: '',
-      //   id: "add"
-      // },
-    ]
+    // children: [
+    //   {
+    //     name: 'Drivers List',
+    //     url: '/app/deals/list',
+    //     icon: '',
+    //     id: 'list'
+    //   },
+    //   {
+    //     name: 'Add Drivers',
+    //     url: '/app/deals/add',
+    //     icon: '',
+    //     id: "add"
+    //   },
+    // ]
   },
   {
     id: "fuel-records",
-    name: 'Fuel records',
+    name: 'Fuel Records',
     url: '/app/fuel-records/fuel-records-list',
     icon: 'assets/image/category.png',
     // children: [
