@@ -46,7 +46,7 @@ export class ListTestimonialComponent {
   view_btn: boolean = false;
   delete_btn: boolean = true;
   addBtnUrl: string = '/app/fleet/add';
-  addBtnName: string = 'Add New Asset';
+  addBtnName: string = 'Add new asset';
   editUrl: string = `/app/fleet/edit/`;
   viewUrl: string = `/app/fleet/view/`;
   global_status: number = 0;
