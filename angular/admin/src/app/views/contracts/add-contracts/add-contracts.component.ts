@@ -22,10 +22,11 @@ export class AddContractsComponent implements OnInit {
   contractId = '';
   startDate: string;
   endDate: string;
-  busesDeployed: string[] = [];
-  driversDeployed: string[] = [];
+  busesDeployed: number = 0;
+  driversDeployed: number = 0;
+  contractType: string = "";
   contactOfficer = '';
-  contractType = 'Fixed';
+  // contractType = 'Fixed';
   invoicingDate: string;
   lastPayment: string;
   status = 1;
@@ -64,10 +65,14 @@ export class AddContractsComponent implements OnInit {
             this.contractId = data.contractId;
             this.startDate = data.startDate ? data.startDate.split('T')[0] : '';
             this.endDate = data.endDate ? data.endDate.split('T')[0] : '';
-            this.busesDeployed = data.busesDeployed || [];
-            this.driversDeployed = data.driversDeployed || [];
+            // ✅ Convert numbers
+            this.busesDeployed = data.busesDeployed;
+            this.driversDeployed = data.driversDeployed;
+
+            // ✅ Convert array to CSV
+            this.contractType = data.contractType?.join(", ") || "";
             this.contactOfficer = data.contactOfficer;
-            this.contractType = data.contractType;
+            // this.contractType = data.contractType;
             this.invoicingDate = data.invoicingDate ? data.invoicingDate.split('T')[0] : '';
             this.lastPayment = data.lastPayment ? data.lastPayment.split('T')[0] : '';
             this.status = data.status;
@@ -85,7 +90,7 @@ export class AddContractsComponent implements OnInit {
         }
       });
 
-   // Load employees
+    // Load employees
     this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1 })
       .subscribe((res) => {
         if (res && res.status) {
@@ -105,10 +110,11 @@ export class AddContractsComponent implements OnInit {
         contractId: this.contractId,
         startDate: this.startDate,
         endDate: this.endDate,
-        busesDeployed: this.busesDeployed,
-        driversDeployed: this.driversDeployed,
+        busesDeployed: Number(this.busesDeployed),
+        driversDeployed: Number(this.driversDeployed),
+        contractType: this.contractType.split(',').map(s => s.trim()),
         contactOfficer: this.contactOfficer,
-        contractType: this.contractType,
+        // contractType: this.contractType,
         invoicingDate: this.invoicingDate,
         lastPayment: this.lastPayment,
         status: this.status,

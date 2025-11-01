@@ -11,28 +11,28 @@ const routes: Routes = [
         path: 'list',
         component: TaglistComponent,
         data: {
-          title: 'Tags List'
+          title: 'Vendor List'
         }
       },
       {
         path: 'add',
         component: AddEditTagComponent,
         data: {
-          title: 'Add Tag'
+          title: 'Add Vendor'
         }
       },
       {
         path: 'edit/:id',
         component: AddEditTagComponent,
         data: {
-          title: 'Edit Tag'
+          title: 'Edit Vendor'
         }
       },
       {
         path: 'view/:id',
         component: AddEditTagComponent,
         data: {
-          title: 'Tag View Page'
+          title: 'Vendor View Page'
         }
       },
       {
