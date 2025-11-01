@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
     <a class="nav-link nav-dropdown-toggle {{helper.isActive(router, item) ? 'seleted-menu' : ''}}"
        appNavDropdownToggle
        [appHtmlAttr]="item.attributes">
-       <i [class]="item.icon" [ngClass]="item | appSidebarNavIcon"></i>
+          <img src={{item.icon}} [ngClass]="item | appSidebarNavIcon">
       <!-- <i *ngIf="helper.hasIcon(item)" [ngClass]="item | appSidebarNavIcon"></i> -->
       <ng-container>{{item.name}}</ng-container>
       <span *ngIf="helper.hasBadge(item)" [ngClass]="item | appSidebarNavBadge">{{ item.badge.text }} </span>

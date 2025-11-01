@@ -5,20 +5,19 @@ export const navItems: INavData[] = [
     id: "Dashboard",
     name: 'Dashboard',
     url: '/app/dashboard',
-    // icon: 'assets/image/menu.png'
-    icon: 'fi fi-rr-dashboard-monitor',
+    icon: 'assets/new_images/sidebar/dashboard.png'
   },
   {
     id: "operations",
     name: 'Operations',
     url: '/app/operations',
-    icon: 'assets/image/category.png',
+    icon: 'assets/new_images/sidebar/operations.png',
     children: [
       {
         id: "Contracts",
         name: 'Contracts',
         url: '/app/contracts',
-        icon: 'assets/image/offer.png',
+        icon: 'assets/new_images/sidebar/contract.png',
         children: [
           {
             name: 'New contracts',
@@ -42,7 +41,7 @@ export const navItems: INavData[] = [
         id: "tags",
         name: 'Vendors',
         url: '/app/tags',
-        icon: 'assets/image/tag.png',
+        icon: 'assets/new_images/sidebar/vendor.png',
         children: [
           {
             name: 'New vendors',
@@ -67,13 +66,13 @@ export const navItems: INavData[] = [
     id: "resources",
     name: 'Resources',
     url: '/app/resources',
-    icon: 'assets/image/category.png',
+    icon: 'assets/new_images/sidebar/resource.png',
     children: [
       {
         id: "Employees",
         name: 'Employees',
         url: '/app/employees',
-        icon: 'assets/image/profile-2user.png',
+        icon: 'assets/new_images/sidebar/employee.png',
         children: [
           {
 
@@ -94,7 +93,7 @@ export const navItems: INavData[] = [
         id: "Feet",
         name: 'Fleet',
         url: '/app/testimonial',
-        icon: 'assets/image/offer.png',
+        icon: 'assets/new_images/sidebar/fleet.png',
         children: [
           {
             name: 'New fleet',
@@ -124,70 +123,69 @@ export const navItems: INavData[] = [
     id: "finance",
     name: 'Finance',
     url: '/app/finance',
-    icon: 'assets/image/category.png',
-    children: [
- {
-    id: "Invoice",
-    name: 'Invoice',
-    url: '/app/invoice',
-    icon: 'assets/image/offer.png',
+    icon: 'assets/new_images/sidebar/finance.png',
     children: [
       {
-        name: 'Add invoice',
-        url: '/app/invoice/add',
-        icon: '',
-        id: 'add'
-      },
-      {
-        name: 'Invoice list',
-        url: '/app/invoice/list',
-        icon: '',
-        id: 'list'
-      },
-    ]
-  },
-    ]
-  },
-{
-    id: "support",
-    name: 'Support',
-    url: '/app/support',
-    icon: 'assets/image/category.png',
-    children: [
-         {
-    id: "Spare Parts",
-    name: 'Spare parts',
-    url: '/app/spare-parts',
-    icon: 'assets/image/category.png',
-    children: [
-      {
-        name: 'Spare parts list',
-        url: '/app/spare-parts/list',
-        icon: '',
-        id: 'list'
-      },
-      {
-        name: 'Add spare Parts',
-        url: '/app/spare-parts/add',
-        icon: '',
-        id: "add"
+        id: "Invoice",
+        name: 'Invoice',
+        url: '/app/invoice',
+        icon: 'assets/new_images/sidebar/invoice.png',
+        children: [
+          {
+            name: 'Add invoice',
+            url: '/app/invoice/add',
+            icon: '',
+            id: 'add'
+          },
+          {
+            name: 'Invoice list',
+            url: '/app/invoice/list',
+            icon: '',
+            id: 'list'
+          },
+        ]
       },
     ]
   },
   {
-    id: "maintenance",
-    name: 'Maintenance',
-    url: '/app/maintenance/maintenance-list',
-    icon: 'assets/image/category.png',
-  },
+    id: "support",
+    name: 'Support',
+    url: '/app/support',
+    icon: 'assets/new_images/sidebar/support.png',
+    children: [
+      {
+        id: "Spare Parts",
+        name: 'Spare parts',
+        url: '/app/spare-parts',
+        icon: 'assets/new_images/sidebar/spare_parts.png',
+        children: [
+          {
+            name: 'Spare parts list',
+            url: '/app/spare-parts/list',
+            icon: '',
+            id: 'list'
+          },
+          {
+            name: 'Add spare Parts',
+            url: '/app/spare-parts/add',
+            icon: '',
+            id: "add"
+          },
+        ]
+      },
+      {
+        id: "maintenance",
+        name: 'Maintenance',
+        url: '/app/maintenance/maintenance-list',
+        icon: 'assets/new_images/sidebar/maintanance.png',
+      },
     ]
-},
+  },
   {
     id: "administrator",
     name: 'Administrators',
     url: '/app/administrator',
-    // icon: 'fi fi-rr-mode-portrait',profile
-    icon: 'assets/image/profile-2user.png',
+    icon: 'assets/new_images/sidebar/administrator.png',
     children: [
       {
         name: 'Admin List',
@@ -205,7 +203,7 @@ export const navItems: INavData[] = [
   //   id: "Employees",
   //   name: 'Employees',
   //   url: '/app/employees',
-  //   icon: 'assets/image/profile-2user.png',
+  //   icon: 'assets/new_images/sidebar/profile-2user.png',
   //   children: [
   //     {
 
@@ -226,7 +224,7 @@ export const navItems: INavData[] = [
   //   id: "Feet",
   //   name: 'Fleet',
   //   url: '/app/testimonial',
-  //   icon: 'assets/image/offer.png',
+  //   icon: 'assets/new_images/sidebar/offer.png',
   //   children: [
   //     {
   //       name: 'New Fleet',
@@ -254,7 +252,7 @@ export const navItems: INavData[] = [
   //   id: "Contracts",
   //   name: 'Contracts',
   //   url: '/app/contracts',
-  //   icon: 'assets/image/offer.png',
+  //   icon: 'assets/new_images/sidebar/offer.png',
   //   children: [
   //     {
   //       name: 'New Contracts',
@@ -274,7 +272,7 @@ export const navItems: INavData[] = [
   //   id: "tags",
   //   name: 'Vendors',
   //   url: '/app/tags',
-  //   icon: 'assets/image/tag.png',
+  //   icon: 'assets/new_images/sidebar/tag.png',
   //   children: [
   //   {
   //       name: 'New Vendors',
@@ -295,7 +293,7 @@ export const navItems: INavData[] = [
   //   id: "Invoice",
   //   name: 'Invoice',
   //   url: '/app/invoice',
-  //   icon: 'assets/image/offer.png',
+  //   icon: 'assets/new_images/sidebar/offer.png',
   //   children: [
   //     {
   //       name: 'Add Invoice',
@@ -336,7 +334,7 @@ export const navItems: INavData[] = [
   //   id: "category",
   //   name: 'Categories',
   //   url: '/app/category',
-  //   icon: 'assets/image/category.png',
+  //   icon: 'assets/new_images/sidebar/category.png',
   //   children: [
   //     {
   //       name: 'Category List',
@@ -369,7 +367,7 @@ export const navItems: INavData[] = [
   //   id: "products",
   //   name: 'Products',
   //   url: '/app/products',
-  //   icon: 'assets/image/box.png',
+  //   icon: 'assets/new_images/sidebar/box.png',
   //   children: [
   //     {
   //       name: 'Products List',
@@ -402,7 +400,7 @@ export const navItems: INavData[] = [
   //   id: "deals",
   //   name: 'Drivers',
   //   url: '/app/deals',
-  //   icon: 'assets/image/deal.png',
+  //   icon: 'assets/new_images/sidebar/deal.png',
   //   children: [
   //     {
   //       name: 'Drivers List',
@@ -422,7 +420,7 @@ export const navItems: INavData[] = [
     id: "reports",
     name: 'Reports',
     url: '/app/report/reported-list',
-    icon: 'assets/image/category.png',
+    icon: 'assets/new_images/sidebar/report.png',
     // children: [
     //   {
     //     name: 'Drivers List',
@@ -442,7 +440,7 @@ export const navItems: INavData[] = [
     id: "fuel-records",
     name: 'Fuel Records',
     url: '/app/fuel-records/fuel-records-list',
-    icon: 'assets/image/category.png',
+    icon: 'assets/new_images/sidebar/fuel_report.png',
     // children: [
     //   {
     //     name: 'Drivers List',
@@ -462,7 +460,7 @@ export const navItems: INavData[] = [
   //   id: "Spare Parts",
   //   name: 'Spare Parts',
   //   url: '/app/spare-parts',
-  //   icon: 'assets/image/category.png',
+  //   icon: 'assets/new_images/sidebar/category.png',
   //   children: [
   //     {
   //       name: 'Spare Parts List',
@@ -482,19 +480,19 @@ export const navItems: INavData[] = [
   //   id: "maintenance",
   //   name: 'Maintenance',
   //   url: '/app/maintenance/maintenance-list',
-  //   icon: 'assets/image/category.png',
+  //   icon: 'assets/new_images/sidebar/category.png',
   // },
   {
     id: "performance-analysis",
     name: 'Performance Analysis',
     url: '/app/performance-analysis/peroformance-analysis-list',
-    icon: 'assets/image/category.png',
+    icon: 'assets/new_images/sidebar/performance_analysis.png',
   },
   // {
   //   id: "combo",
   //   name: 'Combo Offers',
   //   url: '/app/combo',
-  //   icon: 'assets/image/deal.png',
+  //   icon: 'assets/new_images/sidebar/deal.png',
   //   children: [
   //     {
   //       name: 'Combo Offer List',
@@ -537,7 +535,7 @@ export const navItems: INavData[] = [
   //   id: "Orders",
   //   name: 'Orders',
   //   url: '/app/orders',
-  //   icon: 'assets/image/bag.png',
+  //   icon: 'assets/new_images/sidebar/bag.png',
   //   children: [
   //     {
   //       name: 'All Orders',
@@ -595,7 +593,7 @@ export const navItems: INavData[] = [
   //   id: "users",
   //   name: 'Customers',
   //   url: '/app/users',
-  //   icon: 'assets/image/profile-2user.png',
+  //   icon: 'assets/new_images/sidebar/profile-2user.png',
   //   children: [
   //     {
   //       name: 'Customer List',
@@ -619,7 +617,7 @@ export const navItems: INavData[] = [
     id: "settings",
     name: 'Settings',
     url: '/app/settings',
-    icon: 'assets/image/setting-2.png',
+    icon: 'assets/new_images/sidebar/settings.png',
     children: [
       {
         name: 'General Settings',
@@ -653,8 +651,8 @@ export const navItems: INavData[] = [
       //   icon: ''
       // },
       // {
-      //   name: 'Walkthrough Images',
-      //   url: '/app/walkthrough_images/list',
+      //   name: 'Walkthrough new_images/sidebars',
+      //   url: '/app/walkthrough_new_images/sidebars/list',
       //   icon: ''
       // },
       // {
@@ -725,7 +723,7 @@ export const navItems: INavData[] = [
   //   id: "Coupons",
   //   name: 'Coupons',
   //   url: '/app/coupon',
-  //   icon: 'assets/image/ticket-discount.png',
+  //   icon: 'assets/new_images/sidebar/ticket-discount.png',
   //   children: [
   //     {
   //       name: 'All Coupons',
@@ -745,7 +743,7 @@ export const navItems: INavData[] = [
   //   id: "Email Template",
   //   name: 'Email Template',
   //   url: '/app/email',
-  //   icon: 'assets/image/sms.png',
+  //   icon: 'assets/new_images/sidebar/sms.png',
   //   children: [
   //     {
   //       name: 'Email Template List',
@@ -758,7 +756,7 @@ export const navItems: INavData[] = [
   //   id: "Invoice",
   //   name: 'Invoice',
   //   url: '/app/paymentgateway',
-  //   icon: 'assets/image/cards.png',
+  //   icon: 'assets/new_images/sidebar/cards.png',
   //   children: [
   //     {
   //       name: 'Create Invoice ',
@@ -772,7 +770,7 @@ export const navItems: INavData[] = [
   //   id: "Reviews & Ratings",
   //   name: 'Reviews & Ratings',
   //   url: '/app/reviews/rating/list',
-  //   icon: 'assets/image/star.png'
+  //   icon: 'assets/new_images/sidebar/star.png'
   // },
   // {
   //   id: "language",
@@ -826,7 +824,7 @@ export const navItems: INavData[] = [
   //   id: "Site Earnings",
   //   name: 'Site Earnings',
   //   url: '/app/adminearnings/adminearningslist',
-  //   icon: 'assets/image/routing-2.png'
+  //   icon: 'assets/new_images/sidebar/routing-2.png'
   // },
 
 
@@ -834,7 +832,7 @@ export const navItems: INavData[] = [
   //   id: "pages",
   //   name: 'Page List',
   //   url: '/app/pages/list',
-  //   icon: 'assets/image/document-text.png'
+  //   icon: 'assets/new_images/sidebar/document-text.png'
   // },
 
 
@@ -842,7 +840,7 @@ export const navItems: INavData[] = [
   //   id: "Reports",
   //   name: 'Reports',
   //   url: '/app/Reports',
-  //   icon: 'assets/image/category.png',
+  //   icon: 'assets/new_images/sidebar/category.png',
   //   children: [
   //     {
   //       name: 'Finance Report',
@@ -858,7 +856,7 @@ export const navItems: INavData[] = [
   //   id: "Offer Management",
   //   name: 'Offer Management',
   //   url: '/app/offer-management',
-  //   icon: 'assets/image/offer.png',
+  //   icon: 'assets/new_images/sidebar/offer.png',
   //   children : [
   //     {
   //       name: 'Add offer',
@@ -878,7 +876,7 @@ export const navItems: INavData[] = [
   //   id: "Layout Control",
   //   name: 'Layout Control',
   //   url: '/app/Pagecontrol',
-  //   icon: 'assets/image/layout.png',
+  //   icon: 'assets/new_images/sidebar/layout.png',
   //   children: [
   //     // {
   //     //   name: 'Banner Lists',
@@ -887,8 +885,8 @@ export const navItems: INavData[] = [
   //     // },
 
   //     // {
-  //     //   name: 'Walkthrough Images',
-  //     //   url: '/app/walkthrough_images/list',
+  //     //   name: 'Walkthrough new_images/sidebars',
+  //     //   url: '/app/walkthrough_new_images/sidebars/list',
   //     //   icon: ''
   //     // },
   //     {
@@ -907,7 +905,7 @@ export const navItems: INavData[] = [
   //   id: "Banner",
   //   name: 'Banner Types',
   //   url: '/app/banners/banner-types-list',
-  //   icon: 'assets/image/banner.png',
+  //   icon: 'assets/new_images/sidebar/banner.png',
 
   //   children: [
   //     {
@@ -978,8 +976,8 @@ export const navItems: INavData[] = [
   //     //   icon: ''
   //     // },
   //     // {
-  //     //   name: 'Walkthrough Images',
-  //     //   url: '/app/walkthrough_images/list',
+  //     //   name: 'Walkthrough new_images/sidebars',
+  //     //   url: '/app/walkthrough_new_images/sidebars/list',
   //     //   icon: ''
   //     // },
   //     // {
