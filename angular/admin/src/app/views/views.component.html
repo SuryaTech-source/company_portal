@@ -1,10 +1,23 @@
-<app-header [navbarBrandRouterLink]="['/app']" [fixed]="true"
-    [navbarBrandFull]="{src: 'assets/img/complogo.png', width: 100, height: 10, alt: 'Logo'}"
-    [navbarBrandMinimized]="{src: 'assets/img/complogo.png', width: 40, height: 30, alt: 'Logo-icon'}"
-    [sidebarToggler]="'lg'" [asideMenuToggler]="'lg'">
-
-    <ul class="nav navbar-nav ml-auto">
-        <!-- <li class="nav-item dropdown" dropdown placement="bottom right">
+<app-header
+  [navbarBrandRouterLink]="['/app']"
+  [fixed]="true"
+  [navbarBrandFull]="{
+    src: 'assets/img/complogo.png',
+    width: 100,
+    height: 10,
+    alt: 'Logo'
+  }"
+  [navbarBrandMinimized]="{
+    src: 'assets/img/complogo.png',
+    width: 40,
+    height: 30,
+    alt: 'Logo-icon'
+  }"
+  [sidebarToggler]="'lg'"
+  [asideMenuToggler]="'lg'"
+>
+  <ul class="nav navbar-nav ml-auto">
+    <!-- <li class="nav-item dropdown" dropdown placement="bottom right">
             <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="true"
                 aria-expanded="false" dropdownToggle (click)="false"><i class="fa fa-bell-o"></i><span
                     class="badge badge-pill badge-danger"></span>
@@ -51,103 +64,133 @@
 
         </li> -->
 
-        <!-- <li class="nav-item d-md-down-none"> 
+    <!-- <li class="nav-item d-md-down-none"> 
             <a class="nav-link" href="javascript:void(0)"><i class="fa fa-list"></i></a>
         </li> -->
-        <li class="nav-item dropdown" dropdown placement="bottom right">
-            <a class="nav-link" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="true"
-                aria-expanded="false" dropdownToggle (click)="false">
-                <img [src]="profile" class="img-avatar" alt="user image" />
-            </a>
-            <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
-                <div class="dropdown-header text-center"><strong>My Profile</strong></div>
-                <!-- <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-user"></i> Profile</a> -->
-                <!-- <a class="dropdown-item" routerLink="/app/settings"><i class="fa fa-wrench"></i> Setting</a> -->
-                <a  class="dropdown-item" routerLink="/app/settings/change-password"><i class="fa fa-key" aria-hidden="true"></i>Change Password</a>
-                <a  class="dropdown-item" routerLink="/app/settings/profile"><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
-                <a class="dropdown-item" href="javascript:void(0)" (click)="logOutPop(logOutPopup)"><i class="fa fa-lock"></i>
-                    Logout</a>
-            </div>
-        </li>
-    </ul>
+    <li class="nav-item mr-4">
+      <a
+        class="nav-link"
+        href="javascript:void(0)"
+        (click)="logOutPop(logOutPopup)"
+      >
+        <i class="fa fa-sign-out fa-2x"></i>
+      </a>
+    </li>
+  </ul>
 </app-header>
 <div class="app-body">
-    <app-sidebar [fixed]="true" [display]="'lg'" [minimized]="minimized" #sidebar
-        (minimizedChange)="toggleMinimize($event)">
-        <!-- <div class="dashboard_sidebar_logo">
+  <app-sidebar
+    [fixed]="true"
+    [display]="'lg'"
+    [minimized]="minimized"
+    #sidebar
+    (minimizedChange)="toggleMinimize($event)"
+  >
+    <!-- <div class="dashboard_sidebar_logo">
         <img src="assets/image/logo.png" alt="logo">
     </div> -->
-        <app-sidebar-nav [navItems]="navItems"></app-sidebar-nav>
-        <app-sidebar-minimizer></app-sidebar-minimizer>
-    </app-sidebar>
-    <!-- Main content -->
+    <app-sidebar-nav [navItems]="navItems"></app-sidebar-nav>
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+  <!-- Main content -->
 
-    <main class="main">
-        <!-- Breadcrumb -->
-        <cui-breadcrumb>
-            <!-- Breadcrumb Menu-->
-        </cui-breadcrumb>
-        <div class="container-fluid">
-            <router-outlet>
-                <app-spinner></app-spinner>
-            </router-outlet>
-        </div>
-    </main>
-    <!-- <app-aside [fixed]="true" [display]="false">
+  <main class="main">
+    <!-- Breadcrumb -->
+    <cui-breadcrumb>
+      <!-- Breadcrumb Menu-->
+    </cui-breadcrumb>
+    <div class="container-fluid">
+      <router-outlet>
+        <app-spinner></app-spinner>
+      </router-outlet>
+    </div>
+  </main>
+  <!-- <app-aside [fixed]="true" [display]="false">
     </app-aside> -->
 </div>
 <span id="triggerPopupModal" (click)="confirmModal.show()"></span>
-<div bsModal #confirmModal="bs-modal" class="active_inactive_modal modal fade" id="exampleModalCenter" tabindex="-1"
-    role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content cases-model">
-            <h5 class="modal-title" id="exampleModalLongTitle">Change Status </h5>
-            <h6> Are you sure! Do you want to Change Status? </h6>
-            <!-- <div class="product_details">
+<div
+  bsModal
+  #confirmModal="bs-modal"
+  class="active_inactive_modal modal fade"
+  id="exampleModalCenter"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content cases-model">
+      <h5 class="modal-title" id="exampleModalLongTitle">Change Status</h5>
+      <h6>Are you sure! Do you want to Change Status?</h6>
+      <!-- <div class="product_details">
                 <img src="" alt="">
                 <div>
                     <h4>qwertyu</h4>
                     <p>asdfghjk</p>
                 </div>
             </div> -->
-            <div class="yes_no">
-                <button type="button" class="btn conform-cancel" (click)="confirmModal.hide()">
-                    No
-                </button>
-                <button type="button" class="btn conform-dels" (click)="confirmPopunModal();confirmModal.hide();">
-                    Yes
-                </button>
-            </div>
-        </div>
+      <div class="yes_no">
+        <button
+          type="button"
+          class="btn conform-cancel"
+          (click)="confirmModal.hide()"
+        >
+          No
+        </button>
+        <button
+          type="button"
+          class="btn conform-dels"
+          (click)="confirmPopunModal(); confirmModal.hide()"
+        >
+          Yes
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
 <span id="triggerPopupModal1" (click)="confirmModal1.show()"></span>
-<div bsModal #confirmModal1="bs-modal" class="active_inactive_modal modal fade" id="exampleModalCenter" tabindex="-1"
-    role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content cases-model">
-            <h5 class="modal-title" id="exampleModalLongTitle">Change Flag Status </h5>
-            <h6> Are you sure! Do you want to Change Flag Status? </h6>
-            <!-- <div class="product_details">
+<div
+  bsModal
+  #confirmModal1="bs-modal"
+  class="active_inactive_modal modal fade"
+  id="exampleModalCenter"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content cases-model">
+      <h5 class="modal-title" id="exampleModalLongTitle">Change Flag Status</h5>
+      <h6>Are you sure! Do you want to Change Flag Status?</h6>
+      <!-- <div class="product_details">
                 <img src="" alt="">
                 <div>
                     <h4>qwertyu</h4>
                     <p>asdfghjk</p>
                 </div>
             </div> -->
-            <div class="yes_no">
-                <button type="button" class="btn conform-cancel" (click)="confirmModal1.hide()">
-                    No
-                </button>
-                <button type="button" class="btn conform-dels" (click)="confirmPopunModalflag();confirmModal1.hide();">
-                    Yes
-                </button>
-            </div>
-        </div>
+      <div class="yes_no">
+        <button
+          type="button"
+          class="btn conform-cancel"
+          (click)="confirmModal1.hide()"
+        >
+          No
+        </button>
+        <button
+          type="button"
+          class="btn conform-dels"
+          (click)="confirmPopunModalflag(); confirmModal1.hide()"
+        >
+          Yes
+        </button>
+      </div>
     </div>
+  </div>
 </div>
-
 
 <!-- <app-footer [fixed]="true">
     <span class="m-auto"><a href="javascript:void(0)">Copyright {{settings ? settings.site_title : ''}}</a> &copy;
@@ -156,20 +199,28 @@
 </app-footer> -->
 
 <ng-template #logOutPopup>
-    <div class="logout_modal">
-
-        <div class="modal-body login-body">
-            <div class="h4_close">
-                <h4>Logout</h4>
-                <div (click)="destroyPopup()" style="cursor: pointer;" title="close the popup" class="pop_cls_btn">
-                    &#10006;
-                </div>
-            </div>
-            <h6 class="modal-title">Are you sure? You are attempting to logout?</h6>
+  <div class="logout_modal">
+    <div class="modal-body login-body">
+      <div class="h4_close">
+        <h4>Logout</h4>
+        <div
+          (click)="destroyPopup()"
+          style="cursor: pointer"
+          title="close the popup"
+          class="pop_cls_btn"
+        >
+          &#10006;
         </div>
-        <div class="modal-footer border-0">
-            <button type="button" (click)="destroyPopup()" class="btn cancel-btn">Cancel</button>
-            <button type="button" (click)="logout()" class="btn out-bnt">Logout</button>
-        </div>
+      </div>
+      <h6 class="modal-title">Are you sure? You are attempting to logout?</h6>
     </div>
+    <div class="modal-footer border-0">
+      <button type="button" (click)="destroyPopup()" class="btn cancel-btn">
+        Cancel
+      </button>
+      <button type="button" (click)="logout()" class="btn out-bnt">
+        Logout
+      </button>
+    </div>
+  </div>
 </ng-template>
