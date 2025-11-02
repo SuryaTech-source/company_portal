@@ -23,19 +23,22 @@ export class ListContractsComponent implements OnInit {
   }
 
   getContracts() {
-    this.loading = true;
-    this.apiService.CommonApi(Apiconfig.listContracts.method, Apiconfig.listContracts.url, { status: 1 })
-      .subscribe(
-        (res: any) => {
-          this.contracts = res.data || [];
-          this.loading = false;
-        },
-        (err) => {
-          this.notifyService.showError("Failed to load contracts");
-          this.loading = false;
-        }
-      );
-  }
+  this.loading = true;
+  this.apiService.CommonApi(Apiconfig.listContracts.method, Apiconfig.listContracts.url, { status: 1 })
+    .subscribe(
+      (res: any) => {
+        this.contracts = res.data?.map((c: any) => ({
+          ...c,
+          contractType: Array.isArray(c.contractType) ? c.contractType : [c.contractType]
+        })) || [];
+        this.loading = false;
+      },
+      () => {
+        this.notifyService.showError("Failed to load contracts");
+        this.loading = false;
+      }
+    );
+}
 
   downloadPDF() {
     const element = document.getElementById('contractsTable');

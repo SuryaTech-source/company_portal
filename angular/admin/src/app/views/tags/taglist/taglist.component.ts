@@ -26,10 +26,10 @@ import { PopupComponent } from 'src/app/shared/popup.component';
   templateUrl: './taglist.component.html',
   styleUrls: ['./taglist.component.scss']
 })
-export class TaglistComponent  {
+export class TaglistComponent {
   @ViewChild('confirmModal') confirmModal: any;
   @ViewChild('foodForm') form: UntypedFormGroup;
-  status: any=1;
+  status: any = 1;
   categorylist: any;
   getcardsdata: any;
   settings: any;
@@ -84,7 +84,7 @@ export class TaglistComponent  {
           this.delete_btn = true;
         } else {
           this.delete_btn = false;
-          this.bulk_action=false;
+          this.bulk_action = false;
         }
         if (this.userPrivilegeDetails[0].status.edit) {
           this.edit_btn = true;
@@ -108,32 +108,32 @@ export class TaglistComponent  {
     this.loadsettings('');
   }
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     var data = {
       limit: this.limit,
       skip: this.skip,
       status: this.status,
       'search': this.global_search
     }
-    
+
     this.getdata(data)
 
-    
+
     // this.apiService.CommonApi(Apiconfig.tagsGetAll.method,Apiconfig.tagsGetAll.url,{}).subscribe(
     //   (result)=>{
     //     console.log(result,'result for me ');
     //   }
     // )
-    
+
   }
 
   // getdata(data) {
   //   console.log(data,'filtering data,,,,')
   //   this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, data).subscribe(response => {
   //     console.log("+++++++++++++++++++++++");
-      
+
   //     console.log(response);
-      
+
   //     if (response && response.length > 0) {
   //       console.log(response,'tag list....');
   //       this.categorylist = response[0];
@@ -146,20 +146,20 @@ export class TaglistComponent  {
   // }
 
   getdata(data) {
-  console.log(data,'filtering data,,,,')
-  this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, data).subscribe(response => {
-    console.log("+++++++++++++++++++++++");
-    console.log(response);
-    
-    if (response && response.status && response.data && response.data.length > 0) {
-      console.log(response.data,'vendor list....');
-      this.categorylist = response.data; // Changed from response[0] to response.data
-      this.count = response.count; // Changed from response[1] to response.count
-      this.source.load(this.categorylist);
-      this.cd.detectChanges();
-    }
-  })
-}
+    console.log(data, 'filtering data,,,,')
+    this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, data).subscribe(response => {
+      console.log("+++++++++++++++++++++++");
+      console.log(response);
+
+      if (response && response.status && response.data && response.data.length > 0) {
+        console.log(response.data, 'vendor list....');
+        this.categorylist = response.data; // Changed from response[0] to response.data
+        this.count = response.count; // Changed from response[1] to response.count
+        this.source.load(this.categorylist);
+        this.cd.detectChanges();
+      }
+    })
+  }
 
 
   onDeleteChange(event) {
@@ -172,8 +172,8 @@ export class TaglistComponent  {
     console.log("search change");
     this.source = new LocalDataSource();
     this.global_search = event;
-    console.log(this.global_search,"this.global_searchthis.global_searchthis.global_search");
-    
+    console.log(this.global_search, "this.global_searchthis.global_searchthis.global_search");
+
     let data = {
       'skip': this.skip,
       'limit': this.limit,
@@ -201,7 +201,7 @@ export class TaglistComponent  {
       'skip': this.skip,
       'limit': this.limit,
       'search': this.global_search,
-      'status':1
+      'status': 1
     }
     if (Object.keys(this.global_filter_action).length > 0) {
       let perpagedata = {
@@ -512,7 +512,7 @@ export class TaglistComponent  {
   //             return value;
   //           }
   //         },
-        
+
   //         // rcategory: {
   //         //   title: 'Category Name',
   //         //   filter: true,
@@ -520,7 +520,7 @@ export class TaglistComponent  {
   //         //     return value.rcatname.charAt(0).toUpperCase() + value.rcatname.substr(1).toLowerCase();
   //         //   }
   //         // },
-         
+
   //         // isRecommeneded: {
   //         //   title: 'Recommended Product',
   //         //   filter: false,
@@ -559,7 +559,7 @@ export class TaglistComponent  {
   //         //   onComponentInitFunction: (instance: any) => {
   //         //     instance.save.subscribe(row => {
   //         //       console.log(row,"row from productlist");
-                
+
   //         //       this.changefeatured(row._id, row.expensive)
   //         //     });
   //         //   }
@@ -610,214 +610,214 @@ export class TaglistComponent  {
   // };
 
   loadsettings(event) {
-  if (event == 'delete') {
-    this.settings = {
-      selectMode: 'multi',
-      hideSubHeader: true,
-      columns: {
-        vendorName: {
-          title: 'Vendor Name',
-          filter: true,
-          type: 'html',
-          valuePrepareFunction: (value, row) => {
-            return value;
+    if (event == 'delete') {
+      this.settings = {
+        selectMode: 'multi',
+        hideSubHeader: true,
+        columns: {
+          vendorName: {
+            title: 'Vendor Name',
+            filter: true,
+            type: 'html',
+            valuePrepareFunction: (value, row) => {
+              return value;
+            }
+          },
+          contractDetails: {
+            title: 'Contract ID',
+            filter: true,
+            type: 'html',
+            valuePrepareFunction: (value, row) => {
+              return value.contractId;
+            }
+          },
+          startDate: {
+            title: 'Start Date',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          endDate: {
+            title: 'End Date',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          invoicingDate: {
+            title: 'Next Invoicing Date',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          lastPayment: {
+            title: 'Last Payment',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          status: {
+            title: 'Status',
+            filter: true,
+            type: 'custom',
+            renderComponent: PopupComponent,
+            sort: false,
+            editable: true,
+            onComponentInitFunction: (instance: any) => {
+              instance.save.subscribe(row => {
+                this.changeStatus(row._id, row.status);
+              });
+            }
+          },
+          busesDetails: {
+            title: 'Buses Under Contract',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? value.length : 0;
+            }
+          },
+          driversDetails: {
+            title: 'Drivers Under Contract',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? value.length : 0;
+            }
+          },
+          contactOfficer: {
+            title: 'Contact Officer',
+            filter: true,
+            type: 'html',
+            valuePrepareFunction: (value, row) => {
+              return value || '-';
+            }
           }
         },
-        contractDetails: {
-          title: 'Contract ID',
-          filter: true,
-          type: 'html',
-          valuePrepareFunction: (value, row) => {
-            return value.contractId;
+        pager: {
+          display: true,
+          perPage: this.default_limit
+        },
+        actions: {
+          add: true,
+          edit: false,
+          delete: false,
+          columnTitle: 'Actions',
+          class: 'action-column',
+          position: 'right',
+          custom: [],
+        },
+      }
+      this.settings.actions.custom = this.getSettings.loadSettings(event, this.curentUser, '/app/vendors/list', this.userPrivilegeDetails, this.delete_btn, this.edit_btn, this.view_btn);
+    } else {
+      this.settings = {
+        hideSubHeader: true,
+        columns: {
+          index: {
+            title: 'S.No',
+            type: 'text',
+            valuePrepareFunction: (value, row, cell) => {
+              return this.skip + cell.row.index + 1 + '.'
+            }
+          },
+          vendorName: {
+            title: 'Vendor Name',
+            filter: true,
+            type: 'html',
+            valuePrepareFunction: (value, row) => {
+              return value;
+            }
+          },
+          contractDetails: {
+            title: 'Contract ID',
+            filter: true,
+            type: 'html',
+            valuePrepareFunction: (value, row) => {
+              return value.contractId;
+            }
+          },
+          startDate: {
+            title: 'Start Date',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          endDate: {
+            title: 'End Date',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          invoicingDate: {
+            title: 'Next Invoicing Date',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          lastPayment: {
+            title: 'Last Payment',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
+            }
+          },
+          status: {
+            title: 'Status',
+            filter: true,
+            type: 'custom',
+            renderComponent: PopupComponent,
+            sort: false,
+            editable: true,
+            onComponentInitFunction: (instance: any) => {
+              instance.save.subscribe(row => {
+                this.changeStatus(row._id, row.status);
+              });
+            }
+          },
+          busesDetails: {
+            title: 'Buses Under Contract',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? value.length : 0;
+            }
+          },
+          driversDetails: {
+            title: 'Drivers Under Contract',
+            filter: false,
+            valuePrepareFunction: value => {
+              return value ? value.length : 0;
+            }
+          },
+          contactOfficer: {
+            title: 'Contact Officer',
+            filter: true,
+            type: 'html',
+            valuePrepareFunction: (value, row) => {
+              return value || '-';
+            }
           }
         },
-        startDate: {
-          title: 'Start Date',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
+        pager: {
+          display: true,
+          perPage: this.default_limit
         },
-        endDate: {
-          title: 'End Date',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
+        actions: {
+          add: true,
+          edit: false,
+          delete: false,
+          columnTitle: 'Actions',
+          class: 'action-column',
+          position: 'right',
+          custom: [],
         },
-        invoicingDate: {
-          title: 'Next Invoicing Date',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
-        },
-        lastPayment: {
-          title: 'Last Payment',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
-        },
-        status: {
-          title: 'Status',
-          filter: true,
-          type: 'custom',
-          renderComponent: PopupComponent,
-          sort: false,
-          editable: true,
-          onComponentInitFunction: (instance: any) => {
-            instance.save.subscribe(row => {
-              this.changeStatus(row._id, row.status);
-            });
-          }
-        },
-        busesDetails: {
-          title: 'Buses Under Contract',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? value.length : 0;
-          }
-        },
-        driversDetails: {
-          title: 'Drivers Under Contract',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? value.length : 0;
-          }
-        },
-        contactOfficer: {
-          title: 'Contact Officer',
-          filter: true,
-          type: 'html',
-          valuePrepareFunction: (value, row) => {
-            return value || '-';
-          }
-        }
-      },
-      pager: {
-        display: true,
-        perPage: this.default_limit
-      },
-      actions: {
-        add: true,
-        edit: false,
-        delete: false,
-        columnTitle: 'Actions',
-        class: 'action-column',
-        position: 'right',
-        custom: [],
-      },
+      }
+      this.settings.actions.custom = this.getSettings.loadSettings(event, this.curentUser, '/app/vendors/list', this.userPrivilegeDetails, this.delete_btn, this.edit_btn, this.view_btn);
     }
-    this.settings.actions.custom = this.getSettings.loadSettings(event, this.curentUser, '/app/vendors/list', this.userPrivilegeDetails, this.delete_btn, this.edit_btn, this.view_btn);
-  } else {
-    this.settings = {
-      hideSubHeader: true,
-      columns: {
-        index: {
-          title: 'S.No',
-          type: 'text',
-          valuePrepareFunction: (value, row, cell) => {
-            return this.skip + cell.row.index + 1 + '.'
-          }
-        },
-        vendorName: {
-          title: 'Vendor Name',
-          filter: true,
-          type: 'html',
-          valuePrepareFunction: (value, row) => {
-            return value;
-          }
-        },
-        contractDetails: {
-          title: 'Contract ID',
-          filter: true,
-          type: 'html',
-          valuePrepareFunction: (value, row) => {
-            return value.contractId;
-          }
-        },
-        startDate: {
-          title: 'Start Date',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
-        },
-        endDate: {
-          title: 'End Date',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
-        },
-        invoicingDate: {
-          title: 'Next Invoicing Date',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
-        },
-        lastPayment: {
-          title: 'Last Payment',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
-          }
-        },
-        status: {
-          title: 'Status',
-          filter: true,
-          type: 'custom',
-          renderComponent: PopupComponent,
-          sort: false,
-          editable: true,
-          onComponentInitFunction: (instance: any) => {
-            instance.save.subscribe(row => {
-              this.changeStatus(row._id, row.status);
-            });
-          }
-        },
-        busesDetails: {
-          title: 'Buses Under Contract',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? value.length : 0;
-          }
-        },
-        driversDetails: {
-          title: 'Drivers Under Contract',
-          filter: false,
-          valuePrepareFunction: value => {
-            return value ? value.length : 0;
-          }
-        },
-        contactOfficer: {
-          title: 'Contact Officer',
-          filter: true,
-          type: 'html',
-          valuePrepareFunction: (value, row) => {
-            return value || '-';
-          }
-        }
-      },
-      pager: {
-        display: true,
-        perPage: this.default_limit
-      },
-      actions: {
-        add: true,
-        edit: false,
-        delete: false,
-        columnTitle: 'Actions',
-        class: 'action-column',
-        position: 'right',
-        custom: [],
-      },
-    }
-    this.settings.actions.custom = this.getSettings.loadSettings(event, this.curentUser, '/app/vendors/list', this.userPrivilegeDetails, this.delete_btn, this.edit_btn, this.view_btn);
   }
-}
 
 
   ngAfterViewInit(): void {
