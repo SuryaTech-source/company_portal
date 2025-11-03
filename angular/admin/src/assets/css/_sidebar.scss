@@ -50,7 +50,7 @@
     @include sidebar-width($sidebar-borders, $sidebar-width);
   }
 
-  > .sidebar-nav {
+  >.sidebar-nav {
     overflow-x: hidden;
     overflow-y: auto;
   }
@@ -106,6 +106,7 @@
     text-decoration: none;
     background: $sidebar-nav-link-bg;
     @include borders($sidebar-nav-link-borders);
+
     @if $enable-sidebar-nav-rounded {
       border-radius: $border-radius;
     }
@@ -117,6 +118,8 @@
       font-size: $font-size-base;
       color: $sidebar-nav-link-icon-color;
       text-align: center;
+      filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(342deg) brightness(105%) contrast(106%);
+
     }
 
     .badge {
@@ -177,11 +180,14 @@
     @each $color, $value in $theme-colors {
       &.nav-link-#{$color} {
         background: $value;
+
         .nav-icon {
           color: rgba(255, 255, 255, 0.7);
         }
+
         &:hover {
           background: darken($value, 5%);
+
           i {
             color: #fff;
           }
@@ -217,10 +223,12 @@
   .nav-dropdown.open {
     background: $sidebar-nav-dropdown-bg;
     @include borders($sidebar-nav-dropdown-borders);
+
     @if $enable-sidebar-nav-rounded {
       border-radius: $border-radius;
     }
-    > .nav-dropdown-items {
+
+    >.nav-dropdown-items {
       max-height: 1500px;
     }
 
@@ -242,7 +250,7 @@
       }
     }
 
-    > .nav-dropdown-toggle::before {
+    >.nav-dropdown-toggle::before {
       transform: rotate(90deg);
       -webkit-transform: rotate(90deg);
       -moz-transform: rotate(90deg);
@@ -320,6 +328,7 @@
 
     &:hover {
       background-color: $sidebar-minimizer-hover-bg;
+
       &::before {
         background-image: url("../../assets/image/side_three_bar.png");
       }
@@ -415,6 +424,7 @@
         height: 50px;
         background-color: #202b46;
       }
+
       // stylelint-disable no-duplicate-selectors
       .sidebar-nav {
         // padding-bottom: $sidebar-minimizer-height;
@@ -423,6 +433,7 @@
         overflow-y: scroll;
         max-height: 100%;
       }
+
       // Temporary fix end
 
       .sidebar-minimizer::before {
@@ -438,14 +449,16 @@
           width: $sidebar-width + $sidebar-minimized-width;
           overflow: visible;
 
-          > .nav-link {
+          >.nav-link {
             background: $sidebar-nav-link-hover-bg;
 
             .nav-icon {
               color: $sidebar-nav-link-hover-color;
             }
           }
+
           .nav-link {
+
             &.disabled,
             :disabled {
               background: $sidebar-nav-link-disabled-bg;
@@ -457,9 +470,10 @@
           }
         }
       }
+
       // temp fix for vue version
       section {
-        :not(.nav-dropdown-items) > {
+        :not(.nav-dropdown-items)> {
           .nav-item:last-child::after {
             display: block;
             margin-bottom: $sidebar-minimizer-height;
@@ -467,6 +481,7 @@
           }
         }
       }
+
       // temp fix end
 
       .nav-link {
@@ -514,8 +529,8 @@
         }
       }
 
-      .nav > .nav-dropdown {
-        > .nav-dropdown-items {
+      .nav>.nav-dropdown {
+        >.nav-dropdown-items {
           display: none;
           max-height: 1000px;
           background: $sidebar-bg;
@@ -523,7 +538,8 @@
 
         &:hover {
           background: $sidebar-nav-link-hover-bg;
-          > .nav-dropdown-items {
+
+          >.nav-dropdown-items {
             position: absolute;
             left: $sidebar-minimized-width;
             display: inline;
@@ -538,6 +554,7 @@
       .sidebar {
         .nav {
           list-style-image: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+
           .divider {
             height: 0;
           }
@@ -577,8 +594,8 @@
           }
         }
 
-        .nav > .nav-dropdown {
-          > .nav-dropdown-items {
+        .nav>.nav-dropdown {
+          >.nav-dropdown-items {
             display: none;
             max-height: 1000px;
             background: $sidebar-bg;
@@ -586,7 +603,8 @@
 
           &:hover {
             background: $sidebar-nav-link-hover-bg;
-            > .nav-dropdown-items {
+
+            >.nav-dropdown-items {
               position: absolute;
               left: 0;
               display: inline;
@@ -608,7 +626,7 @@
     }
 
     .nav-dropdown.open {
-      > .nav-dropdown-toggle::before {
+      >.nav-dropdown-toggle::before {
         transform: rotate(270deg);
       }
     }
@@ -648,4 +666,3 @@
 ::ng-deep .sidebar .nav-link:hover.nav-dropdown-toggle::before {
   filter: invert(100%) !important;
 }
-

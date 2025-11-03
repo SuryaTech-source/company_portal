@@ -1,9 +1,12 @@
 cui-breadcrumb {
-    margin-top: 10px;
+    position: absolute;
+    width: 80%;
+    top: 0;
+    z-index: 2;
 
     .breadcrumb {
         padding: 15px;
-        background-color: #dfdfdf;
+        background-color: #ffffff;
 
         .breadcrumb-item {
             a {
