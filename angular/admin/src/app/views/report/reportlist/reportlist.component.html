@@ -265,7 +265,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let row of filteredCustomers">
-            <td>{{ row.name }}</td>
+            <td>{{ row.contractClientName }}</td>
             <td>{{ row.contractId }}</td>
             <td>{{ row.invoiceNo }}</td>
             <td>{{ row.dueDate | date }}</td>
@@ -398,10 +398,10 @@
                     class="form-control mb-2"
                     [(ngModel)]="form.client"
                     name="client"
-                    required
+                    (change)="onClientSelect()"
                   >
                     <option value="">Select Client</option>
-                    <option *ngFor="let c of clients" [value]="c._id">
+                    <option *ngFor="let c of clients" [value]="c.clientName">
                       {{ c.clientName }}
                     </option>
                   </select>
@@ -416,16 +416,20 @@
                     class="form-control mb-2"
                     [(ngModel)]="form.contractId"
                     name="contractId"
+                    (change)="onContractChange()"
                   >
                     <option value="">Select contract</option>
-                    <option *ngFor="let ct of contracts" [value]="ct._id">
+                    <option
+                      *ngFor="let ct of filteredContracts"
+                      [value]="ct._id"
+                    >
                       {{ ct.contractId }} - {{ ct.clientName }}
                     </option>
                   </select>
                 </div>
               </div>
 
-              <!-- Invoice select (optional) -->
+              <!-- Invoice select -->
               <div class="col-md-4 col-sm-12">
                 <div class="label_input">
                   <label>Invoice</label>
@@ -433,6 +437,7 @@
                     class="form-control mb-2"
                     [(ngModel)]="form.invoiceRef"
                     name="invoiceRef"
+                    (change)="onInvoiceSelect()"
                   >
                     <option value="">Select invoice</option>
                     <option *ngFor="let inv of invoices" [value]="inv._id">
@@ -441,6 +446,7 @@
                   </select>
                 </div>
               </div>
+
               <div class="col-md-4 col-sm-12">
                 <div class="label_input">
                   <label>Due Date</label>
@@ -452,6 +458,7 @@
                   />
                 </div>
               </div>
+
               <div class="col-md-4 col-sm-12">
                 <div class="label_input">
                   <label>Amount Paid</label>
@@ -463,6 +470,7 @@
                   />
                 </div>
               </div>
+
               <div class="col-md-4 col-sm-12">
                 <div class="label_input">
                   <label>Status</label>
@@ -477,6 +485,7 @@
                   </select>
                 </div>
               </div>
+
               <div class="col-12">
                 <div class="label_input">
                   <label>Remarks</label>
@@ -488,11 +497,12 @@
                 </div>
               </div>
             </ng-container>
+
             <ng-container class="row" *ngIf="activeTab === 'vendors'">
               <div class="col-md-4 col-sm-12">
                 <div class="label_input">
                   <label>Vendor</label>
-                 <select
+                  <select
                     class="form-control mb-2"
                     [(ngModel)]="form.vendor"
                     name="vendor"
@@ -505,7 +515,7 @@
                   </select>
                 </div>
               </div>
-                  <!-- Contract select -->
+              <!-- Contract select -->
               <div class="col-md-4 col-sm-12">
                 <div class="label_input">
                   <label>Contract</label>

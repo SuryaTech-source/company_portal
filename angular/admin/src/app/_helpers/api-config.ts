@@ -229,6 +229,11 @@ export const Apiconfig = {
         "method": "post"
     },
 
+    listInvoicesByContract:{
+        "url": "admin/invoice/invoice-contract",
+        "method": "post"
+    },
+
     performanceList: {
         "url": "admin/performance/report",
         "method": "post"

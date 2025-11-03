@@ -27,8 +27,8 @@ export class AddContractsComponent implements OnInit {
   contractType: string = "";
   contactOfficer = '';
   // contractType = 'Fixed';
-  invoicingDate: string;
-  lastPayment: string;
+  // invoicingDate: string;
+  // lastPayment: string;
   status = 1;
 
   // Dropdown options
@@ -73,8 +73,8 @@ export class AddContractsComponent implements OnInit {
             this.contractType = data.contractType?.join(", ") || "";
             this.contactOfficer = data.contactOfficer;
             // this.contractType = data.contractType;
-            this.invoicingDate = data.invoicingDate ? data.invoicingDate.split('T')[0] : '';
-            this.lastPayment = data.lastPayment ? data.lastPayment.split('T')[0] : '';
+            // this.invoicingDate = data.invoicingDate ? data.invoicingDate.split('T')[0] : '';
+            // this.lastPayment = data.lastPayment ? data.lastPayment.split('T')[0] : '';
             this.status = data.status;
           }
         });
@@ -115,8 +115,8 @@ export class AddContractsComponent implements OnInit {
         contractType: this.contractType.split(',').map(s => s.trim()),
         contactOfficer: this.contactOfficer,
         // contractType: this.contractType,
-        invoicingDate: this.invoicingDate,
-        lastPayment: this.lastPayment,
+        // invoicingDate: this.invoicingDate,
+        // lastPayment: this.lastPayment,
         status: this.status,
       };
 

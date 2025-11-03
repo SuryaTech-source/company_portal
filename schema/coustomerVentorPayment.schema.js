@@ -8,7 +8,7 @@ var PAYMENT_SCHEMA = {};
  * Customer Payments Schema
  */
 PAYMENT_SCHEMA.CUSTOMER_PAYMENT = {
-  client: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
+  clientName: { type: String, required: true },
   contractId: { type: Schema.Types.ObjectId, ref: "Contract", required: true }, // <-- ObjectId ref
   invoiceNo: { type: String },
   invoiceRef: { type: Schema.Types.ObjectId, ref: "Invoice" }, // optional link to invoice doc

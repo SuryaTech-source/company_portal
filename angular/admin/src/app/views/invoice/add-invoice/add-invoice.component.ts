@@ -33,7 +33,7 @@ export class AddInvoiceComponent implements OnInit {
 
   // Clients dropdown
   clientOptions: string[] = ['Acme Corp', 'Globex Inc', 'Soylent LLC', 'Umbrella Ltd'];
-
+  contractList: any[] = [];
   // Temporary item form
   itemForm: any = {
     description: '',
@@ -54,6 +54,8 @@ export class AddInvoiceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.getActiveContracts();
     this.route.paramMap.subscribe(params => {
       this.invoiceId = params.get('id');
       if (this.invoiceId) {
@@ -63,18 +65,40 @@ export class AddInvoiceComponent implements OnInit {
     });
   }
 
+  getActiveContracts() {
+    this.apiService.CommonApi(
+      Apiconfig.contractListActive.method,
+      Apiconfig.contractListActive.url,
+      {}
+    ).subscribe((res: any) => {
+      if (res.status && res.data) {
+        this.contractList = res.data.doc; // contains {_id, clientName,...}
+      }
+    });
+  }
+
+  onContractChange(event: any) {
+    const contractId = event.target.value;
+    const selected = this.contractList.find(c => c._id === contractId);
+    if (selected) {
+      this.invoiceForm.clientName = selected.clientName;
+    }
+  }
+
   // ✅ Fetch invoice for editing
   getInvoiceDetails(id: string) {
     this.apiService.CommonApi(
       Apiconfig.viewInvoice.method,
-      Apiconfig.viewInvoice.url,{id}
-      
+      Apiconfig.viewInvoice.url, { id }
+
     ).subscribe((res: any) => {
       if (res.status && res.data) {
         this.invoiceForm = res.data;
         // convert dates to yyyy-mm-dd format for input type="date"
         this.invoiceForm.date = new Date(this.invoiceForm.date).toISOString().substring(0, 10);
         this.invoiceForm.dueDate = new Date(this.invoiceForm.dueDate).toISOString().substring(0, 10);
+        this.invoiceForm.contract = res.data.contract?._id || res.data.contract;
+        this.invoiceForm.clientName = res.data.clientName;
         this.calculateTotalAmount();
       } else {
         this.notification.showError(res.message || 'Failed to load invoice');
@@ -114,53 +138,53 @@ export class AddInvoiceComponent implements OnInit {
   }
 
   // ✅ Submit invoice (Add or Update)
- submitForm(form: any) {
-  this.submitted = true;
+  submitForm(form: any) {
+    this.submitted = true;
 
-  if (form.valid && this.invoiceForm.items.length > 0) {
-    // --- Save or Update Invoice ---
-    const payload = { ...this.invoiceForm };
-    
-    // Include _id only if updating
-    if (this.isEditMode && this.invoiceId) {
-      payload._id = this.invoiceId;
-    }
+    if (form.valid && this.invoiceForm.items.length > 0) {
+      // --- Save or Update Invoice ---
+      const payload = { ...this.invoiceForm };
 
-    this.apiService.CommonApi(
-      Apiconfig.addInvoice.method, // Use the same API
-      Apiconfig.addInvoice.url,
-      payload
-    ).subscribe((res: any) => {
-      if (res.status) {
-        this.notification.showSuccess(
-          this.isEditMode ? 'Invoice updated successfully' : 'Invoice created successfully'
-        );
-
-        if (this.isEditMode) {
-          this.router.navigate(['/app/invoice/list']); // Back to list after update
-        } else {
-          form.resetForm();
-          this.invoiceForm = {
-            invoiceNo: '',
-            date: this.today,
-            dueDate: '',
-            clientName: '',
-            remarks: '',
-            paymentDetails: { bankName: '', accountNo: '' },
-            items: [],
-            totalAmount: 0
-          };
-          this.submitted = false;
-        }
-      } else {
-        this.notification.showError(res.message || 'Error saving invoice');
+      // Include _id only if updating
+      if (this.isEditMode && this.invoiceId) {
+        payload._id = this.invoiceId;
       }
-    });
 
-  } else {
-    this.notification.showError('Please fill all required fields and add at least one item');
+      this.apiService.CommonApi(
+        Apiconfig.addInvoice.method, // Use the same API
+        Apiconfig.addInvoice.url,
+        payload
+      ).subscribe((res: any) => {
+        if (res.status) {
+          this.notification.showSuccess(
+            this.isEditMode ? 'Invoice updated successfully' : 'Invoice created successfully'
+          );
+
+          if (this.isEditMode) {
+            this.router.navigate(['/app/invoice/list']); // Back to list after update
+          } else {
+            form.resetForm();
+            this.invoiceForm = {
+              invoiceNo: '',
+              date: this.today,
+              dueDate: '',
+              clientName: '',
+              remarks: '',
+              paymentDetails: { bankName: '', accountNo: '' },
+              items: [],
+              totalAmount: 0
+            };
+            this.submitted = false;
+          }
+        } else {
+          this.notification.showError(res.message || 'Error saving invoice');
+        }
+      });
+
+    } else {
+      this.notification.showError('Please fill all required fields and add at least one item');
+    }
   }
-}
 
 
   // ✅ Modal controls

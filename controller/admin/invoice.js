@@ -10,56 +10,69 @@ module.exports = function () {
    * @desc Add / Update Invoice
    */
   controller.saveInvoice = async function (req, res) {
-    try {
-      const body = req.body;
+  try {
+    const body = req.body;
 
-      // prepare invoice data
-      let invoiceData = {
-        invoiceNo: body.invoiceNo,
-        date: body.date ? new Date(body.date) : new Date(),
-        dueDate: body.dueDate ? new Date(body.dueDate) : null,
-        clientName: body.clientName,
-        contract: body.contract ? new mongoose.Types.ObjectId(body.contract) : null,
-        items: body.items || [],
-        status: body.status || "Pending",
-        remarks: body.remarks || "",
-        totalAmount: body.totalAmount || 0,
-        paymentDetails: {
-          bankName: body.paymentDetails?.bankName || "",
-          accountNo: body.paymentDetails?.accountNo || "",
-        },
-      };
+    // prepare invoice data
+    let invoiceData = {
+      invoiceNo: body.invoiceNo,
+      date: body.date ? new Date(body.date) : new Date(),
+      dueDate: body.dueDate ? new Date(body.dueDate) : null,
+      clientName: body.clientName,
+      contract: body.contract ? new mongoose.Types.ObjectId(body.contract) : null,
+      items: body.items || [],
+      status: body.status || "Pending",
+      remarks: body.remarks || "",
+      totalAmount: body.totalAmount || 0,
+      paymentDetails: {
+        bankName: body.paymentDetails?.bankName || "",
+        accountNo: body.paymentDetails?.accountNo || "",
+      },
+    };
 
-      let result;
-      if (body._id) {
-        // --- Update Invoice ---
-        result = await db.UpdateDocument(
-          "invoice",
-          { _id: mongoose.Types.ObjectId(body._id) },
-          invoiceData
-        );
-        return res.send({
-          status: true,
-          message: "Invoice updated successfully",
-          data: result,
-        });
-      } else {
-        // --- Add Invoice ---
-        result = await db.InsertDocument("invoice", invoiceData);
-        return res.send({
-          status: true,
-          message: "Invoice added successfully",
-          data: result,
-        });
-      }
-    } catch (error) {
-      console.log(error, "ERROR saveInvoice");
+    let result;
+
+    if (body._id) {
+      // --- Update Invoice ---
+      result = await db.UpdateDocument(
+        "invoice",
+        { _id: mongoose.Types.ObjectId(body._id) },
+        invoiceData
+      );
+
       return res.send({
-        status: false,
-        message: "Something went wrong while saving invoice.",
+        status: true,
+        message: "Invoice updated successfully",
+        data: result,
+      });
+    } else {
+      // --- Add Invoice ---
+      result = await db.InsertDocument("invoice", invoiceData);
+
+      // ✅ Update corresponding contract invoicingDate
+      if (body.contract) {
+        await db.UpdateDocument(
+          "contract",
+          { _id: new mongoose.Types.ObjectId(body.contract) },
+          { invoicingDate: invoiceData.date, updatedAt: new Date() }
+        );
+      }
+
+      return res.send({
+        status: true,
+        message: "Invoice added successfully",
+        data: result,
       });
     }
-  };
+  } catch (error) {
+    console.log(error, "ERROR saveInvoice");
+    return res.send({
+      status: false,
+      message: "Something went wrong while saving invoice.",
+    });
+  }
+};
+
 
   /**
    * @route POST /invoice/list
@@ -219,6 +232,26 @@ module.exports = function () {
     return res.send({ status: false, message: "Error updating invoice status" });
   }
 };
+
+controller.listInvoices = async (req, res) => {
+  try {
+    const { contract } = req.body;
+    
+    let match = {};
+    if (contract) match.contract = new mongoose.Types.ObjectId(contract); // ✅ filter by contract
+
+    const result = await db.GetAggregation("invoice", [
+      { $match: match },
+      { $sort: { date: -1 } }
+    ]);
+
+    res.send({ status: true, data: result });
+
+  } catch(err) {
+    res.send({ status: false, message: "Error fetching invoices" });
+  }
+};
+
 
 
   return controller;

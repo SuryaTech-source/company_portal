@@ -715,6 +715,7 @@ module.exports = function (app, io) {
     app.post('/admin/invoice/view', ensureAuthorized, invoice.viewInvoice);
     app.post('/admin/invoice/delete', ensureAuthorized, invoice.deleteInvoice);
     app.post('/admin/invoice/update-status', ensureAuthorized, invoice.updateInvoiceStatus);
+    app.post('/admin/invoice/invoice-contract', ensureAuthorized, invoice.listInvoices);
 
     //performance management
     app.post('/admin/performance/report', ensureAuthorized, performance.performanceReport);

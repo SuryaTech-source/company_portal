@@ -28,8 +28,8 @@ module.exports = function () {
         : body.contractType?.split(",").map(s => s.trim()) || [],
 
       contactOfficer: body.contactOfficer,
-      invoicingDate: body.invoicingDate ? new Date(body.invoicingDate) : null,
-      lastPayment: body.lastPayment ? new Date(body.lastPayment) : null,
+      // invoicingDate: body.invoicingDate ? new Date(body.invoicingDate) : null,
+      // lastPayment: body.lastPayment ? new Date(body.lastPayment) : null,
       status: body.status || 1,
     };
 

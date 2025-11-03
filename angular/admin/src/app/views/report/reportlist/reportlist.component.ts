@@ -26,10 +26,21 @@ export class ReportlistComponent implements OnInit {
   clients: any[] = [];
 vendors: any[] = [];
 contracts: any[] = [];
+filteredContracts = [];
+
 invoices: any[] = [];
   // Modal
   showModal = false;
-  form: any = {};
+  form: any = {
+  client: '',
+  contractId: '',
+  invoiceRef: '',
+  dueDate: '',
+  amountPaid: '',
+  status: 'Unpaid',
+  remarks: ''
+};
+;
   editData: any = null;
   // inside class ReportlistComponent
 selectedDate: string = new Date().toISOString().split('T')[0]; // default today
@@ -63,15 +74,18 @@ selectedEmployees: string[] = []; // for bulk
         });
     }
 
-  this.loadInvoices()
-  this.loadContracts()
+  // this.loadInvoices()
+  // this.loadContracts()
   this.loadVendors()
+  this.getActiveContracts()
   }
 
-  loadInvoices() {
-  this.apiService.CommonApi(Apiconfig.listInvoices.method, Apiconfig.listInvoices.url, { limit: 100 })
-    .subscribe((res: any) => { if (res.status) this.invoices = res.data || []; });
-}
+//   loadInvoices() {
+//   this.apiService.CommonApi(Apiconfig.listInvoices.method, Apiconfig.listInvoices.url, { limit: 100 })
+//     .subscribe((res: any) => { if (res.status) this.invoices = res.data || []; });
+// }
+
+
 loadVendors() {
   this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, {})
     .subscribe((res: any) => { if (res.status) this.vendors = res.data || []; });
@@ -266,6 +280,66 @@ loadAttendanceByDate() {
     }
   });
 }
+
+  getActiveContracts() {
+    this.apiService.CommonApi(
+      Apiconfig.contractListActive.method,
+      Apiconfig.contractListActive.url,
+      {}
+    ).subscribe((res: any) => {
+      if (res.status && res.data) {
+        this.contracts = res.data.doc; // contains {_id, clientName,...}
+        const allContracts = res.data.doc || [];
+         this.clients = [...new Map(allContracts.map(x => [x.clientName, x])).values()];
+      }
+    });
+  }
+
+
+onClientSelect() {
+  const clientName = this.form.client; // comes from ngModel
+   console.log(clientName,"clientName");
+   
+  this.filteredContracts = this.contracts.filter(
+    c => c.clientName === clientName
+  );
+
+  // Reset dependent fields
+  this.form.contractId = "";
+  this.form.invoiceRef = "";
+  this.invoices = [];
+}
+onContractChange() {
+  const contract = this.filteredContracts.find(c => c._id === this.form.contractId);
+  if (contract) {
+    this.loadInvoices(contract);
+  }
+}
+loadInvoices(contract: any) {
+  this.form.contractId = contract._id;
+  this.form.clientName = contract.clientName;
+
+  this.apiService.CommonApi(
+    Apiconfig.listInvoicesByContract.method,
+    Apiconfig.listInvoicesByContract.url,
+    { contract: contract._id }
+  ).subscribe((res:any) => {
+    this.invoices = res.data || [];
+  });
+}
+
+onInvoiceSelect() {
+  const selectedInvoice = this.invoices.find(
+    inv => inv._id === this.form.invoiceRef
+  );
+
+  if (selectedInvoice) {
+    this.form.invoiceNo = selectedInvoice.invoiceNo; // ✅ store invoice number
+  } else {
+    this.form.invoiceNo = "";
+  }
+}
+
 
 // mark/update single attendance
 updateAttendance(row: any) {

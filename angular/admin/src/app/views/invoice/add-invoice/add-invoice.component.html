@@ -9,14 +9,21 @@
     </div>
 
     <div class="col-lg-6 col-sm-12">
-      <div class="label_input">
-        <label>Client Name <span class="color_red">*</span></label>
-        <select class="form-control" name="clientName" [(ngModel)]="invoiceForm.clientName" required>
-          <option value="" disabled>Select Client</option>
-          <option *ngFor="let client of clientOptions" [value]="client">{{ client }}</option>
-        </select>
-      </div>
-    </div>
+  <div class="label_input">
+    <label>Client Name <span class="color_red">*</span></label>
+    <select class="form-control"
+            name="contract"
+            [(ngModel)]="invoiceForm.contract"
+            (change)="onContractChange($event)"
+            required>
+      <option value="" disabled>Select Client</option>
+      <option *ngFor="let c of contractList" [value]="c._id">
+        {{ c.clientName }}
+      </option>
+    </select>
+  </div>
+</div>
+
     <div class="col-lg-6 col-sm-12">
       <div class="label_input ">
         <label>Date <span class="color_red">*</span></label>
