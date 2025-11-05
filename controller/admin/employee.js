@@ -1,3 +1,5 @@
+const contact = require("./contact.js");
+
 //"use strict";
 module.exports = function () {
   var db = require("../../controller/adaptor/mongodb.js");
@@ -105,6 +107,7 @@ controller.saveEmployee = async function (req, res) {
       fullName: body.fullName,
       nationality: body.nationality || null,
       bloodGroup: body.bloodGroup || null,
+      contactNumber: body.contactNumber || null,
       dob: body.dob ? new Date(body.dob) : null,
       permanentAddress: body.permanentAddress || null,
       designation: body.designation || null,
@@ -224,6 +227,7 @@ controller.viewemployee = async function (req, res) {
             employeeId: 1,
             designation: 1,
             nationality: 1,
+            contactNumber: 1,
             dateOfJoining: 1,
             visaExpiry: 1,
             nominee: 1,

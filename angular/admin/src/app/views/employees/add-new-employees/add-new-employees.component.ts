@@ -39,6 +39,7 @@ employeeDocuments: any[] = [];
   licenseNo: string = '';
   role: string = 'Staff';
   status: number = 1;
+  contactNumber: string = '';
 
   // Employee document fields
   documentType: string = '';
@@ -141,6 +142,7 @@ employeeDocuments: any[] = [];
         this.licenseNo = emp.licenseNo || '';
         this.role = emp.role || 'Staff';
         this.status = emp.status ?? 1;
+        this.contactNumber = emp.contactNumber || '';
         // this.documentType = emp.documentType || '';
         this.employeeDocuments = emp.documents
            this.initializeDocuments(emp.documents);
@@ -318,6 +320,7 @@ getFullFileUrl(fileUrl: string): string {
       dob: this.dob,
       permanentAddress: this.permanentAddress,
       designation: this.designation,
+      contactNumber: this.contactNumber,
       employeeId: this.employeeId,
       employmentType: this.employmentType,
       dateOfJoining: this.dateOfJoining,

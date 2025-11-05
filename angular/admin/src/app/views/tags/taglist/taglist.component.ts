@@ -646,7 +646,7 @@ export class TaglistComponent {
             }
           },
           invoicingDate: {
-            title: 'Next Invoicing Date',
+            title: 'Invoicing Date',
             filter: false,
             valuePrepareFunction: value => {
               return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';
@@ -752,7 +752,7 @@ export class TaglistComponent {
             }
           },
           invoicingDate: {
-            title: 'Next Invoicing Date',
+            title: 'Invoicing Date',
             filter: false,
             valuePrepareFunction: value => {
               return value ? new DatePipe('en-US').transform(value, 'MMM dd, yyyy') : '-';

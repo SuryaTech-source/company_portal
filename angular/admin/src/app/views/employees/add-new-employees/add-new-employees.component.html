@@ -98,6 +98,21 @@
         </div>
       </div>
 
+      <!-- contact number  -->
+       <div class="col-lg-4">
+
+        <div class="label_input">
+          <label>Contact Number</label>
+          <input type="text" class="form-control" [(ngModel)]="contactNumber" name="contactNumber"
+            #contactNumberCtrl="ngModel" [readonly]="readonly" required maxlength="15" pattern="^[0-9]+$">
+          <div *ngIf="employeeForm.submitted && contactNumberCtrl.errors" class="text-danger">
+            <div *ngIf="contactNumberCtrl.errors['required']">Contact Number is required.</div>
+            <div *ngIf="contactNumberCtrl.errors['maxlength']">Maximum 15 digits allowed.</div>
+            <div *ngIf="contactNumberCtrl.errors['pattern']">Only numbers allowed.</div>
+          </div>
+        </div>
+       </div>
+
       <div class="col-lg-4">
 
         <div class="label_input">

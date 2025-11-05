@@ -9,7 +9,7 @@ EMPLOYEE_SCHEMA.EMPLOYEE = {
     bloodGroup: String,
     dob: Date,
     permanentAddress: String,
-
+    contactNumber: String,
     designation: String,
     employeeId: { type: String, unique: true },
     employmentType: { type: String, enum: ["Full-Time", "Part-Time", "Contract"] },

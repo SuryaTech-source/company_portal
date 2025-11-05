@@ -8,75 +8,156 @@ module.exports = function () {
    * @route POST /vendor/save
    * @desc Add or Update a vendor
    */
-  controller.saveVendor = async function (req, res) {
+//   controller.saveVendor = async function (req, res) {
+//   try {
+//     const body = req.body;
+//     let documents = [];
+
+//     if (body.documents) {
+//       let docsFromBody = typeof body.documents === "string"
+//         ? JSON.parse(body.documents)
+//         : body.documents;
+
+//       documents = docsFromBody.map((doc, index) => {
+//         let matchedFile = req.files?.find(
+//           (f) => f.fieldname === `documents[${index}][file]`
+//         );
+
+//         return {
+//           documentType: doc.type || doc.documentType,
+//           fileUrl: matchedFile
+//             ? matchedFile.destination + matchedFile.filename
+//             : doc.fileUrl || null,
+//         };
+//       });
+//     }
+
+//     let vendorData = {
+//       vendorName: body.vendorName,
+//       contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null, // ✅ correct link
+//       startDate: body.startDate ? new Date(body.startDate) : null,
+//       endDate: body.endDate ? new Date(body.endDate) : null,
+//       buses: body.buses ? body.buses.split(",").map(id => new mongoose.Types.ObjectId(id)) : [],
+//       drivers: body.drivers ? body.drivers.split(",").map(id => new mongoose.Types.ObjectId(id)) : [],
+//       noOfBuses: body.noOfBuses || 0,
+//       noOfDrivers: body.noOfDrivers || 0,
+//       contactOfficer: body.contactOfficer || null,
+//       contractType: body.contractType || null,
+//       invoicingDate: body.invoicingDate ? new Date(body.invoicingDate) : null,
+//       lastPayment: body.lastPayment ? new Date(body.lastPayment) : null,
+//       status: Number(body.status) || 1,
+//       documents: documents,
+//     };
+
+//     let result;
+//     if (body._id && body._id !== "null") {
+//       result = await db.UpdateDocument(
+//         "vendor",
+//         { _id: new mongoose.Types.ObjectId(body._id) },
+//         vendorData
+//       );
+//       return res.send({
+//         status: true,
+//         message: "Vendor updated successfully",
+//         data: result,
+//       });
+//     } else {
+//       result = await db.InsertDocument("vendor", vendorData);
+//       return res.send({
+//         status: true,
+//         message: "Vendor added successfully",
+//         data: result,
+//       });
+//     }
+//   } catch (error) {
+//     console.log(error, "ERROR saveVendor");
+//     return res.send({
+//       status: false,
+//       message: "Something went wrong while saving vendor.",
+//     });
+//   }
+// };
+controller.saveVendor = async function (req, res) {
   try {
     const body = req.body;
-    let documents = [];
 
+    // ✅ Vendor documents upload
+    let documents = [];
     if (body.documents) {
-      let docsFromBody = typeof body.documents === "string"
+      let docsArray = typeof body.documents === "string"
         ? JSON.parse(body.documents)
         : body.documents;
 
-      documents = docsFromBody.map((doc, index) => {
-        let matchedFile = req.files?.find(
+      documents = docsArray.map((doc, index) => {
+        let file = req.files?.find(
           (f) => f.fieldname === `documents[${index}][file]`
         );
-
         return {
-          documentType: doc.type || doc.documentType,
-          fileUrl: matchedFile
-            ? matchedFile.destination + matchedFile.filename
-            : doc.fileUrl || null,
+          documentType: doc.documentType || doc.type,
+          fileUrl: file ? file.destination + file.filename : doc.fileUrl || null,
         };
       });
     }
 
-    let vendorData = {
+    //  matchedFile
+    //         ? matchedFile.destination + matchedFile.filename
+
+    // ✅ Driver docs upload
+    let driverDocs = [];
+    if (body.driverDocs) {
+      let driverDocsArray = typeof body.driverDocs === "string"
+        ? JSON.parse(body.driverDocs)
+        : body.driverDocs;
+
+      driverDocs = driverDocsArray.map((doc, idx) => {
+        const matchFile = req.files?.find(
+          f => f.fieldname === `driverDocs[${idx}][file]`
+        );
+        return {
+          driverId: new mongoose.Types.ObjectId(doc.driverId),
+          fileUrl: matchFile ? matchFile.destination + matchFile.filename: doc.fileUrl || null,
+        };
+      });
+    }
+
+    const vendorData = {
       vendorName: body.vendorName,
-      contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null, // ✅ correct link
+      contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null,
       startDate: body.startDate ? new Date(body.startDate) : null,
       endDate: body.endDate ? new Date(body.endDate) : null,
-      buses: body.buses ? body.buses.split(",").map(id => new mongoose.Types.ObjectId(id)) : [],
-      drivers: body.drivers ? body.drivers.split(",").map(id => new mongoose.Types.ObjectId(id)) : [],
+      buses: body.buses ? JSON.parse(body.buses).map(id => new mongoose.Types.ObjectId(id)) : [],
+      drivers: body.drivers ? JSON.parse(body.drivers).map(id => new mongoose.Types.ObjectId(id)) : [],
+      driverDocs, // ✅ save driver docs
       noOfBuses: body.noOfBuses || 0,
       noOfDrivers: body.noOfDrivers || 0,
-      contactOfficer: body.contactOfficer || null,
-      contractType: body.contractType || null,
+      contactOfficer: body.contactOfficer || "",
+      contractType: body.contractType || "",
       invoicingDate: body.invoicingDate ? new Date(body.invoicingDate) : null,
       lastPayment: body.lastPayment ? new Date(body.lastPayment) : null,
-      status: Number(body.status) || 1,
-      documents: documents,
+      documents,
+      status: Number(body.status) || 1
     };
 
     let result;
-    if (body._id && body._id !== "null") {
+
+    if (body.id) {
       result = await db.UpdateDocument(
         "vendor",
-        { _id: new mongoose.Types.ObjectId(body._id) },
+        { _id: new mongoose.Types.ObjectId(body.id) },
         vendorData
       );
-      return res.send({
-        status: true,
-        message: "Vendor updated successfully",
-        data: result,
-      });
-    } else {
-      result = await db.InsertDocument("vendor", vendorData);
-      return res.send({
-        status: true,
-        message: "Vendor added successfully",
-        data: result,
-      });
+      return res.send({ status: true, message: "Vendor updated", data: result });
     }
+
+    result = await db.InsertDocument("vendor", vendorData);
+    return res.send({ status: true, message: "Vendor saved", data: result });
+
   } catch (error) {
-    console.log(error, "ERROR saveVendor");
-    return res.send({
-      status: false,
-      message: "Something went wrong while saving vendor.",
-    });
+    console.log("ERROR saveVendor", error);
+    return res.send({ status: false, message: "Error saving vendor", error });
   }
 };
+
 
   /**
    * @route POST /vendor/view
@@ -127,6 +208,7 @@ module.exports = function () {
           invoicingDate: 1,
           lastPayment: 1,
           status: 1,
+          driverDocs: 1,
           documents: 1,
           "busesDetails._id": 1,
           "busesDetails.vehicleName": 1,

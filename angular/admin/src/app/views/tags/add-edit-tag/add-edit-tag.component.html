@@ -1,146 +1,143 @@
-<div class="vendors-new_vendors">
-  <h1 class="page_title">New Vendors</h1>
+<form class="row" #tagForm="ngForm" (ngSubmit)="onFormSubmit(tagForm)" autocomplete="off">
 
-  <form class="row" #tagAddEditForm="ngForm" (ngSubmit)="onFormSubmit(tagAddEditForm)" autocomplete="off">
-
-    <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>Carrier Name <span class="mandatory">*</span></label>
-        <input type="text" class="form-control" name="carrierName" [(ngModel)]="userDetails.carrierName" required
-          maxlength="30" #carrierName="ngModel">
-        <div *ngIf="tagAddEditForm.submitted && carrierName.errors" class="text-danger">
-          Carrier Name is required (max 30 chars).
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>No. of Drivers <span class="mandatory">*</span></label>
-        <input type="text" class="form-control" name="noOfDrivers" [(ngModel)]="userDetails.noOfDrivers" required
-          maxlength="30" (keypress)="onlyNumbers($event)" #noOfDrivers="ngModel">
-        <div *ngIf="tagAddEditForm.submitted && noOfDrivers.errors" class="text-danger">
-          No. of Drivers is required (numbers only).
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4 col-sm-12">
-  <div class="label_input">
-    <label>Contract <span class="mandatory">*</span></label>
-    <select class="form-control" name="contractId" [(ngModel)]="userDetails.contractId" required #contractId="ngModel">
-      <option value="" disabled selected>Select Contract</option>
-      <option *ngFor="let c of contracts" [value]="c._id">
-        {{ c.contractId }} - {{ c.clientName }}
-      </option>
-    </select>
-    <div *ngIf="tagAddEditForm.submitted && contractId.errors" class="text-danger">
-      Contract is required.
+  <div class="col-md-4">
+    <div class="label_input">
+      <label>Carrier Name <span class="mandatory">*</span></label>
+      <input type="text" class="form-control" name="carrierName"
+             [(ngModel)]="userDetails.carrierName" required maxlength="30">
     </div>
   </div>
-</div>
 
-
-    <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>Contract Type <span class="mandatory">*</span></label>
-        <select class="form-control" name="contractType" [(ngModel)]="userDetails.contractType" required
-          #contractType="ngModel">
-          <option value="" disabled selected>Select</option>
-          <option *ngFor="let type of contractTypes" [value]="type">{{ type }}</option>
-        </select>
-      </div>
-      <div *ngIf="tagAddEditForm.submitted && contractType.errors" class="text-danger">
-        Contract Type is required.
-      </div>
+  <div class="col-md-4">
+    <div class="label_input">
+      <label>No. of Buses <span class="mandatory">*</span></label>
+      <input type="number" class="form-control" name="noOfBuses"
+             [(ngModel)]="form.noOfBuses" (change)="generateFleetDriverRows()" min="1" required>
     </div>
+  </div>
 
-    <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>Start Date <span class="mandatory">*</span></label>
-        <input type="date" class="form-control" name="startDate" [(ngModel)]="userDetails.startDate" required
-          #startDate="ngModel">
-        <div *ngIf="tagAddEditForm.submitted && startDate.errors" class="text-danger">
-          Start Date is required.
-        </div>
-      </div>
+  <div class="col-md-4">
+    <div class="label_input">
+      <label>Contract <span class="mandatory">*</span></label>
+      <select class="form-control" name="contractId" [(ngModel)]="userDetails.contractId" required>
+        <option value="">Select Contract</option>
+        <option *ngFor="let c of contracts" [value]="c._id">
+          {{ c.contractId }} - {{ c.clientName }}
+        </option>
+      </select>
     </div>
+  </div>
 
-    <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>End Date <span class="mandatory">*</span></label>
-        <input type="date" class="form-control" name="endDate" [(ngModel)]="userDetails.endDate" required
-          #endDate="ngModel">
-        <div *ngIf="tagAddEditForm.submitted && endDate.errors" class="text-danger">
-          End Date is required.
-        </div>
-      </div>
+  <div class="col-md-4">
+    <div class="label_input">
+      <label>Contract Type <span class="mandatory">*</span></label>
+      <select class="form-control" name="contractType" [(ngModel)]="userDetails.contractType" required>
+        <option value="">Select Type</option>
+        <option *ngFor="let type of contractTypes" [value]="type">{{ type }}</option>
+      </select>
     </div>
+  </div>
 
-    <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>No. of Buses <span class="mandatory">*</span></label>
-        <input type="text" class="form-control" name="noOfBuses" [(ngModel)]="userDetails.noOfBuses" required
-          maxlength="30" (keypress)="onlyNumbers($event)" #noOfBuses="ngModel">
-        <div *ngIf="tagAddEditForm.submitted && noOfBuses.errors" class="text-danger">
-          No. of Buses is required (numbers only).
-        </div>
-      </div>
+  <div class="col-md-4">
+    <div class="label_input">
+      <label>Start Date <span class="mandatory">*</span></label>
+      <input type="date" class="form-control" name="startDate" [(ngModel)]="userDetails.startDate" required>
     </div>
+  </div>
 
-    <div class="col-md-4 col-sm-12">
-      <div class="label_input">
-        <label>Contact Officer <span class="mandatory">*</span></label>
-        <input type="text" class="form-control" name="contactOfficer" [(ngModel)]="userDetails.contactOfficer" required
-          maxlength="30" #contactOfficer="ngModel">
-        <div *ngIf="tagAddEditForm.submitted && contactOfficer.errors" class="text-danger">
-          Contact Officer is required (max 30 chars).
-        </div>
-      </div>
+  <div class="col-md-4">
+    <div class="label_input">
+      <label>End Date <span class="mandatory">*</span></label>
+      <input type="date" class="form-control" name="endDate" [(ngModel)]="userDetails.endDate" required>
     </div>
+  </div>
 
-    <h5 class="col-12">Documents</h5>
-    <div class="row">
-      <div class="col-md-4 col-sm-12">
-        <div class="label_input">
-          <label>Upload Document <span class="mandatory">*</span></label>
-          <input type="file" class="form-control" name="documentFile" [(ngModel)]="userDetails.documentFile" required
-            accept=".pdf,.doc,.docx" #documentFile="ngModel">
-          <div *ngIf="tagAddEditForm.submitted && documentFile.errors" class="text-danger">
-            Document is required.
-          </div>
-        </div>
-      </div>
+  <h5 class="col-12 mt-3" *ngIf="form.noOfBuses > 0">Assign Buses & Drivers</h5>
 
-      <div class="col-md-4 col-sm-12">
-        <div class="label_input">
-          <label>Document Type <span class="mandatory">*</span></label>
-          <select class="form-control" name="documentType" [(ngModel)]="userDetails.documentType" required
-            #documentType="ngModel">
-            <option value="" disabled selected>Select</option>
-            <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
+  <table class="table table-bordered" *ngIf="form.noOfBuses > 0">
+    <thead>
+      <tr>
+        <th>Bus Register Number</th>
+        <th>Driver Name</th>
+        <th>Driver Contact</th>
+        <th>Driver Document</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of assignedFleetDrivers; let i = index;">
+        <td>
+          <select class="form-control" [(ngModel)]="row.busId" name="bus{{i}}" required>
+            <option value="">Select Bus</option>
+            <option *ngFor="let f of fleets" [value]="f._id">{{ f.registrationNo }}</option>
           </select>
-        </div>
-        <div *ngIf="tagAddEditForm.submitted && documentType.errors" class="text-danger">
-          Document Type is required.
-        </div>
-      </div>
-    </div>
+        </td>
 
+        <td>
+          <select class="form-control" [(ngModel)]="row.driverId" name="driver{{i}}" (change)="onDriverSelect(i)" required>
+            <option value="">Select Driver</option>
+            <option *ngFor="let d of drivers" [value]="d._id">{{ d.fullName }}</option>
+          </select>
+        </td>
 
-    <div class="page_footer">
-      <button type="button" routerLink="/app/carrier/list" class="close_btn">
-        Cancel
-      </button>
-      <button type="submit" class=" bg_green" [disabled]="submitebtn"> Submit
-        <div class="icon">
-          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
-              fill="currentColor"></path>
-          </svg>
-        </div>
-      </button>
+        <td>
+          <input type="text" class="form-control" [(ngModel)]="row.contactNumber" name="contact{{i}}" readonly>
+        </td>
+
+        <td>
+  <div class="d-flex gap-2 align-items-center">
+    <input type="file" class="form-control" (change)="uploadDriverDoc($event, i)">
+    <!-- Server-hosted preview -->
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      *ngIf="assignedFleetDrivers[i]?.driverDocUrl"
+      (click)="previewDriverDoc(i)"
+    >
+      Preview
+    </button>
+    <!-- Fallback preview for freshly selected file (not yet uploaded) -->
+    <button
+      type="button"
+      class="btn btn-sm btn-secondary"
+      *ngIf="!assignedFleetDrivers[i]?.driverDocUrl && assignedFleetDrivers[i]?.driverDocFile"
+      (click)="previewDriverDocLocal(i)"
+      title="Local preview (not uploaded)"
+    >
+      Preview
+    </button>
+  </div>
+</td>
+
+      </tr>
+    </tbody>
+  </table>
+
+  <h5 class="col-12">Documents</h5>
+
+  <div class="col-md-4">
+    <label>Upload Document <span class="mandatory">*</span></label>
+    <input type="file" class="form-control" (change)="onVendorDocSelect($event)">
+  </div>
+
+  <div class="col-md-4">
+    <label>Document Type <span class="mandatory">*</span></label>
+    <select class="form-control" [(ngModel)]="userDetails.documentType" name="documentType" required>
+      <option value="">Select Type</option>
+      <option value="PDF">PDF</option>
+      <option value="DOC">DOC</option>
+    </select>
+  </div>
+
+  <div class="col-md-4" *ngIf="userDetails.documentFile">
+    <label>Uploaded File:</label>
+    <div>
+      <button type="button" class="btn btn-sm btn-primary" (click)="previewDoc()">Preview</button>
+      <button type="button" class="btn btn-sm btn-success" (click)="downloadDoc()">Download</button>
     </div>
-  </form>
-</div>
+  </div>
+
+  <div class="page_footer">
+    <button type="button" routerLink="/app/carrier/list" class="close_btn">Cancel</button>
+    <button type="submit" class="bg_green" [disabled]="submitebtn">Save</button>
+  </div>
+</form>
