@@ -6,7 +6,7 @@
       <!-- Vehicle Name -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
-          <label>VEHICLE NAME</label>
+          <label>VEHICLE Number</label>
           <input
             type="text"
             class="form-control"
@@ -17,7 +17,61 @@
             maxlength="30"
           />
           <small *ngIf="submitted && vehicleName.invalid" class="text-danger">
-            Vehicle name is required
+            Vehicle nnumber is required
+          </small>
+        </div>
+      </div>
+      
+       <!-- Registration No -->
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>REGISTRATION NO.</label>
+          <input
+            type="text"
+            class="form-control"
+            name="registrationNo"
+            ngModel
+            #registrationNo="ngModel"
+            required
+          />
+          <small *ngIf="submitted && registrationNo.invalid" class="text-danger">
+            Registration number is required
+          </small>
+        </div>
+      </div>
+
+      <!-- Next Passing Due -->
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>NEXT PASSING DUE</label>
+          <input
+            type="date"
+            class="form-control"
+            name="nextPassingDue"
+            ngModel
+            #nextPassingDue="ngModel"
+            required
+          />
+          <small *ngIf="submitted && nextPassingDue.invalid" class="text-danger">
+            Next passing due date is required
+          </small>
+        </div>
+      </div>
+    
+      <!-- Month & Year -->
+      <div class="col-md-4 col-sm-12">
+        <div class="label_input">
+          <label>Model & Year OF</label>
+          <input
+            type="month"
+            class="form-control"
+            name="monthYrOf"
+            ngModel
+            #monthYrOf="ngModel"
+            required
+          />
+          <small *ngIf="submitted && monthYrOf.invalid" class="text-danger">
+            Manufacture month & year is required
           </small>
         </div>
       </div>
@@ -40,24 +94,7 @@
         </div>
       </div>
 
-      <!-- Registration No -->
-      <div class="col-md-4 col-sm-12">
-        <div class="label_input">
-          <label>REGISTRATION NO.</label>
-          <input
-            type="text"
-            class="form-control"
-            name="registrationNo"
-            ngModel
-            #registrationNo="ngModel"
-            required
-          />
-          <small *ngIf="submitted && registrationNo.invalid" class="text-danger">
-            Registration number is required
-          </small>
-        </div>
-      </div>
-
+     
       <!-- Colour -->
       <div class="col-md-4 col-sm-12">
         <div class="label_input">
@@ -112,41 +149,8 @@
         </div>
       </div>
 
-      <!-- Month & Year -->
-      <div class="col-md-4 col-sm-12">
-        <div class="label_input">
-          <label>MONTH & YR OF</label>
-          <input
-            type="month"
-            class="form-control"
-            name="monthYrOf"
-            ngModel
-            #monthYrOf="ngModel"
-            required
-          />
-          <small *ngIf="submitted && monthYrOf.invalid" class="text-danger">
-            Manufacture month & year is required
-          </small>
-        </div>
-      </div>
-
-      <!-- Next Passing Due -->
-      <div class="col-md-4 col-sm-12">
-        <div class="label_input">
-          <label>NEXT PASSING DUE</label>
-          <input
-            type="date"
-            class="form-control"
-            name="nextPassingDue"
-            ngModel
-            #nextPassingDue="ngModel"
-            required
-          />
-          <small *ngIf="submitted && nextPassingDue.invalid" class="text-danger">
-            Next passing due date is required
-          </small>
-        </div>
-      </div>
+      
+      
 
       <!-- Maker's Name -->
       <div class="col-md-4 col-sm-12">

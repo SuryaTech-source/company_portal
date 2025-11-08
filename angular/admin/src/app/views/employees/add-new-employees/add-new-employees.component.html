@@ -1,17 +1,42 @@
 <div class="employees-add_new_employees">
-  <h1 class="page_title">{{ mode === 'add' ? 'Add Employee' : mode === 'edit' ? 'Edit Employee' : 'View Employee' }}
+  <h1 class="page_title">
+    {{
+      mode === "add"
+        ? "Add Employee"
+        : mode === "edit"
+        ? "Edit Employee"
+        : "View Employee"
+    }}
   </h1>
   <form #employeeForm="ngForm" (ngSubmit)="submitForm(employeeForm)">
     <div class="row">
       <div class="col-md-4">
         <div class="label_input">
           <label>Full Name</label>
-          <input type="text" class="form-control" [(ngModel)]="fullName" name="fullName" #fullNameCtrl="ngModel"
-            [readonly]="readonly" required maxlength="25" pattern="^[A-Za-z ]+$">
-          <div *ngIf="employeeForm.submitted && fullNameCtrl.errors" class="text-danger">
-            <div *ngIf="fullNameCtrl.errors['required']">Full Name is required.</div>
-            <div *ngIf="fullNameCtrl.errors['maxlength']">Maximum 25 letters allowed.</div>
-            <div *ngIf="fullNameCtrl.errors['pattern']">Only alphabets allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="fullName"
+            name="fullName"
+            #fullNameCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="25"
+            pattern="^[A-Za-z ]+$"
+          />
+          <div
+            *ngIf="employeeForm.submitted && fullNameCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="fullNameCtrl.errors['required']">
+              Full Name is required.
+            </div>
+            <div *ngIf="fullNameCtrl.errors['maxlength']">
+              Maximum 25 letters allowed.
+            </div>
+            <div *ngIf="fullNameCtrl.errors['pattern']">
+              Only alphabets allowed.
+            </div>
           </div>
         </div>
       </div>
@@ -19,106 +44,370 @@
       <div class="col-lg-4">
         <div class="label_input">
           <label>Nationality</label>
-          <input type="text" class="form-control" [(ngModel)]="nationality" name="nationality"
-            #nationalityCtrl="ngModel" [readonly]="readonly" required maxlength="30" pattern="^[A-Za-z ]+$">
-          <div *ngIf="employeeForm.submitted && nationalityCtrl.errors" class="text-danger">
-            <div *ngIf="nationalityCtrl.errors['required']">Nationality is required.</div>
-            <div *ngIf="nationalityCtrl.errors['maxlength']">Maximum 30 letters allowed.</div>
-            <div *ngIf="nationalityCtrl.errors['pattern']">Only alphabets allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="nationality"
+            name="nationality"
+            #nationalityCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+            pattern="^[A-Za-z ]+$"
+          />
+          <div
+            *ngIf="employeeForm.submitted && nationalityCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="nationalityCtrl.errors['required']">
+              Nationality is required.
+            </div>
+            <div *ngIf="nationalityCtrl.errors['maxlength']">
+              Maximum 30 letters allowed.
+            </div>
+            <div *ngIf="nationalityCtrl.errors['pattern']">
+              Only alphabets allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Blood Group</label>
-          <select class="form-control" [(ngModel)]="bloodGroup" name="bloodGroup" #bloodGroupCtrl="ngModel"
-            [disabled]="readonly" required>
+          <select
+            class="form-control"
+            [(ngModel)]="bloodGroup"
+            name="bloodGroup"
+            #bloodGroupCtrl="ngModel"
+            [disabled]="readonly"
+            required
+          >
             <option value="">-- Select Blood Group --</option>
-            <option *ngFor="let group of bloodGroups" [value]="group">{{ group }}</option>
+            <option *ngFor="let group of bloodGroups" [value]="group">
+              {{ group }}
+            </option>
           </select>
-          <div *ngIf="employeeForm.submitted && bloodGroupCtrl.errors" class="text-danger">
-            <div *ngIf="bloodGroupCtrl.errors['required']">Blood Group is required.</div>
+          <div
+            *ngIf="employeeForm.submitted && bloodGroupCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="bloodGroupCtrl.errors['required']">
+              Blood Group is required.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Date of Birth</label>
-          <input type="date" class="form-control" [(ngModel)]="dob" name="dob" #dobCtrl="ngModel" [readonly]="readonly"
-            required>
-          <div *ngIf="employeeForm.submitted && dobCtrl.errors" class="text-danger">
-            <div *ngIf="dobCtrl.errors['required']">Date of Birth is required.</div>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="dob"
+            name="dob"
+            #dobCtrl="ngModel"
+            [readonly]="readonly"
+            required
+          />
+          <div
+            *ngIf="employeeForm.submitted && dobCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="dobCtrl.errors['required']">
+              Date of Birth is required.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Permanent Address</label>
-          <textarea class="form-control" [(ngModel)]="permanentAddress" name="permanentAddress" #addressCtrl="ngModel"
-            [readonly]="readonly" required maxlength="30"></textarea>
-          <div *ngIf="employeeForm.submitted && addressCtrl.errors" class="text-danger">
-            <div *ngIf="addressCtrl.errors['required']">Permanent Address is required.</div>
-            <div *ngIf="addressCtrl.errors['maxlength']">Maximum 30 letters allowed.</div>
+          <textarea
+            class="form-control"
+            [(ngModel)]="permanentAddress"
+            name="permanentAddress"
+            #addressCtrl="ngModel"
+            [readonly]="readonly"
+            required
+           
+          ></textarea>
+          <div
+            *ngIf="employeeForm.submitted && addressCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="addressCtrl.errors['required']">
+              Permanent Address is required.
+            </div>
+            <div *ngIf="addressCtrl.errors['maxlength']">
+              Maximum 30 letters allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Designation</label>
-          <select class="form-control" [(ngModel)]="designation" name="designation" #designationCtrl="ngModel"
-            [disabled]="readonly" required>
+          <select
+            class="form-control"
+            [(ngModel)]="designation"
+            name="designation"
+            #designationCtrl="ngModel"
+            [disabled]="readonly"
+            required
+          >
             <option value="">-- Select Designation --</option>
-            <option value="Driver">Driver</option>
             <option value="Supervisor">Supervisor</option>
+            <option value="Driver">Driver</option>
+            <option value="Mechanic">Mechanic</option>
+            <option value="Maid">Maid</option>
+            <option value="Others">Others</option>
           </select>
-          <div *ngIf="employeeForm.submitted && designationCtrl.errors" class="text-danger">
-            <div *ngIf="designationCtrl.errors['required']">Designation is required.</div>
+
+          <div
+            *ngIf="employeeForm.submitted && designationCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="designationCtrl.errors['required']">
+              Designation is required.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Employee ID</label>
-          <input type="text" class="form-control" [(ngModel)]="employeeId" name="employeeId" #empIdCtrl="ngModel"
-            [readonly]="readonly" required maxlength="30">
-          <div *ngIf="employeeForm.submitted && empIdCtrl.errors" class="text-danger">
-            <div *ngIf="empIdCtrl.errors['required']">Employee ID is required.</div>
-            <div *ngIf="empIdCtrl.errors['maxlength']">Maximum 30 characters allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="employeeId"
+            name="employeeId"
+            #empIdCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+          />
+          <div
+            *ngIf="employeeForm.submitted && empIdCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="empIdCtrl.errors['required']">
+              Employee ID is required.
+            </div>
+            <div *ngIf="empIdCtrl.errors['maxlength']">
+              Maximum 30 characters allowed.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h5>IDs and Permits</h5>
+
+      <div class="col-lg-4">
+        <div class="label_input">
+          <label>Civil ID (Visa No)</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="civilId"
+            name="civilId"
+            #civilIdCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+          />
+          <div
+            *ngIf="employeeForm.submitted && civilIdCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="civilIdCtrl.errors['required']">
+              Civil ID is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="label_input">
+          <label>Civil ID Expiry</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="civilIdExpiry"
+            name="civilIdExpiry"
+            #civilIdExpiryCtrl="ngModel"
+            [readonly]="readonly"
+            required
+          />
+          <div
+            *ngIf="employeeForm.submitted && civilIdExpiryCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="civilIdExpiryCtrl.errors['required']">
+              Civil ID Expiry is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="label_input">
+          <label>Civil ID Document</label>
+          <div *ngIf="!readonly">
+            <input
+              type="file"
+              class="form-control"
+              (change)="onFileSelected($event, addOrGetDocIndex('Civil ID'))"
+              [required]="
+                !getDoc('Civil ID')?.fileUrl && !getDoc('Civil ID')?.file
+              "
+            />
+            <small class="text-muted" *ngIf="getDoc('Civil ID')?.fileUrl">
+              Current file: {{ getFileName(getDoc("Civil ID")?.fileUrl) }}
+            </small>
+          </div>
+          <div
+            *ngIf="readonly && getDoc('Civil ID')?.fileUrl"
+            class="form-control-plaintext"
+          >
+            <a
+              [href]="getFullFileUrl(getDoc('Civil ID')?.fileUrl)"
+              target="_blank"
+              class="btn btn-sm btn-outline-primary"
+            >
+              <i class="fa fa-download"></i>
+              {{ getFileName(getDoc("Civil ID")?.fileUrl) }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-100"></div>
+
+      <div class="col-lg-4" *ngIf="designation === 'Driver'">
+        <div class="label_input">
+          <label>License No</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="licenseNo"
+            name="licenseNo"
+            #licenseNoCtrl="ngModel"
+            [readonly]="readonly"
+            required
+          />
+          <div
+            *ngIf="employeeForm.submitted && licenseNoCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="licenseNoCtrl.errors['required']">
+              License No is required for drivers.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4" *ngIf="designation === 'Driver'">
+        <div class="label_input">
+          <label>License Expiry</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="licenseExpiry"
+            name="licenseExpiry"
+            #licenseExpiryCtrl="ngModel"
+            [readonly]="readonly"
+            required
+          />
+          <div
+            *ngIf="employeeForm.submitted && licenseExpiryCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="licenseExpiryCtrl.errors['required']">
+              License Expiry is required for drivers.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4" *ngIf="designation === 'Driver'">
+        <div class="label_input">
+          <label>License Document</label>
+          <div *ngIf="!readonly">
+            <input
+              type="file"
+              class="form-control"
+              (change)="onFileSelected($event, addOrGetDocIndex('License'))"
+              [required]="
+                !getDoc('License')?.fileUrl && !getDoc('License')?.file
+              "
+            />
+            <small class="text-muted" *ngIf="getDoc('License')?.fileUrl">
+              Current file: {{ getFileName(getDoc("License")?.fileUrl) }}
+            </small>
+          </div>
+          <div
+            *ngIf="readonly && getDoc('License')?.fileUrl"
+            class="form-control-plaintext"
+          >
+            <a
+              [href]="getFullFileUrl(getDoc('License')?.fileUrl)"
+              target="_blank"
+              class="btn btn-sm btn-outline-primary"
+            >
+              <i class="fa fa-download"></i>
+              {{ getFileName(getDoc("License")?.fileUrl) }}
+            </a>
           </div>
         </div>
       </div>
 
       <!-- contact number  -->
-       <div class="col-lg-4">
-
+      <div class="col-lg-4">
         <div class="label_input">
           <label>Contact Number</label>
-          <input type="text" class="form-control" [(ngModel)]="contactNumber" name="contactNumber"
-            #contactNumberCtrl="ngModel" [readonly]="readonly" required maxlength="15" pattern="^[0-9]+$">
-          <div *ngIf="employeeForm.submitted && contactNumberCtrl.errors" class="text-danger">
-            <div *ngIf="contactNumberCtrl.errors['required']">Contact Number is required.</div>
-            <div *ngIf="contactNumberCtrl.errors['maxlength']">Maximum 15 digits allowed.</div>
-            <div *ngIf="contactNumberCtrl.errors['pattern']">Only numbers allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="contactNumber"
+            name="contactNumber"
+            #contactNumberCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="15"
+            pattern="^[0-9]+$"
+          />
+          <div
+            *ngIf="employeeForm.submitted && contactNumberCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="contactNumberCtrl.errors['required']">
+              Contact Number is required.
+            </div>
+            <div *ngIf="contactNumberCtrl.errors['maxlength']">
+              Maximum 15 digits allowed.
+            </div>
+            <div *ngIf="contactNumberCtrl.errors['pattern']">
+              Only numbers allowed.
+            </div>
           </div>
         </div>
-       </div>
+      </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Employment Type</label>
-          <select class="form-control" [(ngModel)]="employmentType" name="employmentType" [disabled]="readonly"
-            required>
+          <select
+            class="form-control"
+            [(ngModel)]="employmentType"
+            name="employmentType"
+            [disabled]="readonly"
+            required
+          >
             <option value="Full-Time">Full-Time</option>
             <option value="Part-Time">Part-Time</option>
             <option value="Contract">Contract</option>
@@ -127,169 +416,320 @@
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Date of Joining</label>
-          <input type="date" class="form-control" [(ngModel)]="dateOfJoining" name="dateOfJoining" #dojCtrl="ngModel"
-            [readonly]="readonly" required>
-          <div *ngIf="employeeForm.submitted && dojCtrl.errors" class="text-danger">
-            <div *ngIf="dojCtrl.errors['required']">Date of Joining is required.</div>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="dateOfJoining"
+            name="dateOfJoining"
+            #dojCtrl="ngModel"
+            [readonly]="readonly"
+            required
+          />
+          <div
+            *ngIf="employeeForm.submitted && dojCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="dojCtrl.errors['required']">
+              Date of Joining is required.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Under Contract</label>
-          <select class="form-control" [(ngModel)]="underContract" name="underContract" [disabled]="readonly" required>
+          <select
+            class="form-control"
+            [(ngModel)]="underContract"
+            name="underContract"
+            [disabled]="readonly"
+            required
+          >
             <option value="" disabled>Select</option>
             <option value="Yes">Yes</option>
             <option value="No">No</option>
           </select>
-          <div *ngIf="employeeForm.submitted && !underContract" class="text-danger">
+          <div
+            *ngIf="employeeForm.submitted && !underContract"
+            class="text-danger"
+          >
             Under Contract is required.
           </div>
         </div>
       </div>
 
-
       <div class="col-md-4">
         <div class="label_input">
           <label>Salary</label>
-          <input type="text" class="form-control" [(ngModel)]="salary" name="salary" #salaryCtrl="ngModel"
-            [readonly]="readonly" required maxlength="10" (keypress)="allowOnlyNumbers($event)">
-          <div *ngIf="employeeForm.submitted && salaryCtrl.errors" class="text-danger">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="salary"
+            name="salary"
+            #salaryCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="10"
+            (keypress)="allowOnlyNumbers($event)"
+          />
+          <div
+            *ngIf="employeeForm.submitted && salaryCtrl.errors"
+            class="text-danger"
+          >
             <div *ngIf="salaryCtrl.errors['required']">Salary is required.</div>
-            <div *ngIf="salaryCtrl.errors['maxlength']">Maximum 10 digits allowed.</div>
+            <div *ngIf="salaryCtrl.errors['maxlength']">
+              Maximum 10 digits allowed.
+            </div>
           </div>
         </div>
       </div>
-
 
       <h5>Bank Details</h5>
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Bank Name</label>
-          <input type="text" class="form-control" [(ngModel)]="bankName" name="bankName" #bankNameCtrl="ngModel"
-            [readonly]="readonly" required maxlength="30" pattern="^[A-Za-z ]+$">
-          <div *ngIf="employeeForm.submitted && bankNameCtrl.errors" class="text-danger">
-            <div *ngIf="bankNameCtrl.errors['required']">Bank Name is required.</div>
-            <div *ngIf="bankNameCtrl.errors['maxlength']">Maximum 30 letters allowed.</div>
-            <div *ngIf="bankNameCtrl.errors['pattern']">Only alphabets allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="bankName"
+            name="bankName"
+            #bankNameCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+            pattern="^[A-Za-z ]+$"
+          />
+          <div
+            *ngIf="employeeForm.submitted && bankNameCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="bankNameCtrl.errors['required']">
+              Bank Name is required.
+            </div>
+            <div *ngIf="bankNameCtrl.errors['maxlength']">
+              Maximum 30 letters allowed.
+            </div>
+            <div *ngIf="bankNameCtrl.errors['pattern']">
+              Only alphabets allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Account No</label>
-          <input type="text" class="form-control" [(ngModel)]="accountNo" name="accountNo" #accountNoCtrl="ngModel"
-            [readonly]="readonly" required maxlength="30" pattern="^[0-9]+$">
-          <div *ngIf="employeeForm.submitted && accountNoCtrl.errors" class="text-danger">
-            <div *ngIf="accountNoCtrl.errors['required']">Account Number is required.</div>
-            <div *ngIf="accountNoCtrl.errors['maxlength']">Maximum 30 digits allowed.</div>
-            <div *ngIf="accountNoCtrl.errors['pattern']">Only numbers allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="accountNo"
+            name="accountNo"
+            #accountNoCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+            pattern="^[0-9]+$"
+          />
+          <div
+            *ngIf="employeeForm.submitted && accountNoCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="accountNoCtrl.errors['required']">
+              Account Number is required.
+            </div>
+            <div *ngIf="accountNoCtrl.errors['maxlength']">
+              Maximum 30 digits allowed.
+            </div>
+            <div *ngIf="accountNoCtrl.errors['pattern']">
+              Only numbers allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>IFSC</label>
-          <input type="text" class="form-control" [(ngModel)]="ifsc" name="ifsc" #ifscCtrl="ngModel"
-            [readonly]="readonly" required maxlength="30">
-          <div *ngIf="employeeForm.submitted && ifscCtrl.errors" class="text-danger">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="ifsc"
+            name="ifsc"
+            #ifscCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+          />
+          <div
+            *ngIf="employeeForm.submitted && ifscCtrl.errors"
+            class="text-danger"
+          >
             <div *ngIf="ifscCtrl.errors['required']">IFSC is required.</div>
-            <div *ngIf="ifscCtrl.errors['maxlength']">Maximum 30 characters allowed.</div>
+            <div *ngIf="ifscCtrl.errors['maxlength']">
+              Maximum 30 characters allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <h5>Nominee</h5>
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Name</label>
-          <input type="text" class="form-control" [(ngModel)]="nomineeName" name="nomineeName"
-            #nomineeNameCtrl="ngModel" [readonly]="readonly" required maxlength="30" pattern="^[A-Za-z ]+$">
-          <div *ngIf="employeeForm.submitted && nomineeNameCtrl.errors" class="text-danger">
-            <div *ngIf="nomineeNameCtrl.errors['required']">Nominee Name is required.</div>
-            <div *ngIf="nomineeNameCtrl.errors['maxlength']">Maximum 30 letters allowed.</div>
-            <div *ngIf="nomineeNameCtrl.errors['pattern']">Only alphabets allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="nomineeName"
+            name="nomineeName"
+            #nomineeNameCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+            pattern="^[A-Za-z ]+$"
+          />
+          <div
+            *ngIf="employeeForm.submitted && nomineeNameCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="nomineeNameCtrl.errors['required']">
+              Nominee Name is required.
+            </div>
+            <div *ngIf="nomineeNameCtrl.errors['maxlength']">
+              Maximum 30 letters allowed.
+            </div>
+            <div *ngIf="nomineeNameCtrl.errors['pattern']">
+              Only alphabets allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Relation</label>
-          <select class="form-control" [(ngModel)]="nomineeRelation" name="nomineeRelation"
-            #nomineeRelationCtrl="ngModel" [disabled]="readonly" required>
+          <select
+            class="form-control"
+            [(ngModel)]="nomineeRelation"
+            name="nomineeRelation"
+            #nomineeRelationCtrl="ngModel"
+            [disabled]="readonly"
+            required
+          >
             <option value="" disabled>Select Relation</option>
-            <option *ngFor="let relation of relations" [value]="relation">{{ relation }}</option>
+            <option *ngFor="let relation of relations" [value]="relation">
+              {{ relation }}
+            </option>
           </select>
-          <div *ngIf="employeeForm.submitted && nomineeRelationCtrl.errors" class="text-danger">
-            <div *ngIf="nomineeRelationCtrl.errors['required']">Relation is required.</div>
+          <div
+            *ngIf="employeeForm.submitted && nomineeRelationCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="nomineeRelationCtrl.errors['required']">
+              Relation is required.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Contact</label>
-          <input type="text" class="form-control" [(ngModel)]="nomineeContact" name="nomineeContact"
-            #nomineeContactCtrl="ngModel" [readonly]="readonly" required maxlength="15" pattern="^[0-9]+$">
-          <div *ngIf="employeeForm.submitted && nomineeContactCtrl.errors" class="text-danger">
-            <div *ngIf="nomineeContactCtrl.errors['required']">Nominee Contact is required.</div>
-            <div *ngIf="nomineeContactCtrl.errors['maxlength']">Maximum 15 digits allowed.</div>
-            <div *ngIf="nomineeContactCtrl.errors['pattern']">Only numbers allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="nomineeContact"
+            name="nomineeContact"
+            #nomineeContactCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="15"
+            pattern="^[0-9]+$"
+          />
+          <div
+            *ngIf="employeeForm.submitted && nomineeContactCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="nomineeContactCtrl.errors['required']">
+              Nominee Contact is required.
+            </div>
+            <div *ngIf="nomineeContactCtrl.errors['maxlength']">
+              Maximum 15 digits allowed.
+            </div>
+            <div *ngIf="nomineeContactCtrl.errors['pattern']">
+              Only numbers allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>Visa Expiry</label>
-          <input type="date" class="form-control" [(ngModel)]="visaExpiry" name="visaExpiry" #visaExpiryCtrl="ngModel"
-            [readonly]="readonly" required>
-          <div *ngIf="employeeForm.submitted && visaExpiryCtrl.errors" class="text-danger">
-            <div *ngIf="visaExpiryCtrl.errors['required']">Visa Expiry is required.</div>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="visaExpiry"
+            name="visaExpiry"
+            #visaExpiryCtrl="ngModel"
+            [readonly]="readonly"
+            required
+          />
+          <div
+            *ngIf="employeeForm.submitted && visaExpiryCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="visaExpiryCtrl.errors['required']">
+              Visa Expiry is required.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input">
           <label>License No</label>
-          <input type="text" class="form-control" [(ngModel)]="licenseNo" name="licenseNo" #licenseNoCtrl="ngModel"
-            [readonly]="readonly" required maxlength="30">
-          <div *ngIf="employeeForm.submitted && licenseNoCtrl.errors" class="text-danger">
-            <div *ngIf="licenseNoCtrl.errors['required']">License No is required.</div>
-            <div *ngIf="licenseNoCtrl.errors['maxlength']">Maximum 30 characters allowed.</div>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="licenseNo"
+            name="licenseNo"
+            #licenseNoCtrl="ngModel"
+            [readonly]="readonly"
+            required
+            maxlength="30"
+          />
+          <div
+            *ngIf="employeeForm.submitted && licenseNoCtrl.errors"
+            class="text-danger"
+          >
+            <div *ngIf="licenseNoCtrl.errors['required']">
+              License No is required.
+            </div>
+            <div *ngIf="licenseNoCtrl.errors['maxlength']">
+              Maximum 30 characters allowed.
+            </div>
           </div>
         </div>
       </div>
 
       <div class="col-lg-4">
-
         <div class="label_input" *ngIf="mode !== 'add'">
           <label>Status</label>
-          <select class="form-control" [(ngModel)]="status" name="status" [disabled]="readonly">
+          <select
+            class="form-control"
+            [(ngModel)]="status"
+            name="status"
+            [disabled]="readonly"
+          >
             <option [value]="1">Active</option>
             <option [value]="2">Inactive</option>
             <option [value]="0">Deleted</option>
           </select>
         </div>
       </div>
-
     </div>
 
     <h5>Employee Documents</h5>
@@ -298,7 +738,13 @@
       <div class="col-md-4">
         <div class="label_input">
           <label>Document Type</label>
-          <select class="form-control" [(ngModel)]="doc.type" name="documentType{{i}}" [disabled]="readonly" required>
+          <select
+            class="form-control"
+            [(ngModel)]="doc.type"
+            name="documentType{{ i }}"
+            [disabled]="readonly"
+            required
+          >
             <option value="" disabled>Select Document</option>
             <option value="Passport">Passport</option>
             <option value="Visa">Visa</option>
@@ -312,40 +758,64 @@
         <div class="label_input">
           <label>Document File</label>
           <div *ngIf="!readonly">
-            <input type="file" class="form-control" (change)="onFileSelected($event, i)"
-              [required]="!doc.fileUrl && !doc.file">
+            <input
+              type="file"
+              class="form-control"
+              (change)="onFileSelected($event, i)"
+              [required]="!doc.fileUrl && !doc.file"
+            />
             <small class="text-muted" *ngIf="doc.fileUrl">
-              Current file: {{getFileName(doc.fileUrl)}}
+              Current file: {{ getFileName(doc.fileUrl) }}
             </small>
           </div>
         </div>
         <div *ngIf="readonly && doc.fileUrl" class="form-control-plaintext">
-          <a [href]="doc.fileUrl" target="_blank" class="btn btn-sm btn-outline-primary">
-            <i class="fa fa-download"></i> {{getFileName(doc.fileUrl)}}
+          <a
+            [href]="doc.fileUrl"
+            target="_blank"
+            class="btn btn-sm btn-outline-primary"
+          >
+            <i class="fa fa-download"></i> {{ getFileName(doc.fileUrl) }}
           </a>
         </div>
       </div>
 
       <div class="col-md-3">
         <div *ngIf="doc.fileUrl" class="mt-4">
-          <button type="button" class="btn btn-sm btn-info mr-2" (click)="previewDocument(doc.fileUrl)">
+          <button
+            type="button"
+            class="btn btn-sm btn-info mr-2"
+            (click)="previewDocument(doc.fileUrl)"
+          >
             <i class="fa fa-eye"></i> Preview
           </button>
-          <a [href]="getFullFileUrl(doc.fileUrl)" download class="btn btn-sm btn-success">
+          <a
+            [href]="getFullFileUrl(doc.fileUrl)"
+            download
+            class="btn btn-sm btn-success"
+          >
             <i class="fa fa-download"></i> Download
           </a>
         </div>
       </div>
 
       <div *ngIf="readonly && doc.fileUrl" class="form-control-plaintext">
-        <a [href]="getFullFileUrl(doc.fileUrl)" target="_blank" class="btn btn-sm btn-outline-primary">
-          <i class="fa fa-download"></i> {{getFileName(doc.fileUrl)}}
+        <a
+          [href]="getFullFileUrl(doc.fileUrl)"
+          target="_blank"
+          class="btn btn-sm btn-outline-primary"
+        >
+          <i class="fa fa-download"></i> {{ getFileName(doc.fileUrl) }}
         </a>
       </div>
 
       <div class="col-md-1" *ngIf="!readonly">
-        <button type="button" class="btn btn-sm btn-danger mt-4" (click)="removeDocument(i)"
-          *ngIf="employeeDocuments.length > 1">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger mt-4"
+          (click)="removeDocument(i)"
+          *ngIf="employeeDocuments.length > 1"
+        >
           <i class="fa fa-trash"></i>
         </button>
       </div>
@@ -361,12 +831,20 @@
 
     <div class="page_footer" *ngIf="!readonly">
       <button type="button" class="close_btn" (click)="cancel()">Cancel</button>
-      <button type="submit" class=" bg_green"> {{ id ? 'Update' : 'Save' }}
+      <button type="submit" class="bg_green">
+        {{ id ? "Update" : "Save" }}
         <div class="icon">
-          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            height="24"
+            width="24"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
-              fill="currentColor"></path>
+            <path
+              d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+              fill="currentColor"
+            ></path>
           </svg>
         </div>
       </button>

@@ -22,7 +22,7 @@ export class SparePartsNewComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.sparePartForm = this.fb.group({
@@ -32,6 +32,8 @@ export class SparePartsNewComponent implements OnInit {
       description: [''],
       totalQuantity: [0, [Validators.required, Validators.min(0)]],
       unitPrice: [0, [Validators.required, Validators.min(0)]],
+      discount: [0, [Validators.min(0), Validators.max(100)]],
+      finalPrice: [{ value: 0, disabled: true }],
     });
 
     // Check if editing
@@ -40,7 +42,17 @@ export class SparePartsNewComponent implements OnInit {
       this.isEdit = true;
       this.getSparePartById(this.id);
     }
+
+    this.sparePartForm.get('unitPrice')?.valueChanges.subscribe(() => this.calculateFinalPrice());
+this.sparePartForm.get('discount')?.valueChanges.subscribe(() => this.calculateFinalPrice());
+
   }
+calculateFinalPrice() {
+  const price = this.sparePartForm.get('unitPrice')?.value || 0;
+  const discount = this.sparePartForm.get('discount')?.value || 0;
+  const final = price - (price * discount / 100);
+  this.sparePartForm.patchValue({ finalPrice: final }, { emitEvent: false });
+}
 
   getSparePartById(id: string) {
     this.loading = true;
@@ -73,7 +85,11 @@ export class SparePartsNewComponent implements OnInit {
     }
     this.loading = true;
 
-    const payload = this.sparePartForm.value;
+    // const payload = this.sparePartForm.value;
+      const payload = {
+    ...this.sparePartForm.getRawValue(), // ✅ includes final price
+  };
+
     this.apiService.CommonApi(
       Apiconfig.saveSparePart.method,
       Apiconfig.saveSparePart.url,
@@ -85,7 +101,7 @@ export class SparePartsNewComponent implements OnInit {
           this.notificationService.showSuccess('Spare part saved successfully');
           this.router.navigate(['/app/spare-parts/list']);
         } else {
-        this.notificationService.showError(res.message || 'Error saving spare part');
+          this.notificationService.showError(res.message || 'Error saving spare part');
         }
       },
       error: () => {
