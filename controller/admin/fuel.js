@@ -8,56 +8,51 @@ module.exports = function () {
    * @route POST /fuel/save
    * @desc Add or Update Fuel Record
    */
-  controller.saveFuel = async function (req, res) {
+  controller.saveFuel = async (req, res) => {
   try {
     const body = req.body;
 
-    let fuelData = {
-      vehicle: body.vehicleId ? new mongoose.Types.ObjectId(body.vehicleId) : null,
-      driver: body.driverId ? new mongoose.Types.ObjectId(body.driverId) : null,
-      contractId: body.contractId || "",                 // <-- added field
+    if (!body.vehicleId || !body.driverId || !body.contractId) {
+      return res.send({ status: false, message: "Vehicle, Driver, and Contract are required." });
+    }
+
+    if (body.startOdometer < 0 || body.endOdometer < 0) {
+      return res.send({ status: false, message: "Invalid odometer values." });
+    }
+
+    if (body.fuelConsumed <= 0 || body.amountPaid < 0) {
+      return res.send({ status: false, message: "Invalid fuel or amount values." });
+    }
+
+    const fuelData = {
+      vehicle: new mongoose.Types.ObjectId(body.vehicleId),
+      driver: new mongoose.Types.ObjectId(body.driverId),
+      contract: new mongoose.Types.ObjectId(body.contractId),
       monthlyAllowance: Number(body.monthlyAllowance) || 0,
       actualUsage: Number(body.actualUsage) || 0,
       lastRechargeDate: body.prevDate ? new Date(body.prevDate) : null,
       remarks: body.remarks || "",
-      startOdometer: Number(body.startOdometer) || 0,
-      endOdometer: Number(body.endOdometer) || 0,
-      amountPaid: Number(body.amountPaid) || 0,
+      startOdometer: Number(body.startOdometer),
+      endOdometer: Number(body.endOdometer),
+      amountPaid: Number(body.amountPaid),
       issuedBy: body.issuedBy || "",
-      fuelConsumed: Number(body.fuelConsumed) || 0,
+      fuelConsumed: Number(body.fuelConsumed)
     };
 
     let result;
 
     if (body._id) {
-      // Update existing fuel record
-      result = await db.UpdateDocument(
-        "fuel",
-        { _id: new mongoose.Types.ObjectId(body._id) },
-        fuelData
-      );
-      return res.send({
-        status: true,
-        message: "Fuel record updated successfully",
-        data: result,
-      });
+      result = await db.UpdateDocument("fuel", { _id: new mongoose.Types.ObjectId(body._id) }, fuelData);
+      return res.send({ status: true, message: "Fuel record updated successfully", data: result });
     } else {
-      // Insert new fuel record
       result = await db.InsertDocument("fuel", fuelData);
-      return res.send({
-        status: true,
-        message: "Fuel record added successfully",
-        data: result,
-      });
+      return res.send({ status: true, message: "Fuel record added successfully", data: result });
     }
   } catch (error) {
-    console.error(error, "ERROR saveFuel");
-    return res.send({
-      status: false,
-      message: "Something went wrong while saving fuel record.",
-    });
+    console.error("ERROR saveFuel:", error);
+    return res.send({ status: false, message: "Something went wrong while saving fuel record." });
   }
-};
+};  
 
   /**
    * @route POST /fuel/view
@@ -93,28 +88,33 @@ module.exports = function () {
    * @route POST /fuel/list
    * @desc Get list of fuel records with filters
    */
-  controller.listFuels = async function (req, res) {
+ controller.listFuels = async function (req, res) {
   try {
-    const { vehicle, driver, startDate, endDate, search } = req.body;
+    const { vehicle, driver, contract, startDate, endDate, search } = req.body;
 
     let match = {};
     if (vehicle) match.vehicle = new mongoose.Types.ObjectId(vehicle);
     if (driver) match.driver = new mongoose.Types.ObjectId(driver);
+    if (contract) match.contract = new mongoose.Types.ObjectId(contract);
+
     if (startDate && endDate) {
       match.lastRechargeDate = {
         $gte: new Date(startDate),
         $lte: new Date(endDate),
       };
     }
+
     if (search) {
-      // Search remarks, contractId, vehicle registration, or driver name
       match.$or = [
         { remarks: { $regex: search, $options: "i" } },
-        { contractId: { $regex: search, $options: "i" } },
+        // Allow searching by registration number, driver name, or contract name
+        { "vehicleData.registrationNo": { $regex: search, $options: "i" } },
+        { "driverData.fullName": { $regex: search, $options: "i" } },
+        { "contractData.contractName": { $regex: search, $options: "i" } },
       ];
     }
 
-    let pipeline = [
+    const pipeline = [
       { $match: match },
       {
         $lookup: {
@@ -135,8 +135,17 @@ module.exports = function () {
       },
       { $unwind: { path: "$driverData", preserveNullAndEmptyArrays: true } },
       {
+        $lookup: {
+          from: "contract",
+          localField: "contract",
+          foreignField: "_id",
+          as: "contractData",
+        },
+      },
+      { $unwind: { path: "$contractData", preserveNullAndEmptyArrays: true } },
+      {
         $project: {
-          contractId: 1,              // <-- added contractId
+          contract: 1,
           monthlyAllowance: 1,
           actualUsage: 1,
           lastRechargeDate: 1,
@@ -152,6 +161,9 @@ module.exports = function () {
           "driverData._id": 1,
           "driverData.fullName": 1,
           "driverData.employeeId": 1,
+          "contractData.contractId": 1,
+          "contractData._id": 1,
+          "contractData.clientName": 1
         },
       },
       { $sort: { lastRechargeDate: -1 } },
@@ -172,6 +184,7 @@ module.exports = function () {
     });
   }
 };
+
 
 
 controller.fuelUsageAnalytics = async function (req, res) {

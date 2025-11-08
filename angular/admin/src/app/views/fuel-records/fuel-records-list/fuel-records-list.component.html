@@ -129,12 +129,17 @@
       </div>
 
       <div class="col-md-6">
-        <div class="label_input">
-          <label>Contract ID</label>
-          <input type="text" class="form-control" [(ngModel)]="newFuel.contractId" name="contractId"
-            [disabled]="editingFuelId" />
-        </div>
-      </div>
+  <div class="label_input">
+    <label>Contract</label>
+    <select class="form-select" [(ngModel)]="newFuel.contractId" name="contractId" required>
+      <option value="">Select Contract</option>
+      <option *ngFor="let c of contracts" [value]="c._id">
+        {{ c.contractId || '' }} - {{ c.clientName || ''}}
+      </option>
+    </select>
+  </div>
+</div>
+
       <div class="col-md-6">
         <div class="label_input">
           <label>Start Odometer</label>
