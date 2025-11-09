@@ -691,7 +691,7 @@ module.exports = function (app, io) {
 
     //maintenance management
     app.post('/admin/maintenance/save', ensureAuthorized, maintance.saveMaintenance);
-    app.post('/admin/maintenance/list', ensureAuthorized, maintance.listMaintenance);
+    app.post('/admin/maintenance/list', ensureAuthorized, maintance.listMaintenances);
 
     //sapre parts management
     app.post('/admin/sparepart/save', ensureAuthorized, sparepart.saveSparePart);

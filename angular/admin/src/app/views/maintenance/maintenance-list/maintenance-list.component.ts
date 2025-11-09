@@ -119,21 +119,43 @@ export class MaintenanceListComponent implements OnInit {
   }
 
   // 🎛️ Modal
-  openModal(row: any = null) {
-    this.showModal = true;
-    this.editData = row;
-    this.form = row
-      ? {
-          _id: row._id,
-          vehicle: row.vehicleData?._id,
-          driver: row.driverData?._id,
-          maintenanceType: row.maintenanceType,
-          maintenanceCost: row.maintenanceCost,
-          remarks: row.remarks,
-          partsUsed: row.partsUsed?.map((p: any) => ({ part: p.part, quantity: p.quantity })) || []
-        }
-      : { partsUsed: [] };
+ openModal(row: any = null) {
+  console.log(row, 'edit row');
+  
+  this.showModal = true;
+  this.editData = row;
+
+  if (row) {
+    // Pre-fill form for edit
+    this.form = {
+      _id: row._id,
+      vehicle: row.vehicleData?._id || '',
+      driver: row.driverData?._id || '',
+      maintenanceType: row.maintenanceType || '',
+      maintenanceCost: row.maintenanceCost || 0,
+      extraCharges: row.extraCharges || 0,
+      remarks: row.remarks || '',
+      partsUsed: row.partsUsed?.map((p: any) => ({
+        part: p.part?._id || p.part, // keep consistency with DB ID
+        quantity: p.quantity || 0,
+        pricePerUnit: p.pricePerUnit || 0,
+        discount: p.discount || 0,
+        finalPrice: p.finalPrice || 0,
+      })) || []
+    };
+  } else {
+    // Default empty form for add
+    this.form = {
+      vehicle: '',
+      driver: '',
+      maintenanceType: '',
+      maintenanceCost: 0,
+      extraCharges: 0,
+      remarks: '',
+      partsUsed: []
+    };
   }
+}
 
   closeModal() {
     this.showModal = false;
@@ -151,6 +173,8 @@ export class MaintenanceListComponent implements OnInit {
 
   // 💾 Save
   saveMaintenance() {
+    this.calculateTotal()
+
     this.apiService.CommonApi(
       Apiconfig.saveMaintenance.method,
       Apiconfig.saveMaintenance.url,
@@ -165,4 +189,32 @@ export class MaintenanceListComponent implements OnInit {
       }
     });
   }
+
+  updatePartDetails(index: number) {
+  const selectedPartId = this.form.partsUsed[index].part;
+  const selectedPart = this.spareParts.find(sp => sp._id === selectedPartId);
+  if (selectedPart) {
+    this.form.partsUsed[index].pricePerUnit = selectedPart.finalPrice || 0;
+    this.form.partsUsed[index].discount = selectedPart.discount || 0;
+    this.updatePartTotal(index);
+  }
+}
+
+updatePartTotal(index: number) {
+  const p = this.form.partsUsed[index];
+  const qty = Number(p.quantity) || 0;
+  const price = Number(p.pricePerUnit) || 0;
+  const discount = Number(p.discount) || 0;
+
+  const discounted = price - (price * discount / 100);
+  p.finalPrice = +(discounted * qty).toFixed(2);
+
+  this.calculateTotal();
+}
+
+calculateTotal() {
+  const partsTotal = this.form.partsUsed.reduce((sum: number, p: any) => sum + (Number(p.finalPrice) || 0), 0);
+  const extra = Number(this.form.extraCharges) || 0;
+  this.form.maintenanceCost = +(partsTotal + extra).toFixed(2);
+}
 }

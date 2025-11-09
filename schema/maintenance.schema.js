@@ -1,27 +1,29 @@
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-var MAINTENANCE_SCHEMA = {};
+const MAINTENANCE_SCHEMA = {};
 
 MAINTENANCE_SCHEMA.MAINTENANCE = {
-  vehicle: { type: Schema.Types.ObjectId, ref: "Fleet" },
+  vehicle: { type: Schema.Types.ObjectId, ref: "Fleet", required: true },
   driver: { type: Schema.Types.ObjectId, ref: "Employee" },
+  maintenanceDate: { type: Date, default: Date.now },
+  maintenanceType: { type: String, required: true },
 
-  maintenanceDate: { type: Date, required: true }, // date of maintenance
-  maintenanceType: { type: String, enum: ["Repaired", "Serviced", "Replaced"], required: true },
-
-  // 🔹 Spare parts used (optional)
+  // 🧩 updated partsUsed schema
   partsUsed: [
     {
-      part: { type: Schema.Types.ObjectId, ref: "Sparepart" },
-      quantity: { type: Number, default: 1 }
-    }
+      part: { type: Schema.Types.ObjectId, ref: "Sparepart", required: true },
+      quantity: { type: Number, required: true },
+      pricePerUnit: { type: Number, default: 0 },
+      discount: { type: Number, default: 0 },
+      finalPrice: { type: Number, default: 0 },
+    },
   ],
 
+  extraCharges: { type: Number, default: 0 },
   maintenanceCost: { type: Number, default: 0 },
-  remarks: String,
-
-  status: { type: Number, default: 1 } // 1=Active, 0=Deleted
+  remarks: { type: String, default: "" },
+  status: { type: Number, default: 1 },
 };
 
 module.exports = MAINTENANCE_SCHEMA;
