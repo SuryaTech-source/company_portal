@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AddNewEmployeesComponent } from './add-new-employees/add-new-employees.component';
 import { ActiveEmployeesComponent } from './active-employees/active-employees.component';
+import { SalaryViewComponent } from './salary-view/salary-view.component';
 
 const routes: Routes = [
   {
@@ -34,6 +35,13 @@ const routes: Routes = [
       },
       // canActivate: [AuthGuard]
     },
+    {
+      path: 'salary-view/:id',
+      component: SalaryViewComponent ,
+      data: {
+        title: 'Salary View',
+      },
+    }
 ];
 
 @NgModule({

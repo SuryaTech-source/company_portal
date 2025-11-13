@@ -25,15 +25,92 @@ module.exports = function (io, app) {
 		userRefer();
 	})
 
-	var orderStatus = CronJob.schedule('0 * * * *', async () => {
-		console.log('Running scheduled task to update Shiprocket status for orders...');
-		try {
-			// Ensure the router function is invoked correctly
-			// await shiprocket.shiprocket_check_multiple_orders_status();
-		} catch (error) {
-			console.error('Error during cron job execution:', error);
-		}
-	});
+	CronJob.schedule('0 1 1 * *', async () => {
+    console.log('--- Running Monthly Salary Generation Cron Job ---');
+    try {
+        const today = new Date();
+        // Calculate the previous month
+        const prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const year = prevMonthDate.getFullYear();
+        const month = prevMonthDate.getMonth() + 1; // 1-12
+
+        // Fetch active employees
+        const activeEmployeesResult = await db.GetDocument("employee", { status: 1 }, {}, {});
+        const activeEmployees = activeEmployeesResult.doc || []; // Ensure it's an array
+
+        if (activeEmployees.length === 0) {
+            console.log('No active employees found. Exiting job.');
+            return;
+        }
+        
+        for (const employee of activeEmployees) {
+            // 1. Check if salary for this period already exists
+            const existingSalary = await db.GetOneDocument("salary", { employee: employee._id, month, year },{}, {});
+            if (existingSalary.doc && existingSalary.status) {
+                console.log(`Salary for ${employee.fullName} for ${month}/${year} already exists. Skipping.`);
+                continue;
+            }
+
+            // 2. Get attendance for the previous month
+            const attendanceResult = await db.GetOneDocument("attendance", { employee: employee._id },{}, {});
+            const attendanceData = attendanceResult.doc;
+
+            let daysPresent = 0;
+            // Total days in the previous month
+            const totalWorkingDays = new Date(year, month, 0).getDate(); 
+            
+            // 3. Robustly check for the attendance records array
+            if (attendanceData && Array.isArray(attendanceData.records)) {
+                const monthRecords = attendanceData.records.filter(r => {
+                    // Safety check for date property existence
+                    if (!r.date) return false;
+
+                    const recordDate = new Date(r.date);
+                    return recordDate.getFullYear() === year && recordDate.getMonth() + 1 === month;
+                });
+                daysPresent = monthRecords.filter(r => r.status === 'P').length;
+            } else {
+                 // This handles new employees or employees with empty/missing attendance documents gracefully
+                 console.log(`No attendance records or invalid records array found for ${employee.fullName}. Days present defaults to 0.`);
+            }
+            
+            // 4. Calculate final salary
+            const baseSalary = employee.salary || 0;
+            const finalSalary = (baseSalary / totalWorkingDays) * daysPresent;
+
+            const newSalary = {
+                employee: employee._id,
+                month,
+                year,
+                baseSalary,
+                daysPresent,
+                totalWorkingDays,
+                finalSalary: parseFloat(finalSalary.toFixed(2)),
+                totalEarnings: parseFloat(finalSalary.toFixed(2)),
+            };
+
+            await db.InsertDocument("salary", newSalary);
+            console.log(`Created salary record for ${employee.fullName} for ${month}/${year}. Salary: ${newSalary.finalSalary}.`);
+        }
+    } catch (error) {
+        console.error('--- CRON JOB FAILED: Monthly Salary Generation ---', error);
+    }
+}, {
+    scheduled: true,
+    timezone: "Asia/Kolkata" // Set your timezone
+});
+
+	// var orderStatus = CronJob.schedule('0 * * * *', async () => {
+	// 	console.log('Running scheduled task to update Shiprocket status for orders...');
+	// 	try {
+	// 		// Ensure the router function is invoked correctly
+	// 		// await shiprocket.shiprocket_check_multiple_orders_status();
+	// 	} catch (error) {
+	// 		console.error('Error during cron job execution:', error);
+	// 	}
+	// });
+
+	
     // orderStatus.start()
 
 	// var job = new CronJob({

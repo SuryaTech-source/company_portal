@@ -11,26 +11,20 @@ import html2pdf from 'html2pdf.js';
   styleUrls: ['./active-employees.component.scss']
 })
 export class ActiveEmployeesComponent implements OnInit {
-  // Tab management
-  activeTab: string = 'employees';
-
-  // Employee data
-  employees: any[] = [];
+  // --- New dynamic tab and data management ---
+  allEmployees: any[] = [];
+  roles: { key: string, display: string }[] = [
+    { key: 'Driver', display: 'Drivers' },
+    { key: 'Staff', display: 'Employees' },
+    { key: 'Mechanic', display: 'Mechanics' },
+    { key: 'Maid', display: 'Maids' },
+    { key: 'Others', display: 'Others' }
+  ];
+  activeTab: string = 'Staff'; // Default to 'Employees' (Staff)
   loading = false;
-
-  // Employee statistics
-  totalEmployees: number = 0;
-  activeEmployees: number = 0;
-  inactiveEmployees: number = 0;
-  totalActive: number = 0;
-  totalInactive: number = 0;
-  totalDeleted: number = 0;
-
-  // Driver data (if needed)
-  driverList: any[] = [];
-  totalDrivers: number = 0;
-  deployedDrivers: number = 0;
-  driversOnVacation: number = 0;
+  
+  // Statistics
+  stats: { [key: string]: { total: number, active?: number, inactive?: number, deployed?: number, vacation?: number } } = {};
 
   constructor(
     private apiService: ApiService,
@@ -39,37 +33,19 @@ export class ActiveEmployeesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getEmployees();
-    if (this.activeTab === 'drivers') {
-      this.getDrivers();
-    }
+    this.getAllEmployees();
   }
-
-  switchTab(tab: string): void {
-    this.activeTab = tab;
-    if (tab === 'drivers' && this.driverList.length === 0) {
-      this.getDrivers();
-    } else if (tab === 'employees' && this.employees.length === 0) {
-      this.getEmployees();
-    }
-  }
-
-  getEmployees(): void {
+  
+  // --- Replaces getEmployees() and getDrivers() with a single call ---
+  getAllEmployees(): void {
     this.loading = true;
     this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1 })
       .subscribe(
         (res: any) => {
           this.loading = false;
           if (res && res.status) {
-            this.employees = res.data || [];
-            
-            // Calculate statistics
-            this.totalEmployees = this.employees.length;
-            this.activeEmployees = res.counts?.active || this.employees.filter(e => e.status === 1).length;
-            this.inactiveEmployees = res.counts?.inactive || this.employees.filter(e => e.status === 2).length;
-            this.totalActive = this.activeEmployees;
-            this.totalInactive = this.inactiveEmployees;
-            this.totalDeleted = res.counts?.deleted || this.employees.filter(e => e.status === 0).length;
+            this.allEmployees = res.data || [];
+            this.calculateStats();
           }
         },
         (error) => {
@@ -80,38 +56,43 @@ export class ActiveEmployeesComponent implements OnInit {
       );
   }
 
-  getDrivers(): void {
-    this.loading = true;
-    // Assuming similar API structure for drivers
-    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1 })
-      .subscribe(
-        (res: any) => {
-          this.loading = false;
-          if (res && res.status) {
-            this.driverList = res.data || [];
-            this.totalDrivers = this.driverList.length;
-            this.deployedDrivers = this.driverList.filter(d => d.status === 'deployed').length;
-            this.driversOnVacation = this.driverList.filter(d => d.status === 'vacation').length;
-          }
-        },
-        (error) => {
-          this.loading = false;
-          console.error('Error fetching drivers:', error);
-          this.notify.showError("Failed to fetch drivers.");
-        }
-      );
+  // --- New method to filter employees for the active tab ---
+  getEmployeesForTab(roleKey: string): any[] {
+    return this.allEmployees.filter(e => e.role === roleKey);
   }
 
-  // Track by functions for performance optimization
+  calculateStats(): void {
+    this.roles.forEach(role => {
+      const employeesForRole = this.getEmployeesForTab(role.key);
+      
+      const total = employeesForRole.length;
+      if (role.key === 'Driver') {
+        this.stats[role.key] = {
+          total: total,
+          // Assuming status can be 'deployed' or 'vacation' for drivers
+          deployed: employeesForRole.filter(e => e.status === 'deployed').length,
+          vacation: employeesForRole.filter(e => e.status === 'vacation').length,
+        };
+      } else {
+         this.stats[role.key] = {
+           total: total,
+           active: employeesForRole.filter(e => e.status === 1).length,
+           inactive: employeesForRole.filter(e => e.status === 2).length,
+         };
+      }
+    });
+  }
+
+  switchTab(tabKey: string): void {
+    this.activeTab = tabKey;
+  }
+
+  // Track by function for performance
   trackByEmployeeId(index: number, employee: any): any {
-    return employee._id || employee.id || index;
+    return employee._id || index;
   }
 
-  trackByDriverId(index: number, driver: any): any {
-    return driver._id || driver.id || index;
-  }
-
-  // Status helper methods
+  // Status helpers (no change)
   getStatusText(status: number): string {
     switch (status) {
       case 1: return 'Active';
@@ -120,7 +101,6 @@ export class ActiveEmployeesComponent implements OnInit {
       default: return 'Unknown';
     }
   }
-
   getStatusClass(status: number): string {
     switch (status) {
       case 1: return 'badge badge-success';
@@ -130,40 +110,20 @@ export class ActiveEmployeesComponent implements OnInit {
     }
   }
 
-  // PDF download methods
-  downloadEmployeesPDF(): void {
-    const element = document.getElementById('employeeTable');
+  // PDF download method
+  downloadPDF(roleKey: string): void {
+    const element = document.getElementById(`${roleKey}Table`);
     if (!element) {
-      this.notify.showError("Table not found for PDF generation.");
+      this.notify.showError("Table not found.");
       return;
     }
-
     const options = {
       margin: 0.5,
-      filename: 'employees-list.pdf',
+      filename: `${roleKey.toLowerCase()}-list.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
     };
-
-    html2pdf().from(element).set(options).save();
-  }
-
-  downloadDriversPDF(): void {
-    const element = document.getElementById('driverTable');
-    if (!element) {
-      this.notify.showError("Table not found for PDF generation.");
-      return;
-    }
-
-    const options = {
-      margin: 0.5,
-      filename: 'drivers-list.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-    };
-
     html2pdf().from(element).set(options).save();
   }
 
@@ -175,12 +135,9 @@ export class ActiveEmployeesComponent implements OnInit {
   editEmployee(employee: any): void {
     this.router.navigate(['/app/employees/edit', employee._id]);
   }
-
-  viewDriver(driver: any): void {
-    this.router.navigate(['/app/employees/view', driver._id]);
-  }
-
-  editDriver(driver: any): void {
-    this.router.navigate(['/app/employees/edit', driver._id]);
+  
+  // --- New navigation method for salary view ---
+  viewSalary(employee: any): void {
+    this.router.navigate(['/app/employees/salary-view', employee._id]);
   }
 }

@@ -72,7 +72,7 @@ module.exports = function (app, io) {
         var invoice = require('../controller/admin/invoice.js')(app);
         var performance = require('../controller/admin/performance.js')(app);
         var fleetAssignment = require('../controller/admin/fleetassignment.js')(app);
-
+        var salaryController = require('../controller/admin/salary.js')(app);
 
 
 
@@ -726,6 +726,10 @@ module.exports = function (app, io) {
     app.post('/admin/fleet/assignment/list', ensureAuthorized, fleetAssignment.listFleetAssignments);
     app.post('/admin/fleet/assignment/unassign', ensureAuthorized, fleetAssignment.unassignFleet);
     app.post('/admin/fleet/assignment/assignment-stats', ensureAuthorized, fleetAssignment.fleetAssignmentCounts);
+
+    //salary
+    app.post('/admin/salaries/employee-list', ensureAuthorized, salaryController.listByEmployee);
+app.post('/admin/salary/edit', ensureAuthorized, salaryController.updateSalary);
     
     } catch (e) {
         console.log('erroe in index.js---------->>>>', e);

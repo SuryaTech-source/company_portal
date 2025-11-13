@@ -243,6 +243,23 @@ export const Apiconfig = {
         "method": "post"
     },
 
+   generateSalaryForEmployee:{
+        "url": "admin/salary/generate",
+        "method": "post"
+    },
+    salaryEdit:{
+        "url": "admin/salary/edit",
+        "method": "post"
+
+    },
+    listSalariesOfEmployee:{
+        "url": "admin/salaries/employee-list",
+        "method": "post"
+    },
+
+   
+
+
 
     subadminEdit: {
         "url": "admins/getusersrole",

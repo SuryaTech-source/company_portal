@@ -1,0 +1,105 @@
+<div class="salary-view-page">
+  <div *ngIf="employee">
+    <h4 class="page_title">Salary History for: {{ employee.fullName }}</h4>
+    <p>Employee ID: {{ employee.employeeId }} | Base Salary: {{ employee.salary | currency:'INR' }}</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="d-flex gap-2 align-items-center justify-content-end mb-3">
+    <input type="number" class="form-control" placeholder="Year" [(ngModel)]="filterYear" (ngModelChange)="applyFilters()">
+    <select class="form-select" [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()">
+      <option value="">All Statuses</option>
+      <option value="Pending">Pending</option>
+      <option value="Paid">Paid</option>
+    </select>
+  </div>
+
+  <!-- Salary Table -->
+  <div class="table_section">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Base Salary</th>
+          <th>Overtime</th>
+          <th>Penalties</th>
+          <th>Final Salary</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let salary of filteredSalaries">
+          <td>{{ getMonthName(salary.month) }} {{ salary.year }}</td>
+          <td>{{ salary.baseSalary | currency:'INR' }}</td>
+          <td>{{ salary.overtimeAmount | currency:'INR' }}</td>
+          <td>{{ salary.totalPenaltyAmount | currency:'INR' }}</td>
+          <td>{{ salary.finalSalary | currency:'INR' }}</td>
+          <td>
+            <span class="badge" [ngClass]="{'badge-warning': salary.paymentStatus === 'Pending', 'badge-success': salary.paymentStatus === 'Paid'}">
+              {{ salary.paymentStatus }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-warning" (click)="openEditModal(editSalaryModal, salary)">Edit</button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredSalaries.length === 0">
+            <td colspan="7" class="text-center">No salary records found for the selected filters.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Edit Salary Modal -->
+<ng-template #editSalaryModal>
+  <div class="modal-header">
+    <h5 class="modal-title">Edit Salary for {{ getMonthName(editingSalary.month) }} {{ editingSalary.year }}</h5>
+    <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+  </div>
+  <div class="modal-body" *ngIf="editingSalary">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label>Overtime Hours</label>
+        <input type="number" class="form-control" [(ngModel)]="editingSalary.overtimeHours">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label>Overtime Rate (per hour)</label>
+        <input type="number" class="form-control" [(ngModel)]="editingSalary.overtimeRate">
+      </div>
+    </div>
+    
+    <h6>Penalties</h6>
+    <div *ngFor="let penalty of editingSalary.penalties; let i = index" class="row align-items-center mb-2">
+      <div class="col-md-4"><input type="text" class="form-control" placeholder="Description" [(ngModel)]="penalty.description"></div>
+      <div class="col-md-3"><input type="number" class="form-control" placeholder="Amount" [(ngModel)]="penalty.amount"></div>
+      <div class="col-md-3">
+        <select class="form-control" [(ngModel)]="penalty.type">
+          <option>Traffic Violation</option><option>Damage</option><option>Other</option>
+        </select>
+      </div>
+      <div class="col-md-2"><button class="btn btn-sm btn-danger" (click)="removePenalty(i)">X</button></div>
+    </div>
+    <button class="btn btn-sm btn-secondary" (click)="addPenalty()">+ Add Penalty</button>
+    
+    <hr>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label>Payment Status</label>
+        <select class="form-control" [(ngModel)]="editingSalary.paymentStatus">
+          <option>Pending</option><option>Paid</option>
+        </select>
+      </div>
+      <div class="col-md-6 mb-3" *ngIf="editingSalary.paymentStatus === 'Paid'">
+        <label>Payment Date</label>
+        <input type="date" class="form-control" [(ngModel)]="editingSalary.paymentDate">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modalRef?.hide()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="saveSalaryUpdate()">Save Changes</button>
+  </div>
+</ng-template>
+
