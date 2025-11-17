@@ -104,6 +104,7 @@ module.exports = function (io, app) {
 const jobalert = CronJob.schedule('0 0 * * *', async () => {
     generateFleetAlerts();
 	generateEmployeeAlerts();	
+	generatePaymentAlerts();
 
 }, {
     scheduled: true,
@@ -1080,6 +1081,74 @@ function formatDate(d) {
     }
   }
 }
+
+
+async function generatePaymentAlerts() {
+  let today = new Date();
+
+  // --- CUSTOMER PAYMENTS ---
+  let customerPayments = await db.GetDocument("customerPayment", {}, {}, {});
+  for (let pay of customerPayments.doc) {
+
+    let due = pay.nextDueDate || pay.dueDate;
+    if (!due) continue;
+
+    let alertDate = new Date(due);
+    alertDate.setDate(alertDate.getDate() - 5); // alert 5 days before due date
+
+    if (alertDate <= today && pay.balance > 0) {
+
+      const exists = await db.GetOneDocument("alert", {
+        type: "customer_payment_due",
+        paymentId: pay._id,
+        resolved: { $ne: true }
+      });
+
+      if (!exists.doc && exists.status) {
+        await db.InsertDocument("alert", {
+          type: "customer_payment_due",
+          message: `Payment due for customer ${pay.clientName}. Due on ${formatDate(due)} - Balance: ${pay.balance}`,
+          customerId: pay._id,
+          paymentId: pay._id,
+          alertDate,
+          expireAt: new Date(today.getTime() + 5 * 86400000),
+        });
+      }
+    }
+  }
+
+  // --- VENDOR PAYMENTS ---
+  let vendorPayments = await db.GetDocument("vendorPayment", {}, {}, {});
+  for (let pay of vendorPayments.doc) {
+
+    let due = pay.nextDueDate || pay.dueDate;
+    if (!due) continue;
+
+    let alertDate = new Date(due);
+    alertDate.setDate(alertDate.getDate() - 5);
+
+    if (alertDate <= today && pay.balance > 0) {
+
+      const exists = await db.GetOneDocument("alert", {
+        type: "vendor_payment_due",
+        paymentId: pay._id,
+        resolved: { $ne: true }
+      });
+
+      if (!exists.doc && exists.status) {
+        await db.InsertDocument("alert", {
+          type: "vendor_payment_due",
+          message: `Payment due for Vendor invoice ${pay.invoiceNo}. Due on ${formatDate(due)} - Balance: ${pay.balance}`,
+          vendorId: pay._id,
+          paymentId: pay._id,
+          alertDate,
+          expireAt: new Date(today.getTime() + 5 * 86400000),
+        });
+      }
+    }
+  }
+}
+
 
 
 

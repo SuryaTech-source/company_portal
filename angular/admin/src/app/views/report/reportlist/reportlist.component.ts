@@ -36,6 +36,7 @@ invoices: any[] = [];
   contractId: '',
   invoiceRef: '',
   dueDate: '',
+  nextPaymentDue: '',
   amountPaid: '',
   status: 'Unpaid',
   remarks: ''
@@ -210,6 +211,7 @@ openModal(row: any = null) {
       invoiceNo: row.invoiceNo || '',
       invoiceRef: row.invoiceRef || '',
       dueDate: row.dueDate ? row.dueDate.split('T')[0] : '',
+      nextPaymentDue: row.nextPaymentDue ? row.nextPaymentDue.split('T')[0] : '',
       amountPaid: row.amountPaid || 0,
       status: row.status || 'Unpaid',
       balance: row.balance || 0,
@@ -249,6 +251,7 @@ openModal(row: any = null) {
     });
   }
 
+  
   // 🔹 Export PDF
   downloadPDF() {
     const element = this.tableContent.nativeElement;
