@@ -67,15 +67,55 @@
     <!-- <li class="nav-item d-md-down-none"> 
             <a class="nav-link" href="javascript:void(0)"><i class="fa fa-list"></i></a>
         </li> -->
-    <li class="nav-item mr-4">
-      <a
-        class="nav-link"
-        href="javascript:void(0)"
-        (click)="logOutPop(logOutPopup)"
-      >
-        <i class="fa fa-sign-out fa-2x"></i>
-      </a>
-    </li>
+    <li class="nav-item dropdown mr-4" dropdown placement="bottom right">
+  <!-- 🔔 Notification Icon -->
+  <a
+    class="nav-link"
+    href="javascript:void(0)"
+    dropdownToggle
+    (click)="loadAlerts()"
+  >
+    <i class="fa fa-bell-o fa-2x"></i>
+
+    <span *ngIf="alerts.length > 0" class="badge badge-pill badge-danger">
+      {{ alerts.length }}
+    </span>
+  </a>
+
+  <div class="dropdown-menu dropdown-menu-right notification-dropdown" *dropdownMenu>
+    <div class="dropdown-header text-center">
+      You have <strong>{{ alerts.length }}</strong> Alerts
+    </div>
+
+    <div class="alert-list-container">
+      <div class="dropdown-item" *ngFor="let alert of alerts">
+        <div class="media-body">
+          <span>{{ alert.message }}</span>
+          <small class="text-muted">
+            Alert Date: {{ alert.alertDate | date:'mediumDate' }}
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="dropdown-footer text-center">
+      <a routerLink="/app/alerts">View all alerts</a>
+    </div>
+  </div>
+</li>
+
+<!-- ✔ Logout button always last -->
+<li class="nav-item logout-item">
+  <a
+    class="nav-link"
+    href="javascript:void(0)"
+    (click)="logOutPop(logOutPopup)"
+  >
+    <i class="fa fa-sign-out fa-2x"></i>
+  </a>
+</li>
+
+
   </ul>
 </app-header>
 <div class="app-body">

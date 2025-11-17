@@ -99,6 +99,16 @@ module.exports = function (io, app) {
     scheduled: true,
     timezone: "Asia/Kolkata" // Set your timezone
 });
+//'0 0 * * *'      "*/20 * * * * *"
+
+const jobalert = CronJob.schedule('0 0 * * *', async () => {
+    generateFleetAlerts();
+	generateEmployeeAlerts();	
+
+}, {
+    scheduled: true,
+    timezone: "Asia/Kolkata" // or your specific timezone
+});
 
 	// var orderStatus = CronJob.schedule('0 * * * *', async () => {
 	// 	console.log('Running scheduled task to update Shiprocket status for orders...');
@@ -918,5 +928,161 @@ module.exports = function (io, app) {
 	}
 
 
+function formatDate(d) {
+  if (!d) return '';
+  const date = new Date(d);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
 
+
+ async function generateEmployeeAlerts() {
+  let employees = await db.GetDocument("employee", {}, {}, {});
+  let today = new Date();
+
+  for (let emp of employees.doc) {
+
+    // CIVIL ID
+    if (emp.civilIdExpiry) {
+      let alertDate = new Date(emp.civilIdExpiry);
+      alertDate.setDate(alertDate.getDate() - 30);
+
+      if (alertDate <= today) {
+
+        // ⛔ Avoid duplicates
+        const exists = await db.GetOneDocument("alert", {
+          type: "employee_civilid_expiry",
+          employeeId: emp._id,
+          resolved: { $ne: true }
+        });
+        if (!exists.doc && exists.status) {
+          await db.InsertDocument("alert", {
+            type: "employee_civilid_expiry",
+            message: `${emp.fullName}'s Civil ID expires on ${formatDate(emp.civilIdExpiry)}`,
+            employeeId: emp._id,
+            alertDate,
+            expireAt: new Date(today.getTime() + 5 * 86400000) // ⏳ expires after 5 days
+          });
+        }
+      }
+    }
+
+    // VISA
+    if (emp.visaExpiry) {
+      let alertDate = new Date(emp.visaExpiry);
+      alertDate.setDate(alertDate.getDate() - 30);
+
+      if (alertDate <= today) {
+
+        const exists = await db.GetOneDocument("alert", {
+          type: "employee_visa_expiry",
+          employeeId: emp._id,
+          resolved: { $ne: true }
+        });
+        if (!exists.doc && exists.status) {
+          await db.InsertDocument("alert", {
+            type: "employee_visa_expiry",
+            message: `${emp.fullName}'s Visa expires on ${formatDate(emp.visaExpiry)}`,
+            employeeId: emp._id,
+            alertDate,
+            expireAt: new Date(today.getTime() + 5 * 86400000)
+          });
+        }
+      }
+    }
+
+    // LICENSE
+    if (emp.licenseExpiry) {
+      let alertDate = new Date(emp.licenseExpiry);
+      alertDate.setDate(alertDate.getDate() - 30);
+
+      if (alertDate <= today) {
+
+        const exists = await db.GetOneDocument("alert", {
+          type: "employee_license_expiry",
+          employeeId: emp._id,
+          resolved: { $ne: true }
+        });
+
+        if (!exists.doc && exists.status) {
+          await db.InsertDocument("alert", {
+            type: "employee_license_expiry",
+            message: `${emp.fullName}'s License expires on ${formatDate(emp.licenseExpiry)}`,
+            employeeId: emp._id,
+            alertDate,
+            expireAt: new Date(today.getTime() + 5 * 86400000)
+          });
+        }
+      }
+    }
+  }
+}
+
+
+
+
+ async function generateFleetAlerts() {
+  let fleets = await db.GetDocument("fleet", {}, {}, {});
+  let today = new Date();
+
+  for (let fleet of fleets.doc) {
+
+    // INSURANCE
+    if (fleet.passingExpiry) {
+      let alertDate = new Date(fleet.passingExpiry);
+      alertDate.setDate(alertDate.getDate() - 30);
+
+      if (alertDate <= today) {
+
+        const exists = await db.GetOneDocument("alert", {
+          type: "fleet_insurance_expiry",
+          fleetId: fleet._id,
+          resolved: { $ne: true }
+        });
+        if (!exists.doc && exists.status) {
+          await db.InsertDocument("alert", {
+            type: "fleet_insurance_expiry",
+            message: `${fleet.vehicleName}'s insurance expires on ${formatDate(fleet.passingExpiry)}`,
+            fleetId: fleet._id,
+            alertDate,
+            expireAt: new Date(today.getTime() + 5 * 86400000)
+          });
+        }
+      }
+    }
+
+    // MAINTENANCE
+    if (fleet.maintenance?.nextMaintenanceDue) {
+      let due = new Date(fleet.maintenance.nextMaintenanceDue);
+      let alertDate = new Date(due);
+      alertDate.setDate(alertDate.getDate() - 30);
+
+      if (alertDate <= today) {
+
+        const exists = await db.GetOneDocument("alert", {
+          type: "fleet_maintenance_due",
+          fleetId: fleet._id,
+          resolved: { $ne: true }
+        });
+
+        if (!exists.doc && exists.status) {
+          await db.InsertDocument("alert", {
+            type: "fleet_maintenance_due",
+            message: `${fleet.vehicleName}'s maintenance is due on ${formatDate(due)}`,
+            fleetId: fleet._id,
+            alertDate,
+            expireAt: new Date(today.getTime() + 5 * 86400000)
+          });
+        }
+      }
+    }
+  }
+}
+
+
+
+
+	
 }

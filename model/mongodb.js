@@ -87,6 +87,7 @@ var sparepart_schema = require('../schema/spareParts.schema.js');
 var payment_schema = require('../schema/coustomerVentorPayment.schema.js');
 var fleetfleetassignment_schema = require('../schema/fleetassignment.schema.js');
 var salary_schema = require('../schema/salary.schema.js');
+var alert_schema = require('../schema/alert.schema.js');
 
 // define the schema for our user model
 var adminSchema = mongoose.Schema(config_admin_schema.ADMIN, { timestamps: true, versionKey: false });
@@ -177,6 +178,7 @@ var vendorPaymentSchema = mongoose.Schema(payment_schema.VENDOR_PAYMENT, { times
 var customerPaymentSchema = mongoose.Schema(payment_schema.CUSTOMER_PAYMENT, { timestamps: true, versionKey: false });
 var fleetAssignmentSchema = mongoose.Schema(fleetfleetassignment_schema.FLEET_ASSIGNMENT, { timestamps: true, versionKey: false });
 var salarySchema = mongoose.Schema(salary_schema.SALARY, { timestamps: true, versionKey: false });
+var alert_schema = mongoose.Schema(alert_schema.ALERT, { timestamps: true, versionKey: false });
 
 // var checkin_schema = mongoose.Schema(checkin_schema.CHECKIN,{timestamps:true,versionkey:false})
 /* 
@@ -582,6 +584,7 @@ var vendorPayment = mongoose.model('vendorPayment', vendorPaymentSchema, 'vendor
 var customerPayment = mongoose.model('customerPayment', customerPaymentSchema, 'customerPayment');
 var fleetAssignment = mongoose.model('fleetAssignment', fleetAssignmentSchema, 'fleetAssignment');
 var salary = mongoose.model('salary', salarySchema, 'salary');
+var alert = mongoose.model('alert', alert_schema, 'alert');
 // var checkin = mongoose.model('checkin',checkin_schema,'checkin');
 const tags = mongoose.model('tags', tagsSchema, 'tags');
 const deals = mongoose.model('deals', dealsSchema, 'deals');
@@ -676,6 +679,7 @@ module.exports = {
 	'vendorPayment': vendorPayment,
 	'customerPayment': customerPayment,
 	'fleetAssignment': fleetAssignment,
-	'salary': salary
+	'salary': salary,
+	'alert': alert
 	// 'checkin':checkin
 };

@@ -84,6 +84,11 @@ export const Apiconfig = {
         "method": "post"
     },
 
+    alertList:{
+        "url": "admin/alerts/list",
+        "method": "post"
+    },
+
    listFuels:{
         "url": "admin/fuel/list",
         "method": "post"

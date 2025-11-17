@@ -445,13 +445,13 @@ module.exports = function () {
     }
   };
 
- controller.saveCustomerPayment = async function (req, res) {
+controller.saveCustomerPayment = async function (req, res) {
   try {
     const body = req.body;
 
     const data = {
-      clientName: body.clientName || "",  // ✅ store only name
-      contractId: new mongoose.Types.ObjectId(body.contractId), // ✅ mandatory
+      clientName: body.clientName || "",
+      contractId: new mongoose.Types.ObjectId(body.contractId),
       invoiceNo: body.invoiceNo || "",
       invoiceRef: body.invoiceRef ? new mongoose.Types.ObjectId(body.invoiceRef) : null,
       dueDate: body.dueDate ? new Date(body.dueDate) : null,
@@ -465,8 +465,11 @@ module.exports = function () {
     let result;
     let msg;
     if (body._id) {
-      result = await db.UpdateDocument("customerPayment", 
-        { _id: new mongoose.Types.ObjectId(body._id) }, data);
+      result = await db.UpdateDocument(
+        "customerPayment",
+        { _id: new mongoose.Types.ObjectId(body._id) },
+        data
+      );
       msg = "Customer payment updated";
     } else {
       data.createdAt = new Date();
@@ -474,61 +477,74 @@ module.exports = function () {
       msg = "Customer payment saved";
     }
 
+    // Optional: create alert for customers
+    try {
+      if (data.dueDate) await createOrUpdateAlertForPayment(result, false);
+    } catch (err) {
+      console.log("CUSTOMER ALERT ERROR:", err);
+    }
+
     return res.send({ status: true, message: msg, data: result });
 
   } catch (err) {
     console.log("ERROR saveCustomerPayment", err);
-    res.send({ status: false, message: "Error saving customer payment" });
+    return res.send({ status: false, message: "Error saving customer payment" });
   }
 };
 
+
+
   controller.saveVendorPayment = async function (req, res) {
-    try {
-      const body = req.body;
+  try {
+    const body = req.body;
 
-      const data = {
-        vendor: body.vendor ? new mongoose.Types.ObjectId(body.vendor) : null,
-        contractId: body.contractId
-          ? new mongoose.Types.ObjectId(body.contractId)
-          : null,
-        invoiceNo: body.invoiceNo || "",
-        invoiceRef: body.invoiceRef
-          ? new mongoose.Types.ObjectId(body.invoiceRef)
-          : null,
-        dueDate: body.dueDate ? new Date(body.dueDate) : null,
-        amountPaid: Number(body.amountPaid) || 0,
-        status: body.status || "Unpaid",
-        balance: Number(body.balance) || 0,
-        remarks: body.remarks || "",
-        updatedAt: new Date(),
-      };
+    const data = {
+      vendor: body.vendor ? new mongoose.Types.ObjectId(body.vendor) : null,
+      contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null,
+      invoiceNo: body.invoiceNo || "",
+      invoiceRef: body.invoiceRef ? new mongoose.Types.ObjectId(body.invoiceRef) : null,
+      dueDate: body.dueDate ? new Date(body.dueDate) : null,
+      nextPaymentDue: body.nextPaymentDue ? new Date(body.nextPaymentDue) : null, // NEW
+      amountPaid: Number(body.amountPaid) || 0,
+      status: body.status || "Unpaid",
+      balance: Number(body.balance) || 0,
+      remarks: body.remarks || "",
+      updatedAt: new Date(),
+    };
 
-      let result;
-      if (body._id) {
-        result = await db.UpdateDocument(
-          "vendorPayment",
-          { _id: new mongoose.Types.ObjectId(body._id) },
-          data
-        );
-      } else {
-        data.createdAt = new Date();
-        result = await db.InsertDocument("vendorPayment", data);
-      }
-
-      return res.send({
-        status: true,
-        message: body._id ? "Vendor payment updated" : "Vendor payment saved",
-        data: result,
-      });
-    } catch (err) {
-      console.log("ERROR saveVendorPayment", err);
-      return res.send({
-        status: false,
-        message: "Error saving vendor payment",
-      });
+    let result;
+    if (body._id) {
+      result = await db.UpdateDocument(
+        "vendorPayment",
+        { _id: new mongoose.Types.ObjectId(body._id) },
+        data
+      );
+    } else {
+      data.createdAt = new Date();
+      result = await db.InsertDocument("vendorPayment", data);
     }
-  };
 
+    // If Partial or dueDate/nextPaymentDue exists -> create/update alert for payment
+    try {
+      await createOrUpdateAlertForPayment(result); // helper below
+    } catch (err) {
+      console.error('Failed to create/update payment alert:', err);
+      // don't fail the request if alert creation fails
+    }
+
+    return res.send({
+      status: true,
+      message: body._id ? "Vendor payment updated" : "Vendor payment saved",
+      data: result,
+    });
+  } catch (err) {
+    console.log("ERROR saveVendorPayment", err);
+    return res.send({
+      status: false,
+      message: "Error saving vendor payment",
+    });
+  }
+};
   controller.listCustomerPayments = async function (req, res) {
     try {
       const {

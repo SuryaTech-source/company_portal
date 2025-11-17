@@ -39,6 +39,7 @@ export class ViewsComponent implements OnInit, AfterViewInit {
   modalLogoutRef: BsModalRef;
   logo: string = '';
   profile : string;
+  alerts: any[] = [];
 
   constructor(
     private authService: AuthenticationService,
@@ -113,7 +114,7 @@ export class ViewsComponent implements OnInit, AfterViewInit {
   }
   ngOnInit(): void {
     this.notificationData()
-
+    this.loadAlerts();
 
 
 
@@ -285,6 +286,24 @@ export class ViewsComponent implements OnInit, AfterViewInit {
         this.total = this.pendingOrderlength
       })
   }
+
+  loadAlerts() {
+  this.apiService
+    .CommonApi(Apiconfig.alertList.method, Apiconfig.alertList.url, {})
+    .subscribe(
+      (result: any) => {
+        if (result?.status === 1 && result?.data?.doc) {
+          this.alerts = result.data.doc;
+        } else {
+          this.alerts = [];
+        }
+      },
+      (err) => {
+        console.log("Alert load error:", err);
+        this.alerts = [];
+      }
+    );
+}
 
 generateDefaultImage(name: string) {
     // Create a canvas element
