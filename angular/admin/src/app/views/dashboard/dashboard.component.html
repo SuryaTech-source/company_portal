@@ -35,7 +35,7 @@
     <div class="db_card">
       <h6>Alerts</h6>
       <div class="dash_title">
-        <span>02</span>
+        <span>{{ dashboardDetails.alertcount }}</span>
         <i class="fi fi-sr-engine-warning"></i>
       </div>
     </div>
@@ -51,193 +51,239 @@
 
   <div class="row mt-4">
     <!-- <div class="col-md-6 mb-3"> -->
-      <!-- <div class="bg_sw">
+    <!-- <div class="bg_sw">
         <h5 class="sec_title">Live Map</h5>
         <iframe width="100%" height="400" style="border:0; border-radius:8px;" loading="lazy" allowfullscreen
           referrerpolicy="no-referrer-when-downgrade"
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509508!2d144.95373631531593!3d-37.81627944202148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf0727f4f2a2b5f9a!2sVictoria!5e0!3m2!1sen!2sau!4v1634125792045!5m2!1sen!2sau">
         </iframe>
       </div> -->
-      <div class="row mt-4">
-        <div class="col-12 col-md-6 mt-4">
-          <div class="bg_sw p-3 shadow rounded">
-            <h5 class="sec_title">Fuel Usage Analytics</h5>
+    <div class="row mt-4">
+      <div class="col-12 col-md-6 mt-4">
+        <div class="bg_sw p-3 shadow rounded mt-4">
+          <h5 class="sec_title">Fuel Usage Analytics</h5>
 
-            <!-- Filter Row -->
-            <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
-              <label class="fw-semibold me-2">Type:</label>
-              <select
-                class="form-select form-select-sm w-auto"
-                [(ngModel)]="fuelChartType"
-              >
-                <option value="daily">Daily</option>
-                <option value="monthly" selected>Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
-
-              <label class="fw-semibold ms-3 me-2">From:</label>
-              <input
-                type="date"
-                class="form-control form-control-sm w-auto"
-                [(ngModel)]="fuelStartDate"
-              />
-
-              <label class="fw-semibold ms-3 me-2">To:</label>
-              <input
-                type="date"
-                class="form-control form-control-sm w-auto"
-                [(ngModel)]="fuelEndDate"
-              />
-
-              <button
-                class="btn btn-sm btn-primary ms-3"
-                (click)="loadFuelChart()"
-              >
-                Apply
-              </button>
-            </div>
-
-            <!-- Chart Display -->
-            <apx-chart
-              *ngIf="fuelChartOptions"
-              [series]="fuelChartOptions.series"
-              [chart]="fuelChartOptions.chart"
-              [xaxis]="fuelChartOptions.xaxis"
-              [stroke]="fuelChartOptions.stroke"
-              [dataLabels]="fuelChartOptions.dataLabels"
-              [fill]="fuelChartOptions.fill"
-              [colors]="fuelChartOptions.colors"
-              [yaxis]="fuelChartOptions.yaxis"
-              [title]="fuelChartOptions.title"
-            ></apx-chart>
-
-            <div
-              *ngIf="!fuelChartOptions?.series?.length"
-              class="text-center text-muted py-4"
+          <!-- Filter Row -->
+          <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+            <label class="fw-semibold me-2">Type:</label>
+            <select
+              class="form-select form-select-sm w-auto"
+              [(ngModel)]="fuelChartType"
             >
-              No data available for the selected range.
-            </div>
+              <option value="daily">Daily</option>
+              <option value="monthly" selected>Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+
+            <label class="fw-semibold ms-3 me-2">From:</label>
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              [(ngModel)]="fuelStartDate"
+            />
+
+            <label class="fw-semibold ms-3 me-2">To:</label>
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              [(ngModel)]="fuelEndDate"
+            />
+
+            <button
+              class="btn btn-sm btn-primary ms-3"
+              (click)="loadFuelChart()"
+            >
+              Apply
+            </button>
           </div>
-        </div>
 
-        <div class="col-12 col-md-6 mt-4">
-          <div class="bg_sw p-3 shadow rounded">
-            <h5 class="sec_title">Fuel Efficiency</h5>
+          <!-- Chart Display -->
+          <apx-chart
+            *ngIf="fuelChartOptions"
+            [series]="fuelChartOptions.series"
+            [chart]="fuelChartOptions.chart"
+            [xaxis]="fuelChartOptions.xaxis"
+            [stroke]="fuelChartOptions.stroke"
+            [dataLabels]="fuelChartOptions.dataLabels"
+            [fill]="fuelChartOptions.fill"
+            [colors]="fuelChartOptions.colors"
+            [yaxis]="fuelChartOptions.yaxis"
+            [title]="fuelChartOptions.title"
+          ></apx-chart>
 
-            <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
-              <label class="fw-semibold me-2">Type:</label>
-              <select
-                class="form-select form-select-sm w-auto"
-                [(ngModel)]="fuelEfficiencyType"
-              >
-                <option value="daily">Daily</option>
-                <option value="monthly" selected>Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
-
-              <label class="fw-semibold ms-3 me-2">From:</label>
-              <input
-                type="date"
-                class="form-control form-control-sm w-auto"
-                [(ngModel)]="fuelEfficiencyStart"
-              />
-
-              <label class="fw-semibold ms-3 me-2">To:</label>
-              <input
-                type="date"
-                class="form-control form-control-sm w-auto"
-                [(ngModel)]="fuelEfficiencyEnd"
-              />
-
-              <button
-                class="btn btn-sm btn-primary ms-3"
-                (click)="loadFuelEfficiencyChart()"
-              >
-                Apply
-              </button>
-            </div>
-
-            <apx-chart
-              *ngIf="fuelEfficiencyChartOptions"
-              [series]="fuelEfficiencyChartOptions.series"
-              [chart]="fuelEfficiencyChartOptions.chart"
-              [xaxis]="fuelEfficiencyChartOptions.xaxis"
-              [yaxis]="fuelEfficiencyChartOptions.yaxis"
-              [dataLabels]="fuelEfficiencyChartOptions.dataLabels"
-              [stroke]="fuelEfficiencyChartOptions.stroke"
-              [fill]="fuelEfficiencyChartOptions.fill"
-              [tooltip]="fuelEfficiencyChartOptions.tooltip"
-              [colors]="fuelEfficiencyChartOptions.colors"
-            ></apx-chart>
-
-            <div
-              *ngIf="!fuelEfficiencyChartOptions?.series?.length"
-              class="text-center text-muted py-4"
-            >
-              No data available for the selected range.
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-md-6 mt-4">
-          <div class="bg_sw p-3 shadow rounded">
-            <h5 class="sec_title">Cost per Kilometer</h5>
-
-            <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
-              <label class="fw-semibold me-2">Type:</label>
-              <select
-                class="form-select form-select-sm w-auto"
-                [(ngModel)]="costPerKmType"
-              >
-                <option value="daily">Daily</option>
-                <option value="monthly" selected>Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
-
-              <label class="fw-semibold ms-3 me-2">From:</label>
-              <input
-                type="date"
-                class="form-control form-control-sm w-auto"
-                [(ngModel)]="costPerKmStart"
-              />
-
-              <label class="fw-semibold ms-3 me-2">To:</label>
-              <input
-                type="date"
-                class="form-control form-control-sm w-auto"
-                [(ngModel)]="costPerKmEnd"
-              />
-
-              <button
-                class="btn btn-sm btn-primary ms-3"
-                (click)="loadCostPerKmChart()"
-              >
-                Apply
-              </button>
-            </div>
-
-            <apx-chart
-              *ngIf="costPerKmChartOptions"
-              [series]="costPerKmChartOptions.series"
-              [chart]="costPerKmChartOptions.chart"
-              [xaxis]="costPerKmChartOptions.xaxis"
-              [yaxis]="costPerKmChartOptions.yaxis"
-              [dataLabels]="costPerKmChartOptions.dataLabels"
-              [stroke]="costPerKmChartOptions.stroke"
-              [fill]="costPerKmChartOptions.fill"
-              [tooltip]="costPerKmChartOptions.tooltip"
-              [colors]="costPerKmChartOptions.colors"
-            ></apx-chart>
-
-            <div
-              *ngIf="!costPerKmChartOptions?.series?.length"
-              class="text-center text-muted py-4"
-            >
-              No data available for the selected range.
-            </div>
+          <div
+            *ngIf="!fuelChartOptions?.series?.length"
+            class="text-center text-muted py-4"
+          >
+            No data available for the selected range.
           </div>
         </div>
       </div>
+
+      <div class="col-12 col-md-6 mt-4">
+        <div class="bg_sw p-3 shadow rounded mt-4">
+          <h5 class="sec_title">Fuel Efficiency</h5>
+
+          <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+            <label class="fw-semibold me-2">Type:</label>
+            <select
+              class="form-select form-select-sm w-auto"
+              [(ngModel)]="fuelEfficiencyType"
+            >
+              <option value="daily">Daily</option>
+              <option value="monthly" selected>Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+
+            <label class="fw-semibold ms-3 me-2">From:</label>
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              [(ngModel)]="fuelEfficiencyStart"
+            />
+
+            <label class="fw-semibold ms-3 me-2">To:</label>
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              [(ngModel)]="fuelEfficiencyEnd"
+            />
+
+            <button
+              class="btn btn-sm btn-primary ms-3"
+              (click)="loadFuelEfficiencyChart()"
+            >
+              Apply
+            </button>
+          </div>
+
+          <apx-chart
+            *ngIf="fuelEfficiencyChartOptions"
+            [series]="fuelEfficiencyChartOptions.series"
+            [chart]="fuelEfficiencyChartOptions.chart"
+            [xaxis]="fuelEfficiencyChartOptions.xaxis"
+            [yaxis]="fuelEfficiencyChartOptions.yaxis"
+            [dataLabels]="fuelEfficiencyChartOptions.dataLabels"
+            [stroke]="fuelEfficiencyChartOptions.stroke"
+            [fill]="fuelEfficiencyChartOptions.fill"
+            [tooltip]="fuelEfficiencyChartOptions.tooltip"
+            [colors]="fuelEfficiencyChartOptions.colors"
+          ></apx-chart>
+
+          <div
+            *ngIf="!fuelEfficiencyChartOptions?.series?.length"
+            class="text-center text-muted py-4"
+          >
+            No data available for the selected range.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 mt-4">
+        <div class="bg_sw p-3 shadow rounded mt-4">
+          <h5 class="sec_title">Cost per Kilometer</h5>
+
+          <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+            <label class="fw-semibold me-2">Type:</label>
+            <select
+              class="form-select form-select-sm w-auto"
+              [(ngModel)]="costPerKmType"
+            >
+              <option value="daily">Daily</option>
+              <option value="monthly" selected>Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+
+            <label class="fw-semibold ms-3 me-2">From:</label>
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              [(ngModel)]="costPerKmStart"
+            />
+
+            <label class="fw-semibold ms-3 me-2">To:</label>
+            <input
+              type="date"
+              class="form-control form-control-sm w-auto"
+              [(ngModel)]="costPerKmEnd"
+            />
+
+            <button
+              class="btn btn-sm btn-primary ms-3"
+              (click)="loadCostPerKmChart()"
+            >
+              Apply
+            </button>
+          </div>
+
+          <apx-chart
+            *ngIf="costPerKmChartOptions"
+            [series]="costPerKmChartOptions.series"
+            [chart]="costPerKmChartOptions.chart"
+            [xaxis]="costPerKmChartOptions.xaxis"
+            [yaxis]="costPerKmChartOptions.yaxis"
+            [dataLabels]="costPerKmChartOptions.dataLabels"
+            [stroke]="costPerKmChartOptions.stroke"
+            [fill]="costPerKmChartOptions.fill"
+            [tooltip]="costPerKmChartOptions.tooltip"
+            [colors]="costPerKmChartOptions.colors"
+          ></apx-chart>
+
+          <div
+            *ngIf="!costPerKmChartOptions?.series?.length"
+            class="text-center text-muted py-4"
+          >
+            No data available for the selected range.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 mt-4">
+        <div class="bg_sw p-3 shadow rounded text-center mt-4">
+          <h5 class="sec_title">Driver Performance Chart</h5>
+
+          <div
+            class="d-flex gap-2 align-items-center mb-3 flex-wrap justify-content-center"
+          >
+            <label class="fw-semibold me-2">Month:</label>
+            <select
+              class="form-select form-select-sm w-auto"
+              [(ngModel)]="dpMonth"
+            >
+              <option *ngFor="let m of months" [value]="m.value">
+                {{ m.name }}
+              </option>
+            </select>
+
+            <label class="fw-semibold ms-3 me-2">Year:</label>
+            <select
+              class="form-select form-select-sm w-auto"
+              [(ngModel)]="dpYear"
+            >
+              <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+            </select>
+
+            <button
+              class="btn btn-sm btn-primary ms-3"
+              (click)="loadDriverPerformanceChart()"
+            >
+              Apply
+            </button>
+          </div>
+
+          <apx-chart
+            *ngIf="driverPerformanceChart"
+            [series]="driverPerformanceChart.series"
+            [chart]="driverPerformanceChart.chart"
+            [dataLabels]="driverPerformanceChart.dataLabels"
+            [plotOptions]="driverPerformanceChart.plotOptions"
+            [xaxis]="driverPerformanceChart.xaxis"
+            [colors]="driverPerformanceChart.colors"
+          >
+          </apx-chart>
+        </div>
+      </div>
+    </div>
     <!-- </div> -->
 
     <!-- <div class="col-md-6 mb-3">

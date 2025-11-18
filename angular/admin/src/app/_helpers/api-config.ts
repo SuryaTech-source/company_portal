@@ -111,6 +111,12 @@ export const Apiconfig = {
         "method": "post"
     },
 
+
+    driverPerformanceChart:{
+        "url": "admin/performance/driver-performance-chart",
+        "method": "post"
+    },
+
     saveContract:{
         "url": "admin/contract/save",
         "method": "post"

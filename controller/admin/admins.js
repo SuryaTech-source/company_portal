@@ -1204,11 +1204,12 @@ module.exports = function (io) {
 router.getusersrole = async function (req, res) {
   try {
     // 1️⃣ Get all totals concurrently
-    const [vendorDocs, driverCount, contractCount, employeeCount] = await Promise.all([
+    const [vendorDocs, driverCount, contractCount, employeeCount,alertcount] = await Promise.all([
       db.GetDocument('vendor', { status: 1 }, {}, {}), // vendor docs
       db.GetCount('deals', { status: 1 }),             // driver total
       db.GetCount('contract', { status: 1 }),          // contract total
-      db.GetCount('employee', { status: 1 })           // employee total
+      db.GetCount('employee', { status: 1 }),
+      db.GetCount('alert',{})           // employee total
     ]);
 
     // 2️⃣ Calculate vendor totals
@@ -1225,7 +1226,8 @@ router.getusersrole = async function (req, res) {
         totalNoOfBuses,
         driverTotal: driverCount,
         contractTotal: contractCount,
-        employeeTotal: employeeCount
+        employeeTotal: employeeCount,
+        alertcount:alertcount
       }
     };
 

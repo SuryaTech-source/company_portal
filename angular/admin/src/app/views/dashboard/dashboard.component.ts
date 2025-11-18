@@ -118,8 +118,9 @@ costPerKmType = 'daily';
 costPerKmStart: string = '';
 costPerKmEnd: string = '';
 costPerKmChartOptions: any;
-
-
+driverPerformanceChart: any = {};
+dpMonth = new Date().getMonth() + 1;
+dpYear = new Date().getFullYear();
 
   public chartOptionschart: Partial<ApexOptions> = {
     series: [
@@ -839,6 +840,69 @@ loadCostPerKmChart() {
     }
   });
 }
+
+
+loadDriverPerformanceChart() {
+  const payload = {
+    month: Number(this.dpMonth),
+    year: Number(this.dpYear),
+  };
+
+  this.apiService
+    .CommonApi(Apiconfig.driverPerformanceChart.method, Apiconfig.driverPerformanceChart.url, payload)
+    .subscribe((res: any) => {
+
+      if (!res.status) return;
+
+      const value = res.overallScore; // gauge score
+      const maxValue = 100; // can change to 1000 like in your screenshot
+
+      this.driverPerformanceChart = {
+        series: [value],
+        chart: {
+          type: "radialBar",
+          height: 350,
+        },
+        plotOptions: {
+          radialBar: {
+            startAngle: -135,
+            endAngle: 135,
+            hollow: {
+              size: "55%",
+            },
+            track: {
+              background: "#E0E0E0",
+              strokeWidth: "100%",
+            },
+            dataLabels: {
+              name: {
+                show: false,
+              },
+              value: {
+                fontSize: "32px",
+                offsetY: 20,
+                formatter: () => `${value}%`,
+              },
+            },
+          },
+        },
+        fill: {
+          type: "gradient",
+          gradient: {
+            shade: "light",
+            gradientToColors: ["#76FF03"],
+            stops: [0, 100],
+          },
+        },
+        colors: ["#32CD32"], // lime green
+        stroke: {
+          lineCap: "round",
+        },
+      };
+    });
+}
+
+
   populateYears() {
     const startYear = 2018;
     const currentYear = new Date().getFullYear();
@@ -1102,6 +1166,7 @@ loadCostPerKmChart() {
 
   this.loadFuelEfficiencyChart()
   this.loadCostPerKmChart()
+  this.loadDriverPerformanceChart()
  this.apiService.CommonApi(Apiconfig.getDashboard.method, Apiconfig.getDashboard.url, {}).subscribe(
       (result) => {
 
@@ -1114,7 +1179,7 @@ loadCostPerKmChart() {
 
 
 
-    // this.populateYears();
+    this.populateYears();
     // this.setCurrentMonthAndYear();
     // var date = new Date();
     // let dataFrom = new Date(new Date().setDate(date.getDate() - 6));

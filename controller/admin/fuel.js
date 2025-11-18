@@ -495,5 +495,123 @@ controller.costPerKmAnalytics = async function (req, res) {
 
 
 
+controller.driverPerformanceChart = async function (req, res) {
+  try {
+    const { month, year } = req.body;
+
+    if (!month || !year) {
+      return res.send({
+        status: false,
+        message: "Month and Year are required",
+      });
+    }
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+
+    // Fetch all Drivers
+    const employees = await db.GetDocument(
+      "employee",
+      { status: 1, role: "Driver" },
+      {},
+      {}
+    );
+
+    if (!employees.status || employees.doc.length === 0) {
+      return res.send({
+        status: false,
+        message: "No drivers found",
+      });
+    }
+
+    const result = [];
+
+    for (const emp of employees.doc) {
+      const attnDoc = await db.GetOneDocument(
+        "attendance",
+        { employee: emp._id },
+        {},
+        {}
+      );
+
+      let leaveDays = 0,
+        sickDays = 0,
+        presentDays = 0,
+        totalDays = 0;
+
+      if (attnDoc.status && attnDoc.doc && attnDoc.doc.records.length > 0) {
+        const records = attnDoc.doc.records.filter(
+          (r) => r.date >= startDate && r.date <= endDate
+        );
+
+        totalDays = records.length;
+
+        records.forEach((r) => {
+          if (r.status === "P") presentDays++;
+          if (r.status === "A") leaveDays++;
+          if (r.status === "L" || r.status === "S") sickDays++;
+        });
+      }
+
+      const performancePercent =
+        totalDays > 0 ? (presentDays / totalDays) * 100 : 0;
+
+      let behaviourScore = 100;
+
+      if (attnDoc.status && attnDoc.doc.performance.length > 0) {
+        const perf = attnDoc.doc.performance.find(
+          (p) => p.month === month && p.year === year
+        );
+
+        if (perf) {
+          const violations =
+            perf.speedViolations +
+            perf.accidents +
+            perf.trafficPenalties +
+            perf.incidents;
+
+          behaviourScore = Math.max(0, 100 - violations * 5);
+        }
+      }
+
+      const finalScore = Number(
+        (performancePercent * 0.7 + behaviourScore * 0.3).toFixed(2)
+      );
+
+      result.push({
+        driverId: emp.employeeId,
+        driverName: emp.fullName,
+        performancePercent: Number(performancePercent.toFixed(2)),
+        behaviourScore,
+        finalScore,
+      });
+    }
+
+    // 🟢 Calculate overall average for GAUGE
+    const overallScore =
+      result.length > 0
+        ? Number(
+            (result.reduce((sum, d) => sum + d.finalScore, 0) / result.length).toFixed(2)
+          )
+        : 0;
+
+    return res.send({
+      status: true,
+      labels: result.map((r) => r.driverName),
+      scores: result.map((r) => r.finalScore),
+      data: result,
+      overallScore, // 🟢 Send overall score
+    });
+  } catch (error) {
+    console.log("ERROR driverPerformanceChart:", error);
+    return res.send({
+      status: false,
+      message: "Error generating driver performance chart",
+    });
+  }
+};
+
+
+
   return controller;
 };

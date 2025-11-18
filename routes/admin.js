@@ -1452,6 +1452,13 @@ module.exports = function (app, io) {
       ensureAuthorized,
       fuel.costPerKmAnalytics
     );
+    app.post(
+      "/admin/performance/driver-performance-chart",
+      ensureAuthorized,
+      fuel.driverPerformanceChart
+    );
+
+  
 
     //maintenance management
     app.post(
