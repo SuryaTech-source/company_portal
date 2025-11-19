@@ -306,6 +306,7 @@ module.exports = function (io) {
 
     router.getpendinglist = async function (req, res) {
         //  console.log('-------------------------------')
+        let err =""
         const shops = await db.GetDocument('restaurant', { status: { $eq: 3 } }, {}, {})
         if (shops.status === false) {
             res.send(err);
