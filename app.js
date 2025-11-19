@@ -165,6 +165,7 @@ mongoose.connect(CONFIG.DB_URL, function (error) {
 
 const mongoUrl = process.env.MONGODB_URI || 
   `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER}/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`;
+console.log(mongoUrl, "MONGO URL");
 
 // Update your connection code
 (async () => {
