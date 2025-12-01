@@ -103,24 +103,24 @@ export class DashboardComponent implements OnInit {
   // years: number[] = [];
   // selectedMonth: number;
   // selectedYear: number;
-fuelChartOptions: Partial<ApexOptions>;
-fuelChartType: 'daily' | 'monthly' | 'yearly' = 'monthly';
-fuelStartDate: string;
-fuelEndDate: string;
+  fuelChartOptions: Partial<ApexOptions>;
+  fuelChartType: 'daily' | 'monthly' | 'yearly' = 'monthly';
+  fuelStartDate: string;
+  fuelEndDate: string;
 
-fuelEfficiencyType = 'daily';
-fuelEfficiencyStart: string = '';
-fuelEfficiencyEnd: string = '';
-fuelEfficiencyChartOptions: any;
+  fuelEfficiencyType = 'daily';
+  fuelEfficiencyStart: string = '';
+  fuelEfficiencyEnd: string = '';
+  fuelEfficiencyChartOptions: any;
 
 
-costPerKmType = 'daily';
-costPerKmStart: string = '';
-costPerKmEnd: string = '';
-costPerKmChartOptions: any;
-driverPerformanceChart: any = {};
-dpMonth = new Date().getMonth() + 1;
-dpYear = new Date().getFullYear();
+  costPerKmType = 'daily';
+  costPerKmStart: string = '';
+  costPerKmEnd: string = '';
+  costPerKmChartOptions: any;
+  driverPerformanceChart: any = {};
+  dpMonth = new Date().getMonth() + 1;
+  dpYear = new Date().getFullYear();
 
   public chartOptionschart: Partial<ApexOptions> = {
     series: [
@@ -424,7 +424,7 @@ dpYear = new Date().getFullYear();
   // month: any;
   categoryName: any;
   orderCount: any
-  earningsOrders : any
+  earningsOrders: any
   // day: any;
   date: any;
   last7DaysOrders: any[] = []
@@ -470,7 +470,7 @@ dpYear = new Date().getFullYear();
   tax_total: any;
   delivery_amount: any;
   coupon_total: any;
-  curreny_symbol : any ;
+  curreny_symbol: any;
   dashBoardDetails: any = {
     orders: 0 as Number,
     completedOrders: 0 as Number,
@@ -629,7 +629,12 @@ dpYear = new Date().getFullYear();
   ];
 
 
- loadFuelChart(): void {
+  loadFuelChart(): void {
+    if (this.fuelStartDate && this.fuelEndDate && this.fuelStartDate > this.fuelEndDate) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
+
     const payload = {
       type: this.fuelChartType,
       startDate: this.fuelStartDate,
@@ -651,7 +656,7 @@ dpYear = new Date().getFullYear();
       });
   }
 
-  
+
 
   setFuelChart(labels: string[], fuel: number[], amount: number[]): void {
     this.fuelChartOptions = {
@@ -740,167 +745,177 @@ dpYear = new Date().getFullYear();
     };
   }
 
-loadFuelEfficiencyChart() {
-  const payload = {
-    type: this.fuelEfficiencyType,
-    startDate: this.fuelEfficiencyStart,
-    endDate: this.fuelEfficiencyEnd,
-  };
+  loadFuelEfficiencyChart() {
+    if (this.fuelEfficiencyStart && this.fuelEfficiencyEnd && this.fuelEfficiencyStart > this.fuelEfficiencyEnd) {
+      alert('From date cannot be greater than To date');
+      return;
+    }
+
+    const payload = {
+      type: this.fuelEfficiencyType,
+      startDate: this.fuelEfficiencyStart,
+      endDate: this.fuelEfficiencyEnd,
+    };
 
     this.apiService
       .CommonApi(Apiconfig.fuelEfficiencyAnalytics.method, Apiconfig.fuelEfficiencyAnalytics.url, payload).subscribe((res: any) => {
-    if (res.status && res.data.length) {
-      const labels = res.data.map((x: any) => x.label);
-      const efficiency = res.data.map((x: any) => +(x.fuelEfficiency.toFixed(2)));
+        if (res.status && res.data.length) {
+          const labels = res.data.map((x: any) => x.label);
+          const efficiency = res.data.map((x: any) => +(x.fuelEfficiency.toFixed(2)));
 
-      this.fuelEfficiencyChartOptions = {
-        series: [
-          {
-            name: 'Fuel Efficiency (L/km)',
-            data: efficiency,
-          },
-        ],
-        chart: {
-          type: 'line',
-          height: 350,
-          toolbar: { show: false },
-        },
-        xaxis: {
-          categories: labels,
-          title: { text: 'Date' },
-          labels: { rotate: -45 },
-        },
-        yaxis: {
-          title: { text: 'Fuel Efficiency (L/km)' },
-          decimalsInFloat: 2,
-        },
-        tooltip: {
-          y: {
-            formatter: (val: number) => `${val.toFixed(2)} L/km`,
-          },
-        },
-        stroke: { curve: 'smooth', width: 2 },
-        fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical' } },
-        colors: ['#1E90FF'],
-        dataLabels: { enabled: true },
-      };
-    } else {
-      this.fuelEfficiencyChartOptions = { series: [] };
+          this.fuelEfficiencyChartOptions = {
+            series: [
+              {
+                name: 'Fuel Efficiency (L/km)',
+                data: efficiency,
+              },
+            ],
+            chart: {
+              type: 'line',
+              height: 350,
+              toolbar: { show: false },
+            },
+            xaxis: {
+              categories: labels,
+              title: { text: 'Date' },
+              labels: { rotate: -45 },
+            },
+            yaxis: {
+              title: { text: 'Fuel Efficiency (L/km)' },
+              decimalsInFloat: 2,
+            },
+            tooltip: {
+              y: {
+                formatter: (val: number) => `${val.toFixed(2)} L/km`,
+              },
+            },
+            stroke: { curve: 'smooth', width: 2 },
+            fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical' } },
+            colors: ['#1E90FF'],
+            dataLabels: { enabled: true },
+          };
+        } else {
+          this.fuelEfficiencyChartOptions = { series: [] };
+        }
+      });
+  }
+
+
+  loadCostPerKmChart() {
+    if (this.costPerKmStart && this.costPerKmEnd && this.costPerKmStart > this.costPerKmEnd) {
+      alert('From date cannot be greater than To date');
+      return;
     }
-  });
-}
 
+    const payload = {
+      type: this.costPerKmType,
+      startDate: this.costPerKmStart,
+      endDate: this.costPerKmEnd,
+    };
 
-loadCostPerKmChart() {
-  const payload = {
-    type: this.costPerKmType,
-    startDate: this.costPerKmStart,
-    endDate: this.costPerKmEnd,
-  };
-
-  this.apiService
+    this.apiService
       .CommonApi(Apiconfig.costPerKmAnalytics.method, Apiconfig.costPerKmAnalytics.url, payload).subscribe((res: any) => {
-    if (res.status && res.data.length) {
-      const labels = res.data.map((x: any) => x.label);
-      const costPerKm = res.data.map((x: any) => +(x.costPerKm.toFixed(2)));
+        if (res.status && res.data.length) {
+          const labels = res.data.map((x: any) => x.label);
+          const costPerKm = res.data.map((x: any) => +(x.costPerKm.toFixed(2)));
 
-      this.costPerKmChartOptions = {
-        series: [
-          {
-            name: 'Cost per Kilometer (₹/km)',
-            data: costPerKm,
-          },
-        ],
-        chart: {
-          type: 'bar',
-          height: 350,
-          toolbar: { show: false },
-        },
-        xaxis: {
-          categories: labels,
-          title: { text: 'Date' },
-          labels: { rotate: -45 },
-        },
-        yaxis: {
-          title: { text: 'Cost (₹/km)' },
-          decimalsInFloat: 2,
-        },
-        tooltip: {
-          y: {
-            formatter: (val: number) => `₹${val.toFixed(2)} per km`,
-          },
-        },
-        stroke: { curve: 'smooth', width: 2 },
-        fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical' } },
-        colors: ['#00C49F'],
-        dataLabels: { enabled: true },
-      };
-    } else {
-      this.costPerKmChartOptions = { series: [] };
-    }
-  });
-}
-
-
-loadDriverPerformanceChart() {
-  const payload = {
-    month: Number(this.dpMonth),
-    year: Number(this.dpYear),
-  };
-
-  this.apiService
-    .CommonApi(Apiconfig.driverPerformanceChart.method, Apiconfig.driverPerformanceChart.url, payload)
-    .subscribe((res: any) => {
-
-      if (!res.status) return;
-
-      const value = res.overallScore; // gauge score
-      const maxValue = 100; // can change to 1000 like in your screenshot
-
-      this.driverPerformanceChart = {
-        series: [value],
-        chart: {
-          type: "radialBar",
-          height: 350,
-        },
-        plotOptions: {
-          radialBar: {
-            startAngle: -135,
-            endAngle: 135,
-            hollow: {
-              size: "55%",
-            },
-            track: {
-              background: "#E0E0E0",
-              strokeWidth: "100%",
-            },
-            dataLabels: {
-              name: {
-                show: false,
+          this.costPerKmChartOptions = {
+            series: [
+              {
+                name: 'Cost per Kilometer (₹/km)',
+                data: costPerKm,
               },
-              value: {
-                fontSize: "32px",
-                offsetY: 20,
-                formatter: () => `${value}%`,
+            ],
+            chart: {
+              type: 'bar',
+              height: 350,
+              toolbar: { show: false },
+            },
+            xaxis: {
+              categories: labels,
+              title: { text: 'Date' },
+              labels: { rotate: -45 },
+            },
+            yaxis: {
+              title: { text: 'Cost (₹/km)' },
+              decimalsInFloat: 2,
+            },
+            tooltip: {
+              y: {
+                formatter: (val: number) => `₹${val.toFixed(2)} per km`,
               },
             },
+            stroke: { curve: 'smooth', width: 2 },
+            fill: { type: 'gradient', gradient: { shade: 'light', type: 'vertical' } },
+            colors: ['#00C49F'],
+            dataLabels: { enabled: true },
+          };
+        } else {
+          this.costPerKmChartOptions = { series: [] };
+        }
+      });
+  }
+
+
+  loadDriverPerformanceChart() {
+    const payload = {
+      month: Number(this.dpMonth),
+      year: Number(this.dpYear),
+    };
+
+    this.apiService
+      .CommonApi(Apiconfig.driverPerformanceChart.method, Apiconfig.driverPerformanceChart.url, payload)
+      .subscribe((res: any) => {
+
+        if (!res.status) return;
+
+        const value = res.overallScore; // gauge score
+        const maxValue = 100; // can change to 1000 like in your screenshot
+
+        this.driverPerformanceChart = {
+          series: [value],
+          chart: {
+            type: "radialBar",
+            height: 350,
           },
-        },
-        fill: {
-          type: "gradient",
-          gradient: {
-            shade: "light",
-            gradientToColors: ["#76FF03"],
-            stops: [0, 100],
+          plotOptions: {
+            radialBar: {
+              startAngle: -135,
+              endAngle: 135,
+              hollow: {
+                size: "55%",
+              },
+              track: {
+                background: "#E0E0E0",
+                strokeWidth: "100%",
+              },
+              dataLabels: {
+                name: {
+                  show: false,
+                },
+                value: {
+                  fontSize: "32px",
+                  offsetY: 20,
+                  formatter: () => `${value}%`,
+                },
+              },
+            },
           },
-        },
-        colors: ["#32CD32"], // lime green
-        stroke: {
-          lineCap: "round",
-        },
-      };
-    });
-}
+          fill: {
+            type: "gradient",
+            gradient: {
+              shade: "light",
+              gradientToColors: ["#76FF03"],
+              stops: [0, 100],
+            },
+          },
+          colors: ["#32CD32"], // lime green
+          stroke: {
+            lineCap: "round",
+          },
+        };
+      });
+  }
 
 
   populateYears() {
@@ -925,13 +940,13 @@ loadDriverPerformanceChart() {
   onYearChange() {
     this.fetchData();
   }
-  
-  fetchData() {
-    console.log(this.selectedMonth,'Selected Month');
-    console.log(this.selectedYear,'Selected Year');
 
-    
-    if (this.selectedMonth!=0 && this.selectedYear) {
+  fetchData() {
+    console.log(this.selectedMonth, 'Selected Month');
+    console.log(this.selectedYear, 'Selected Year');
+
+
+    if (this.selectedMonth != 0 && this.selectedYear) {
       // Fetch daily data for the selected month
       const fromDate = new Date(this.selectedYear, this.selectedMonth - 1, 1).toISOString();
       const toDate = new Date(this.selectedYear, this.selectedMonth, 0).toISOString();
@@ -939,26 +954,26 @@ loadDriverPerformanceChart() {
       //   this.from = '0';
       //   this.to = '0';
       // } else {
-        this.from = fromDate;
-        this.to = toDate;
+      this.from = fromDate;
+      this.to = toDate;
       // }
       this.month = true;
       this.day = true;
       this.year = this.years
       this.getDays(this.from, this.to);
-    } else if (this.selectedYear && this.selectedMonth==0) {
+    } else if (this.selectedYear && this.selectedMonth == 0) {
       // Fetch monthly data for the selected year
       const fromDate = new Date(this.selectedYear, 0, 1).toISOString();
-      
+
       const toDate = new Date(this.selectedYear, 11, 31).toISOString();
-      console.log(fromDate,toDate,"for,...................");
+      console.log(fromDate, toDate, "for,...................");
 
       // if (this.selectedMonth == 0) {
       //   this.from = '0';
       //   this.to = '0';
       // } else {
-        this.from = fromDate;
-        this.to = toDate;
+      this.from = fromDate;
+      this.to = toDate;
       // }
       this.month = true;
       this.day = false;
@@ -971,19 +986,19 @@ loadDriverPerformanceChart() {
 
   getDays(startdate: string, enddate: string): void {
     console.log(this.selectedMonth, 'this.selectedMonthADAAAAA');
-    if (this.selectedMonth !== 0) {    
+    if (this.selectedMonth !== 0) {
       const start = this.datepipe.transform(startdate, 'yyyy-MM-dd');
       const end = this.datepipe.transform(enddate, 'yyyy-MM-dd');
-      
+
       if (!start || !end) {
         console.error('Invalid start or end date.');
         return;
       }
-      
+
       const date = new Date(start);
       const endDate = new Date(end);
       this.dates = [];
-  
+
       while (date <= endDate) {
         const formattedDate = this.datepipe.transform(date, 'dd-MM-yyyy');
         if (formattedDate) {
@@ -991,12 +1006,12 @@ loadDriverPerformanceChart() {
         }
         date.setDate(date.getDate() + 1);
       }
-  
+
       console.log(this.dates, "Dates generated");
-  
+
       this.barChartLabels = [...this.dates];
       console.log(this.barChartLabels, 'Bar Chart Labels');
-      
+
       this.chartOptionsEarnings = {
         ...this.chartOptionsEarnings,
         xaxis: {
@@ -1004,7 +1019,7 @@ loadDriverPerformanceChart() {
           categories: [...this.dates]
         }
       };
-  
+
       this.cdr.detectChanges();
       console.log(this.chartOptionsEarnings.xaxis.categories, "Chart xaxis categories updated");
     }
@@ -1012,14 +1027,14 @@ loadDriverPerformanceChart() {
 
   getMonths(startdate: string, enddate: string) {
     // console.log(this.selectedYear,'this.selectedYear');
-    console.log(this.selectedMonth,'this.selectedMonthMMMMMMMMMMMMMMMMMMM');
+    console.log(this.selectedMonth, 'this.selectedMonthMMMMMMMMMMMMMMMMMMM');
 
-    
-    if(this.selectedYear && this.selectedMonth == 0){
-      console.log(startdate,"Start Date");
-      console.log(enddate,"End Date");
 
-      
+    if (this.selectedYear && this.selectedMonth == 0) {
+      console.log(startdate, "Start Date");
+      console.log(enddate, "End Date");
+
+
       const start = new Date(startdate);
       const end = new Date(enddate);
       this.dates = [];
@@ -1037,8 +1052,8 @@ loadDriverPerformanceChart() {
     }
     this.barChartLabels = [...this.dates];
     this.cdr.detectChanges()
-    console.log(this.chartOptionsEarnings.xaxis.categories,"this.chartOptionsEarnings.xaxis.categoriesthis.chartOptionsEarnings.xaxis.categories");
-    
+    console.log(this.chartOptionsEarnings.xaxis.categories, "this.chartOptionsEarnings.xaxis.categoriesthis.chartOptionsEarnings.xaxis.categories");
+
   }
 
   formatDateToMMMYYYYWithDash(dateString: string): string {
@@ -1057,49 +1072,49 @@ loadDriverPerformanceChart() {
 
     this.apiService.CommonApi("get", url, {}).subscribe(
       (result: any[]) => {
-        if(result.length!=0){
+        if (result.length != 0) {
 
-          if(this.selectedMonth==0){
+          if (this.selectedMonth == 0) {
             result.forEach(item => {
               // if(this.selectedMonth=0){
-                console.log("Are you entered here?");
-                
-                const transformedDate = this.formatDateToMMMYYYYWithDash(item.Date);
-                console.log(transformedDate,'transformedDate');
-                
-                // const date = transformedDate.trim(); // Ensure no leading/trailing spaces
-                // console.log(date,'date');
-                console.log(this.barChartLabels,'date');
-      
-                const index = this.barChartLabels.findIndex(label => label.trim() === transformedDate);
-                console.log(index,'index');
-      
-                if (index !== -1) {
-                  this.barChartData[0].data[index] = item.count || 0; // Handle null values
-                  this.barChartData[1].data[index] = item.totalGrandAmount || 0; // Handle null values
-                }
-          
-    
+              console.log("Are you entered here?");
+
+              const transformedDate = this.formatDateToMMMYYYYWithDash(item.Date);
+              console.log(transformedDate, 'transformedDate');
+
+              // const date = transformedDate.trim(); // Ensure no leading/trailing spaces
+              // console.log(date,'date');
+              console.log(this.barChartLabels, 'date');
+
+              const index = this.barChartLabels.findIndex(label => label.trim() === transformedDate);
+              console.log(index, 'index');
+
+              if (index !== -1) {
+                this.barChartData[0].data[index] = item.count || 0; // Handle null values
+                this.barChartData[1].data[index] = item.totalGrandAmount || 0; // Handle null values
+              }
+
+
             });
-          }else{
+          } else {
             result.forEach(item => {
               const transformedDate = this.datepipe.transform(item.Date, 'dd-MM-yyyy');
-              console.log(transformedDate,'transformedDate');
-              
+              console.log(transformedDate, 'transformedDate');
+
               const date = transformedDate.trim(); // Ensure no leading/trailing spaces
-              console.log(date,'date');
-              console.log(this.barChartLabels,'date');
-    
+              console.log(date, 'date');
+              console.log(this.barChartLabels, 'date');
+
               const index = this.barChartLabels.findIndex(label => label.trim() === date);
-              console.log(index,'index');
-    
+              console.log(index, 'index');
+
               if (index !== -1) {
                 this.barChartData[0].data[index] = item.count || 0; // Handle null values
                 this.barChartData[1].data[index] = item.totalGrandAmount || 0; // Handle null values
               }
             });
           }
-        }else{
+        } else {
           const zeroDataArray = new Array(this.barChartLabels.length).fill(0);
           this.barChartData[0].data = zeroDataArray;
           this.barChartData[1].data = zeroDataArray;
@@ -1110,15 +1125,15 @@ loadDriverPerformanceChart() {
         // Ensure all data points are set; fill with 0 where data is missing
         this.barChartData[0].data = this.replaceEmptyWithZero(this.barChartData[0].data)
         // let total = this.barChartData[0].data.map(data => data);
-        for(let datas of this.barChartData[0].data){
-          this.earningsOrders += datas 
-          console.log(this.earningsOrders,"datasdatasdatasdatasdatas");
-              //  var   total =        
+        for (let datas of this.barChartData[0].data) {
+          this.earningsOrders += datas
+          console.log(this.earningsOrders, "datasdatasdatasdatasdatas");
+          //  var   total =        
         }
         // console.log(total, "Total sum of this.barChartData[0].data");
-        console.log(this.barChartData[0].data.map(data => data++),"this.barChartData[0].data")
+        console.log(this.barChartData[0].data.map(data => data++), "this.barChartData[0].data")
         this.barChartData[1].data = this.replaceEmptyWithZero(this.barChartData[1].data)
-        console.log(this.barChartData[1].data,"this.barChartData[1].data")
+        console.log(this.barChartData[1].data, "this.barChartData[1].data")
 
         // Update chart options after setting data
         this.chartOptionsEarnings.series = [...this.barChartData];
@@ -1154,25 +1169,25 @@ loadDriverPerformanceChart() {
   ngOnInit(): void {
     // console.log('asdasdasdddd  dashboard');
     //getDashboard
- const today = new Date();
-  const sixMonthsAgo = new Date(today);
-  sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const today = new Date();
+    const sixMonthsAgo = new Date(today);
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
 
-  this.fuelChartType = 'monthly';
-  this.fuelStartDate = sixMonthsAgo.toISOString().split('T')[0];
-  this.fuelEndDate = today.toISOString().split('T')[0];
+    this.fuelChartType = 'monthly';
+    this.fuelStartDate = sixMonthsAgo.toISOString().split('T')[0];
+    this.fuelEndDate = today.toISOString().split('T')[0];
 
-  this.loadFuelChart();
+    this.loadFuelChart();
 
-  this.loadFuelEfficiencyChart()
-  this.loadCostPerKmChart()
-  this.loadDriverPerformanceChart()
- this.apiService.CommonApi(Apiconfig.getDashboard.method, Apiconfig.getDashboard.url, {}).subscribe(
+    this.loadFuelEfficiencyChart()
+    this.loadCostPerKmChart()
+    this.loadDriverPerformanceChart()
+    this.apiService.CommonApi(Apiconfig.getDashboard.method, Apiconfig.getDashboard.url, {}).subscribe(
       (result) => {
 
-        console.log(result,"result");
+        console.log(result, "result");
         this.dashboardDetails = result.totals
-        
+
 
       })
 
@@ -1198,7 +1213,7 @@ loadDriverPerformanceChart() {
     //   this.getDays(dataFrom.toString(), date.toString())
     // }else{
     //   console.log(this.selectedYear,"kkkk");
-      
+
     //   const fromDate = new Date(this.selectedYear, 0, 1).toISOString();
     //   const toDate = new Date(this.selectedYear, 11, 31).toISOString();
     //   // if (this.selectedMonth == 0) {

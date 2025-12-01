@@ -66,55 +66,32 @@
           <!-- Filter Row -->
           <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
             <label class="fw-semibold me-2">Type:</label>
-            <select
-              class="form-select form-select-sm w-auto"
-              [(ngModel)]="fuelChartType"
-            >
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="fuelChartType">
               <option value="daily">Daily</option>
               <option value="monthly" selected>Monthly</option>
               <option value="yearly">Yearly</option>
             </select>
 
             <label class="fw-semibold ms-3 me-2">From:</label>
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              [(ngModel)]="fuelStartDate"
-            />
+            <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelStartDate"
+              [max]="fuelEndDate" />
 
             <label class="fw-semibold ms-3 me-2">To:</label>
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              [(ngModel)]="fuelEndDate"
-            />
+            <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEndDate"
+              [min]="fuelStartDate" />
 
-            <button
-              class="btn btn-sm btn-primary ms-3"
-              (click)="loadFuelChart()"
-            >
+            <button class="btn btn-sm btn-primary ms-3" (click)="loadFuelChart()">
               Apply
             </button>
           </div>
 
           <!-- Chart Display -->
-          <apx-chart
-            *ngIf="fuelChartOptions"
-            [series]="fuelChartOptions.series"
-            [chart]="fuelChartOptions.chart"
-            [xaxis]="fuelChartOptions.xaxis"
-            [stroke]="fuelChartOptions.stroke"
-            [dataLabels]="fuelChartOptions.dataLabels"
-            [fill]="fuelChartOptions.fill"
-            [colors]="fuelChartOptions.colors"
-            [yaxis]="fuelChartOptions.yaxis"
-            [title]="fuelChartOptions.title"
-          ></apx-chart>
+          <apx-chart *ngIf="fuelChartOptions" [series]="fuelChartOptions.series" [chart]="fuelChartOptions.chart"
+            [xaxis]="fuelChartOptions.xaxis" [stroke]="fuelChartOptions.stroke"
+            [dataLabels]="fuelChartOptions.dataLabels" [fill]="fuelChartOptions.fill" [colors]="fuelChartOptions.colors"
+            [yaxis]="fuelChartOptions.yaxis" [title]="fuelChartOptions.title"></apx-chart>
 
-          <div
-            *ngIf="!fuelChartOptions?.series?.length"
-            class="text-center text-muted py-4"
-          >
+          <div *ngIf="!fuelChartOptions?.series?.length" class="text-center text-muted py-4">
             No data available for the selected range.
           </div>
         </div>
@@ -126,54 +103,32 @@
 
           <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
             <label class="fw-semibold me-2">Type:</label>
-            <select
-              class="form-select form-select-sm w-auto"
-              [(ngModel)]="fuelEfficiencyType"
-            >
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="fuelEfficiencyType">
               <option value="daily">Daily</option>
               <option value="monthly" selected>Monthly</option>
               <option value="yearly">Yearly</option>
             </select>
 
             <label class="fw-semibold ms-3 me-2">From:</label>
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              [(ngModel)]="fuelEfficiencyStart"
-            />
+            <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEfficiencyStart"
+              [max]="fuelEfficiencyEnd" />
 
             <label class="fw-semibold ms-3 me-2">To:</label>
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              [(ngModel)]="fuelEfficiencyEnd"
-            />
+            <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="fuelEfficiencyEnd"
+              [min]="fuelEfficiencyStart" />
 
-            <button
-              class="btn btn-sm btn-primary ms-3"
-              (click)="loadFuelEfficiencyChart()"
-            >
+            <button class="btn btn-sm btn-primary ms-3" (click)="loadFuelEfficiencyChart()">
               Apply
             </button>
           </div>
 
-          <apx-chart
-            *ngIf="fuelEfficiencyChartOptions"
-            [series]="fuelEfficiencyChartOptions.series"
-            [chart]="fuelEfficiencyChartOptions.chart"
-            [xaxis]="fuelEfficiencyChartOptions.xaxis"
-            [yaxis]="fuelEfficiencyChartOptions.yaxis"
-            [dataLabels]="fuelEfficiencyChartOptions.dataLabels"
-            [stroke]="fuelEfficiencyChartOptions.stroke"
-            [fill]="fuelEfficiencyChartOptions.fill"
-            [tooltip]="fuelEfficiencyChartOptions.tooltip"
-            [colors]="fuelEfficiencyChartOptions.colors"
-          ></apx-chart>
+          <apx-chart *ngIf="fuelEfficiencyChartOptions" [series]="fuelEfficiencyChartOptions.series"
+            [chart]="fuelEfficiencyChartOptions.chart" [xaxis]="fuelEfficiencyChartOptions.xaxis"
+            [yaxis]="fuelEfficiencyChartOptions.yaxis" [dataLabels]="fuelEfficiencyChartOptions.dataLabels"
+            [stroke]="fuelEfficiencyChartOptions.stroke" [fill]="fuelEfficiencyChartOptions.fill"
+            [tooltip]="fuelEfficiencyChartOptions.tooltip" [colors]="fuelEfficiencyChartOptions.colors"></apx-chart>
 
-          <div
-            *ngIf="!fuelEfficiencyChartOptions?.series?.length"
-            class="text-center text-muted py-4"
-          >
+          <div *ngIf="!fuelEfficiencyChartOptions?.series?.length" class="text-center text-muted py-4">
             No data available for the selected range.
           </div>
         </div>
@@ -185,54 +140,32 @@
 
           <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
             <label class="fw-semibold me-2">Type:</label>
-            <select
-              class="form-select form-select-sm w-auto"
-              [(ngModel)]="costPerKmType"
-            >
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="costPerKmType">
               <option value="daily">Daily</option>
               <option value="monthly" selected>Monthly</option>
               <option value="yearly">Yearly</option>
             </select>
 
             <label class="fw-semibold ms-3 me-2">From:</label>
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              [(ngModel)]="costPerKmStart"
-            />
+            <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="costPerKmStart"
+              [max]="costPerKmEnd" />
 
             <label class="fw-semibold ms-3 me-2">To:</label>
-            <input
-              type="date"
-              class="form-control form-control-sm w-auto"
-              [(ngModel)]="costPerKmEnd"
-            />
+            <input type="date" class="form-control form-control-sm w-auto" [(ngModel)]="costPerKmEnd"
+              [min]="costPerKmStart" />
 
-            <button
-              class="btn btn-sm btn-primary ms-3"
-              (click)="loadCostPerKmChart()"
-            >
+            <button class="btn btn-sm btn-primary ms-3" (click)="loadCostPerKmChart()">
               Apply
             </button>
           </div>
 
-          <apx-chart
-            *ngIf="costPerKmChartOptions"
-            [series]="costPerKmChartOptions.series"
-            [chart]="costPerKmChartOptions.chart"
-            [xaxis]="costPerKmChartOptions.xaxis"
-            [yaxis]="costPerKmChartOptions.yaxis"
-            [dataLabels]="costPerKmChartOptions.dataLabels"
-            [stroke]="costPerKmChartOptions.stroke"
-            [fill]="costPerKmChartOptions.fill"
-            [tooltip]="costPerKmChartOptions.tooltip"
-            [colors]="costPerKmChartOptions.colors"
-          ></apx-chart>
+          <apx-chart *ngIf="costPerKmChartOptions" [series]="costPerKmChartOptions.series"
+            [chart]="costPerKmChartOptions.chart" [xaxis]="costPerKmChartOptions.xaxis"
+            [yaxis]="costPerKmChartOptions.yaxis" [dataLabels]="costPerKmChartOptions.dataLabels"
+            [stroke]="costPerKmChartOptions.stroke" [fill]="costPerKmChartOptions.fill"
+            [tooltip]="costPerKmChartOptions.tooltip" [colors]="costPerKmChartOptions.colors"></apx-chart>
 
-          <div
-            *ngIf="!costPerKmChartOptions?.series?.length"
-            class="text-center text-muted py-4"
-          >
+          <div *ngIf="!costPerKmChartOptions?.series?.length" class="text-center text-muted py-4">
             No data available for the selected range.
           </div>
         </div>
@@ -242,44 +175,28 @@
         <div class="bg_sw p-3 shadow rounded text-center mt-4">
           <h5 class="sec_title">Driver Performance Chart</h5>
 
-          <div
-            class="d-flex gap-2 align-items-center mb-3 flex-wrap justify-content-center"
-          >
+          <div class="d-flex gap-2 align-items-center mb-3 flex-wrap justify-content-center">
             <label class="fw-semibold me-2">Month:</label>
-            <select
-              class="form-select form-select-sm w-auto"
-              [(ngModel)]="dpMonth"
-            >
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="dpMonth">
               <option *ngFor="let m of months" [value]="m.value">
                 {{ m.name }}
               </option>
             </select>
 
             <label class="fw-semibold ms-3 me-2">Year:</label>
-            <select
-              class="form-select form-select-sm w-auto"
-              [(ngModel)]="dpYear"
-            >
+            <select class="form-select form-select-sm w-auto" [(ngModel)]="dpYear">
               <option *ngFor="let y of years" [value]="y">{{ y }}</option>
             </select>
 
-            <button
-              class="btn btn-sm btn-primary ms-3"
-              (click)="loadDriverPerformanceChart()"
-            >
+            <button class="btn btn-sm btn-primary ms-3" (click)="loadDriverPerformanceChart()">
               Apply
             </button>
           </div>
 
-          <apx-chart
-            *ngIf="driverPerformanceChart"
-            [series]="driverPerformanceChart.series"
-            [chart]="driverPerformanceChart.chart"
-            [dataLabels]="driverPerformanceChart.dataLabels"
-            [plotOptions]="driverPerformanceChart.plotOptions"
-            [xaxis]="driverPerformanceChart.xaxis"
-            [colors]="driverPerformanceChart.colors"
-          >
+          <apx-chart *ngIf="driverPerformanceChart" [series]="driverPerformanceChart.series"
+            [chart]="driverPerformanceChart.chart" [dataLabels]="driverPerformanceChart.dataLabels"
+            [plotOptions]="driverPerformanceChart.plotOptions" [xaxis]="driverPerformanceChart.xaxis"
+            [colors]="driverPerformanceChart.colors">
           </apx-chart>
         </div>
       </div>
