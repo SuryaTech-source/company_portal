@@ -14,9 +14,9 @@ export class AddNewEmployeesComponent implements OnInit {
   mode: 'add' | 'edit' | 'view' = 'add';
   id: string | null = null;
   readonly: boolean = false;
-uploadedDocument: boolean = false;
-employeeDocuments: any[] = [];
-   apiUrl = environment.apiUrl
+  uploadedDocument: boolean = false;
+  employeeDocuments: any[] = [];
+  apiUrl = environment.apiUrl
   // Employee fields
   fullName: string = '';
   nationality: string = '';
@@ -52,18 +52,19 @@ employeeDocuments: any[] = [];
   documentTypes: string[] = ['Aadhar Card', 'PAN Card', 'Ration Card', 'License'];
 
   civilId: string = '';
-civilIdExpiry: string = '';
-licenseExpiry: string = ''; // for drivers only
+  civilIdExpiry: string = '';
+  licenseExpiry: string = ''; // for drivers only
+  minDate: string = new Date().toISOString().split('T')[0];
 
-  
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private apiService: ApiService,
     private notifyService: NotificationService
-  ) {}
+  ) { }
 
-   ngOnInit(): void {
+  ngOnInit(): void {
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.id = params['id'];
@@ -77,20 +78,20 @@ licenseExpiry: string = ''; // for drivers only
     });
     this.loadContracts();
   }
- 
+
 
   getDoc(type: string) {
-  return this.employeeDocuments.find(d => d.type === type);
-}
-
-addOrGetDocIndex(type: string): number {
-  let idx = this.employeeDocuments.findIndex(d => d.type === type);
-  if (idx === -1) {
-    this.employeeDocuments.push({ type, file: null, fileUrl: '', isExisting: false });
-    idx = this.employeeDocuments.length - 1;
+    return this.employeeDocuments.find(d => d.type === type);
   }
-  return idx;
-}
+
+  addOrGetDocIndex(type: string): number {
+    let idx = this.employeeDocuments.findIndex(d => d.type === type);
+    if (idx === -1) {
+      this.employeeDocuments.push({ type, file: null, fileUrl: '', isExisting: false });
+      idx = this.employeeDocuments.length - 1;
+    }
+    return idx;
+  }
   // Load contract options from API
   loadContracts() {
     this.apiService.CommonApi(
@@ -118,15 +119,15 @@ addOrGetDocIndex(type: string): number {
   }
 
   // File selection handler
-//  onFileSelected(event: any) {
-//   const file = event.target.files[0];
-//   if (file) {
-//     this.documentFile = file;
-//     this.uploadedDocument = true;
-//   } else {
-//     this.uploadedDocument = false;
-//   }
-// }
+  //  onFileSelected(event: any) {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     this.documentFile = file;
+  //     this.uploadedDocument = true;
+  //   } else {
+  //     this.uploadedDocument = false;
+  //   }
+  // }
 
   // Get employee by ID
   getEmployee() {
@@ -137,8 +138,8 @@ addOrGetDocIndex(type: string): number {
     ).subscribe((res: any) => {
       if (res.status) {
         const emp = res.data.doc;
-        console.log(emp,"empempempempemp");
-        
+        console.log(emp, "empempempempemp");
+
         this.fullName = emp.fullName || '';
         this.nationality = emp.nationality || '';
         this.bloodGroup = emp.bloodGroup || '';
@@ -162,17 +163,17 @@ addOrGetDocIndex(type: string): number {
         this.status = emp.status ?? 1;
         this.contactNumber = emp.contactNumber || '';
         // this.documentType = emp.documentType || '';
-         this.civilId = emp.civilId || '';
-  this.civilIdExpiry = emp.civilIdExpiry ? emp.civilIdExpiry.split('T')[0] : '';
-  this.licenseExpiry = emp.licenseExpiry ? emp.licenseExpiry.split('T')[0] : '';
+        this.civilId = emp.civilId || '';
+        this.civilIdExpiry = emp.civilIdExpiry ? emp.civilIdExpiry.split('T')[0] : '';
+        this.licenseExpiry = emp.licenseExpiry ? emp.licenseExpiry.split('T')[0] : '';
         this.employeeDocuments = emp.documents
-           this.initializeDocuments(emp.documents);
+        this.initializeDocuments(emp.documents);
         // documentFile cannot be preloaded (only preview URL from backend if available)
       }
     });
   }
 
-    // Initialize documents based on mode
+  // Initialize documents based on mode
   initializeDocuments(existingDocuments?: any[]) {
     if (existingDocuments && existingDocuments.length > 0) {
       // Edit/View mode: populate with existing documents
@@ -190,14 +191,14 @@ addOrGetDocIndex(type: string): number {
   }
 
   addDocument() {
-    this.employeeDocuments.push({ 
-      type: '', 
-      file: null, 
-      fileUrl: '', 
-      isExisting: false 
+    this.employeeDocuments.push({
+      type: '',
+      file: null,
+      fileUrl: '',
+      isExisting: false
     });
   }
- // Remove document row
+  // Remove document row
   removeDocument(index: number) {
     if (this.employeeDocuments.length > 1) {
       this.employeeDocuments.splice(index, 1);
@@ -215,38 +216,38 @@ addOrGetDocIndex(type: string): number {
       }
     }
   }
-// Get filename from URL
-getFileName(fileUrl: string): string {
-  if (!fileUrl) return '';
-  // Handle both relative and absolute URLs
-  const fileName = fileUrl.split('/').pop() || 'Unknown file';
-  return fileName;
-}
-
-// Preview document in new tab
-previewDocument(fileUrl: string) {
-  if (fileUrl) {
-    const fullUrl = this.getFullFileUrl(fileUrl);
-    console.log('Opening file at:', fullUrl);
-    window.open(fullUrl, '_blank');
+  // Get filename from URL
+  getFileName(fileUrl: string): string {
+    if (!fileUrl) return '';
+    // Handle both relative and absolute URLs
+    const fileName = fileUrl.split('/').pop() || 'Unknown file';
+    return fileName;
   }
-}
 
-// Get full file URL with proper slash handling
-getFullFileUrl(fileUrl: string): string {
-  if (!fileUrl) return '';
-  
-  // Remove leading './' if present
-  let cleanPath = fileUrl.replace(/^\.\//, '');
-  
-  // Remove leading '/' if present to avoid double slashes
-  cleanPath = cleanPath.replace(/^\//, '');
-  
-  // Ensure apiUrl doesn't end with '/' and add single '/'
-  const baseUrl = this.apiUrl.replace(/\/$/, '');
-  
-  return `${baseUrl}/${cleanPath}`;
-}
+  // Preview document in new tab
+  previewDocument(fileUrl: string) {
+    if (fileUrl) {
+      const fullUrl = this.getFullFileUrl(fileUrl);
+      console.log('Opening file at:', fullUrl);
+      window.open(fullUrl, '_blank');
+    }
+  }
+
+  // Get full file URL with proper slash handling
+  getFullFileUrl(fileUrl: string): string {
+    if (!fileUrl) return '';
+
+    // Remove leading './' if present
+    let cleanPath = fileUrl.replace(/^\.\//, '');
+
+    // Remove leading '/' if present to avoid double slashes
+    cleanPath = cleanPath.replace(/^\//, '');
+
+    // Ensure apiUrl doesn't end with '/' and add single '/'
+    const baseUrl = this.apiUrl.replace(/\/$/, '');
+
+    return `${baseUrl}/${cleanPath}`;
+  }
 
   // Save employee
   // submitForm(form: any) {
@@ -316,109 +317,109 @@ getFullFileUrl(fileUrl: string): string {
 
 
 
-   submitForm(form: any) {
-  if (form.invalid) {
-    this.notifyService.showError('Please fill all required fields');
-    return;
-  }
-
-  // Driver-specific requirement
-  if (this.designation === 'Driver') {
-    if (!this.licenseNo || !this.licenseExpiry) {
-      this.notifyService.showError('License No and Expiry are required for drivers');
+  submitForm(form: any) {
+    if (form.invalid) {
+      this.notifyService.showError('Please fill all required fields');
       return;
     }
-  }
 
-  // Civil ID required for all
-  if (!this.civilId || !this.civilIdExpiry) {
-    this.notifyService.showError('Civil ID and Expiry are required');
-    return;
-  }
-
-  // Ensure dedicated doc slots exist for Civil ID and License (Driver)
-  const civilIdx = this.addOrGetDocIndex('Civil ID');
-  if (this.designation === 'Driver') {
-    this.addOrGetDocIndex('License');
-  }
-
-  // Validate each document row has both type and file (or existing URL)
-  // const invalidDocuments = this.employeeDocuments.filter(
-  //   doc => !doc.type || (!doc.file && !doc.fileUrl)
-  // );
-  // if (invalidDocuments.length > 0) {
-  //   this.notifyService.showError('Please select document type and file for all documents');
-  //   return;
-  // }
-
-  const payload: any = {
-    _id: this.id,
-    fullName: this.fullName,
-    nationality: this.nationality,
-    bloodGroup: this.bloodGroup,
-    dob: this.dob,
-    permanentAddress: this.permanentAddress,
-    designation: this.designation,
-    contactNumber: this.contactNumber,
-    employeeId: this.employeeId,
-    employmentType: this.employmentType,
-    dateOfJoining: this.dateOfJoining,
-    underContract: this.underContract,
-    salary: this.salary,
-    bankDetails: {
-      bankName: this.bankName,
-      accountNo: this.accountNo,
-      ifsc: this.ifsc
-    },
-    nominee: {
-      name: this.nomineeName,
-      relation: this.nomineeRelation,
-      contact: this.nomineeContact
-    },
-    visaExpiry: this.visaExpiry,
-    licenseNo: this.licenseNo,
-    role: this.role,
-    status: this.status,
-    civilId: this.civilId,
-    civilIdExpiry: this.civilIdExpiry,
-    licenseExpiry: this.licenseExpiry
-  };
-
-  const formData = new FormData();
-  Object.keys(payload).forEach(key => {
-    if (typeof payload[key] === 'object') {
-      formData.append(key, JSON.stringify(payload[key]));
-    } else {
-      formData.append(key, payload[key]);
+    // Driver-specific requirement
+    if (this.designation === 'Driver') {
+      if (!this.licenseNo || !this.licenseExpiry) {
+        this.notifyService.showError('License No and Expiry are required for drivers');
+        return;
+      }
     }
-  });
 
-  // Append documents in the same structure the backend expects (array-like bracket notation)
-  this.employeeDocuments.forEach((doc: any, index: number) => {
-    formData.append(`documents[${index}][type]`, doc.type);
-    if (doc.file) {
-      formData.append(`documents[${index}][file]`, doc.file, doc.file.name);
-    } else if (doc.fileUrl && doc.isExisting) {
-      formData.append(`documents[${index}][existingFileUrl]`, doc.fileUrl);
-      if (doc._id) formData.append(`documents[${index}][documentId]`, doc._id);
+    // Civil ID required for all
+    if (!this.civilId || !this.civilIdExpiry) {
+      this.notifyService.showError('Civil ID and Expiry are required');
+      return;
     }
-  });
 
-  this.apiService.CommonApi(
-    Apiconfig.saveEmployee.method,
-    Apiconfig.saveEmployee.url,
-    formData
-  ).subscribe((res: any) => {
-    if (res.status) {
-      this.notifyService.showSuccess(
-        this.id ? 'Employee updated successfully' : 'Employee added successfully'
-      );
-      this.router.navigate(['/app/employees/active-list']);
-    } else {
-      this.notifyService.showError('Failed to save employee');
+    // Ensure dedicated doc slots exist for Civil ID and License (Driver)
+    const civilIdx = this.addOrGetDocIndex('Civil ID');
+    if (this.designation === 'Driver') {
+      this.addOrGetDocIndex('License');
     }
-  });
-}
+
+    // Validate each document row has both type and file (or existing URL)
+    // const invalidDocuments = this.employeeDocuments.filter(
+    //   doc => !doc.type || (!doc.file && !doc.fileUrl)
+    // );
+    // if (invalidDocuments.length > 0) {
+    //   this.notifyService.showError('Please select document type and file for all documents');
+    //   return;
+    // }
+
+    const payload: any = {
+      _id: this.id,
+      fullName: this.fullName,
+      nationality: this.nationality,
+      bloodGroup: this.bloodGroup,
+      dob: this.dob,
+      permanentAddress: this.permanentAddress,
+      designation: this.designation,
+      contactNumber: this.contactNumber,
+      employeeId: this.employeeId,
+      employmentType: this.employmentType,
+      dateOfJoining: this.dateOfJoining,
+      underContract: this.underContract,
+      salary: this.salary,
+      bankDetails: {
+        bankName: this.bankName,
+        accountNo: this.accountNo,
+        ifsc: this.ifsc
+      },
+      nominee: {
+        name: this.nomineeName,
+        relation: this.nomineeRelation,
+        contact: this.nomineeContact
+      },
+      visaExpiry: this.visaExpiry,
+      licenseNo: this.licenseNo,
+      role: this.role,
+      status: this.status,
+      civilId: this.civilId,
+      civilIdExpiry: this.civilIdExpiry,
+      licenseExpiry: this.licenseExpiry
+    };
+
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+      if (typeof payload[key] === 'object') {
+        formData.append(key, JSON.stringify(payload[key]));
+      } else {
+        formData.append(key, payload[key]);
+      }
+    });
+
+    // Append documents in the same structure the backend expects (array-like bracket notation)
+    this.employeeDocuments.forEach((doc: any, index: number) => {
+      formData.append(`documents[${index}][type]`, doc.type);
+      if (doc.file) {
+        formData.append(`documents[${index}][file]`, doc.file, doc.file.name);
+      } else if (doc.fileUrl && doc.isExisting) {
+        formData.append(`documents[${index}][existingFileUrl]`, doc.fileUrl);
+        if (doc._id) formData.append(`documents[${index}][documentId]`, doc._id);
+      }
+    });
+
+    this.apiService.CommonApi(
+      Apiconfig.saveEmployee.method,
+      Apiconfig.saveEmployee.url,
+      formData
+    ).subscribe((res: any) => {
+      if (res.status) {
+        this.notifyService.showSuccess(
+          this.id ? 'Employee updated successfully' : 'Employee added successfully'
+        );
+        this.router.navigate(['/app/employees/active-list']);
+      } else {
+        this.notifyService.showError('Failed to save employee');
+      }
+    });
+  }
 
 
   // Cancel button

@@ -226,10 +226,13 @@
         <div class="form-group">
           <label>Civil ID Expiry</label>
           <input type="date" class="form-control" [(ngModel)]="civilIdExpiry" name="civilIdExpiry"
-            #civilIdExpiryCtrl="ngModel" [readonly]="readonly" required />
+            #civilIdExpiryCtrl="ngModel" [readonly]="readonly" required [min]="minDate" />
           <div *ngIf="employeeForm.submitted && civilIdExpiryCtrl.errors" class="text-danger small">
             <div *ngIf="civilIdExpiryCtrl.errors['required']">
               Civil ID Expiry is required.
+            </div>
+            <div *ngIf="civilIdExpiryCtrl.errors['min']">
+              Expiry date must be in the future.
             </div>
           </div>
         </div>
@@ -259,10 +262,13 @@
         <div class="form-group">
           <label>Visa Expiry</label>
           <input type="date" class="form-control" [(ngModel)]="visaExpiry" name="visaExpiry" #visaExpiryCtrl="ngModel"
-            [readonly]="readonly" required />
+            [readonly]="readonly" required [min]="minDate" />
           <div *ngIf="employeeForm.submitted && visaExpiryCtrl.errors" class="text-danger small">
             <div *ngIf="visaExpiryCtrl.errors['required']">
               Visa Expiry is required.
+            </div>
+            <div *ngIf="visaExpiryCtrl.errors['min']">
+              Expiry date must be in the future.
             </div>
           </div>
         </div>
@@ -286,10 +292,13 @@
           <div class="form-group">
             <label>License Expiry</label>
             <input type="date" class="form-control" [(ngModel)]="licenseExpiry" name="licenseExpiry"
-              #licenseExpiryCtrl="ngModel" [readonly]="readonly" required />
+              #licenseExpiryCtrl="ngModel" [readonly]="readonly" required [min]="minDate" />
             <div *ngIf="employeeForm.submitted && licenseExpiryCtrl.errors" class="text-danger small">
               <div *ngIf="licenseExpiryCtrl.errors['required']">
                 License Expiry is required for drivers.
+              </div>
+              <div *ngIf="licenseExpiryCtrl.errors['min']">
+                Expiry date must be in the future.
               </div>
             </div>
           </div>
