@@ -166,7 +166,7 @@ module.exports = function () {
 
       const result = await db.UpdateDocument(
         "contract",
-        { _id: mongoose.Types.ObjectId(id) },
+        { _id:new mongoose.Types.ObjectId(id) },
         { status: 0 }
       );
 

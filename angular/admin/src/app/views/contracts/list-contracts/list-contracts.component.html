@@ -105,6 +105,7 @@
           <th>Buses/Drivers Deployed</th>
           <th>Contact Supervisor</th>
           <th>Contract Type</th>
+          <th>ACTIONS</th>
         </tr>
       </thead>
       <tbody>
@@ -115,6 +116,7 @@
           <td>{{ contract.endDate | date }}</td>
           <td>{{ contract.invoicingDate | date }}</td>
           <td>{{ contract.lastPayment | date }}</td>
+          
           <td>
             <span *ngIf="contract.status === 1" class="badge badge-success"
               >Active</span
@@ -138,6 +140,25 @@
             <ng-container *ngIf="contract.contractType">
               {{ contract.contractType.join(", ") }}
             </ng-container>
+          </td>
+          <td>
+            <a
+              [routerLink]="['/app/contracts/view', contract._id]"
+              class="btn btn-primary btn-sm"
+              >View</a
+            >
+            <a
+              [routerLink]="['/app/contracts/edit', contract._id]"
+              class="btn btn-secondary btn-sm"
+              >Edit</a
+            >
+            <button
+              class="btn btn-danger btn-sm"
+              (click)="deleteContract(contract._id)"
+              *ngIf="contract.status !== 0"
+            >
+              Delete  
+            </button>
           </td>
         </tr>
       </tbody>

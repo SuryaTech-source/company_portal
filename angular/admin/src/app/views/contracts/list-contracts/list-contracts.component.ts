@@ -40,6 +40,21 @@ export class ListContractsComponent implements OnInit {
     );
 }
 
+  deleteContract(contractId: number) {
+    if (confirm("Are you sure you want to delete this contract?")) {
+      this.apiService.CommonApi(Apiconfig.deleteContract.method, Apiconfig.deleteContract.url, { id: contractId })
+        .subscribe(
+          (res: any) => {
+            this.notifyService.showSuccess("Contract deleted successfully");
+            this.getContracts();
+          },
+          () => {
+            this.notifyService.showError("Failed to delete contract");
+          }
+        );
+    }
+  }
+
   downloadPDF() {
     const element = document.getElementById('contractsTable');
     const options = {

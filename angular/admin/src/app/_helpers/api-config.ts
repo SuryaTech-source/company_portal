@@ -127,6 +127,11 @@ export const Apiconfig = {
 },
 
 
+deleteContract:{
+        "url": "admin/contract/delete",
+        "method": "post"
+    },
+
     listContracts:{
         "url": "admin/contract/list",
         "method": "post"
