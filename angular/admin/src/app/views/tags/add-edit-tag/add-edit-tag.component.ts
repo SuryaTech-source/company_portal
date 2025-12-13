@@ -220,7 +220,7 @@ export class AddEditTagComponent implements OnInit {
       .CommonApi(Apiconfig.saveVendor.method, Apiconfig.saveVendor.url, fd)
       .subscribe({
         next: (res: any) => {
-          if (res?.status === 0) {
+          if (!res.status) {
             this.notifyService.showError(res.message || 'Failed to save');
           } else {
             this.notifyService.showSuccess(res?.message || 'Saved successfully');
@@ -266,7 +266,13 @@ export class AddEditTagComponent implements OnInit {
           const driverDetail = (v.driversDetails || []).find((d: any) => d._id === driverId);
 
           // Find driver doc by driverID
-          const driverDoc = (v.driverDocs || []).find((doc: any) => doc.driverId === driverId);
+          // console.log(`Mapping Driver ${i}: driverId=${driverId}`);
+          // console.log(`Available Driver Docs:`, v.driverDocs);
+
+          const driverDoc = (v.driverDocs || []).find((doc: any) =>
+            // Compare as strings to ensure matching works even if types differ
+            String(doc.driverId) === String(driverId)
+          );
 
           return {
             busId: busId, // Use the ID from the ordered array
