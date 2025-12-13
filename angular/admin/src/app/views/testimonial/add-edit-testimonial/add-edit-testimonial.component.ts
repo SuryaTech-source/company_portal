@@ -1,7 +1,7 @@
-import { Component, OnInit, TemplateRef,ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule,NgForm } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { Apiconfig } from "src/app/_helpers/api-config";
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,7 +23,7 @@ export class AddEditTestimonialComponent implements OnInit {
   documentTypeOptions: string[] = ['RC', 'Insurance', 'Pollution', 'Other'];
   documentType = '';
   documentFile: File | null = null;
-   apiUrl = environment.apiUrl
+  apiUrl = environment.apiUrl
 
   preview: string = '';
   getFleet: any = null;
@@ -33,7 +33,7 @@ export class AddEditTestimonialComponent implements OnInit {
     private route: ActivatedRoute,
     private notifyService: NotificationService,
     private apiService: ApiService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
@@ -49,9 +49,16 @@ export class AddEditTestimonialComponent implements OnInit {
       .subscribe((res) => {
         if (res && res.status && res.data?.doc) {
           this.getFleet = res.data.doc;
+
+          const doc = (this.getFleet.documents && this.getFleet.documents.length > 0) ? this.getFleet.documents[0] : null;
+
+          if (doc) {
+            this.documentType = doc.documentType;
+          }
+
           setTimeout(() => {
             if (this.testimonialForm) {
-              this.testimonialForm.setValue({
+              this.testimonialForm.form.patchValue({
                 vehicleName: this.getFleet.vehicleName || '',
                 cubicCapacity: this.getFleet.cubicCapacity || '',
                 registrationNo: this.getFleet.registrationNo || '',
@@ -61,8 +68,7 @@ export class AddEditTestimonialComponent implements OnInit {
                 monthYrOf: this.formatMonth(this.getFleet.manufactureDate),
                 nextPassingDue: this.formatDate(this.getFleet.passingExpiry),
                 makersName: this.getFleet.makerName || '',
-                documentType: '',
-                document: ''
+                documentType: doc ? doc.documentType : ''
               });
             }
           });
@@ -94,27 +100,27 @@ export class AddEditTestimonialComponent implements OnInit {
   }
   // Preview document in new tab
   previewDocument(fileUrl: string) {
-  if (fileUrl) {
-    const fullUrl = this.getFullFileUrl(fileUrl);
-    console.log('Opening file at:', fullUrl);
-    window.open(fullUrl, '_blank');
+    if (fileUrl) {
+      const fullUrl = this.getFullFileUrl(fileUrl);
+      console.log('Opening file at:', fullUrl);
+      window.open(fullUrl, '_blank');
+    }
   }
-}
 
-getFullFileUrl(fileUrl: string): string {
-  if (!fileUrl) return '';
-  
-  // Remove leading './' if present
-  let cleanPath = fileUrl.replace(/^\.\//, '');
-  
-  // Remove leading '/' if present to avoid double slashes
-  cleanPath = cleanPath.replace(/^\//, '');
-  
-  // Ensure apiUrl doesn't end with '/' and add single '/'
-  const baseUrl = this.apiUrl.replace(/\/$/, '');
-  
-  return `${baseUrl}/${cleanPath}`;
-}
+  getFullFileUrl(fileUrl: string): string {
+    if (!fileUrl) return '';
+
+    // Remove leading './' if present
+    let cleanPath = fileUrl.replace(/^\.\//, '');
+
+    // Remove leading '/' if present to avoid double slashes
+    cleanPath = cleanPath.replace(/^\//, '');
+
+    // Ensure apiUrl doesn't end with '/' and add single '/'
+    const baseUrl = this.apiUrl.replace(/\/$/, '');
+
+    return `${baseUrl}/${cleanPath}`;
+  }
 
 
   // Download document
@@ -130,7 +136,7 @@ getFullFileUrl(fileUrl: string): string {
     document.body.removeChild(a);
   }
 
-   // Submit / Update
+  // Submit / Update
   submitForm(form: NgForm): void {
     this.submitted = true;
 

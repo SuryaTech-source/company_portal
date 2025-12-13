@@ -18,31 +18,31 @@ export class AddEditTagComponent implements OnInit {
   id: string | null = null;
 
   contractTypes = ['Monthly', 'Yearly'];
-  documentTypes = ['PDF', 'DOC'];
+  documentTypes = ['PDF', 'DOC', 'Image', 'Other'];
   contracts: any[] = [];
 
   form: any = { noOfBuses: 0 };
   fleets: any[] = [];
   drivers: any[] = [];
-     apiUrl = environment.apiUrl
+  apiUrl = environment.apiUrl
 
   // hold actual File objects selected in UI
   selectedVendorDocFile: File | null = null;
 
- assignedFleetDrivers: Array<{
-  busId: string;
-  driverId: string;
-  contactNumber: string;
-  driverDocFile: File | null;
-  driverDocUrl?: string; // relative URL from API, if any
-}> = [];
+  assignedFleetDrivers: Array<{
+    busId: string;
+    driverId: string;
+    contactNumber: string;
+    driverDocFile: File | null;
+    driverDocUrl?: string; // relative URL from API, if any
+  }> = [];
 
   constructor(
     private apiService: ApiService,
     private router: Router,
     private notifyService: NotificationService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
@@ -73,7 +73,7 @@ export class AddEditTagComponent implements OnInit {
         driverId: '',
         contactNumber: '',
         driverDocFile: null,
-        
+
       });
     }
     while (this.assignedFleetDrivers.length > count) {
@@ -134,6 +134,8 @@ export class AddEditTagComponent implements OnInit {
   // Basic field validations (template-driven adds required too)
   private validateFormModel(f: NgForm): string | null {
     const u = this.userDetails;
+    console.log(f, "vendor form   msdf");
+
     if (!f.valid) return 'Please enter all mandatory fields.';
     if (!u.carrierName?.trim()) return 'Carrier Name is required.';
     if (!u.contractId) return 'Contract is required.';
@@ -240,7 +242,7 @@ export class AddEditTagComponent implements OnInit {
         if (!res.status) return;
 
         const v = res.data;
- 
+
         this.userDetails = {
           carrierName: v.vendorName,
           contractId: v.contractDetails?._id,
@@ -253,13 +255,27 @@ export class AddEditTagComponent implements OnInit {
 
         this.form.noOfBuses = v.busesDetails?.length || 0;
 
-        this.assignedFleetDrivers = (v.busesDetails || []).map((b: any, i: number) => ({
-          busId: b._id,
-          driverId: v.driversDetails?.[i]?._id || '',
-          contactNumber: '',
-          driverDocFile: null, // not auto-loaded
-          driverDocUrl: v.driverDocs?.[i]?.fileUrl || ''
-        }));
+        // Correctly map based on the ORDERED buses array, not the unordered busesDetails from lookup
+        const busIds = v.buses || []; // The preserved order of buses
+        const driverIds = v.drivers || []; // The preserved order of drivers
+
+        this.assignedFleetDrivers = busIds.map((busId: string, i: number) => {
+          // Find bus details by ID
+          const busDetail = (v.busesDetails || []).find((b: any) => b._id === busId);
+          const driverId = driverIds[i]; // Matching driver ID at same index
+          const driverDetail = (v.driversDetails || []).find((d: any) => d._id === driverId);
+
+          // Find driver doc by driverID
+          const driverDoc = (v.driverDocs || []).find((doc: any) => doc.driverId === driverId);
+
+          return {
+            busId: busId, // Use the ID from the ordered array
+            driverId: driverId, // Use the ID from the ordered array
+            contactNumber: '', // Will be populated by onDriverSelect or we can find it if driverDetail has it
+            driverDocFile: null,
+            driverDocUrl: driverDoc ? driverDoc.fileUrl : ''
+          };
+        });
 
         setTimeout(() => {
           this.assignedFleetDrivers.forEach((_, i) => this.onDriverSelect(i));
@@ -274,27 +290,27 @@ export class AddEditTagComponent implements OnInit {
   // }
 
   previewDoc() {
-  if (this.userDetails.documentFile) {
-    const fullUrl = this.getFullFileUrl(this.userDetails.documentFile);
-    console.log('Opening file at:', fullUrl);
-    window.open(fullUrl, '_blank');
+    if (this.userDetails.documentFile) {
+      const fullUrl = this.getFullFileUrl(this.userDetails.documentFile);
+      console.log('Opening file at:', fullUrl);
+      window.open(fullUrl, '_blank');
+    }
   }
-}
 
-getFullFileUrl(fileUrl: string): string {
-  if (!fileUrl) return '';
-  
-  // Remove leading './' if present
-  let cleanPath = fileUrl.replace(/^\.\//, '');
-  
-  // Remove leading '/' if present to avoid double slashes
-  cleanPath = cleanPath.replace(/^\//, '');
-  
-  // Ensure apiUrl doesn't end with '/' and add single '/'
-  const baseUrl = this.apiUrl.replace(/\/$/, '');
-  
-  return `${baseUrl}/${cleanPath}`;
-}
+  getFullFileUrl(fileUrl: string): string {
+    if (!fileUrl) return '';
+
+    // Remove leading './' if present
+    let cleanPath = fileUrl.replace(/^\.\//, '');
+
+    // Remove leading '/' if present to avoid double slashes
+    cleanPath = cleanPath.replace(/^\//, '');
+
+    // Ensure apiUrl doesn't end with '/' and add single '/'
+    const baseUrl = this.apiUrl.replace(/\/$/, '');
+
+    return `${baseUrl}/${cleanPath}`;
+  }
 
   downloadDoc() {
     if (!this.userDetails.documentFile) return;
@@ -305,27 +321,27 @@ getFullFileUrl(fileUrl: string): string {
   }
 
   previewDriverDoc(index: number) {
-  const url = this.assignedFleetDrivers[index]?.driverDocUrl;
+    const url = this.assignedFleetDrivers[index]?.driverDocUrl;
 
-  if (!url) {
-    this.notifyService.showError('No driver document available');
-    return;
+    if (!url) {
+      this.notifyService.showError('No driver document available');
+      return;
+    }
+    const fullUrl = this.getFullFileUrl(url);
+    window.open(fullUrl, '_blank');
   }
-  const fullUrl = this.getFullFileUrl(url);
-  window.open(fullUrl, '_blank');
-}
 
 
-previewDriverDocLocal(index: number) {
-  const file = this.assignedFleetDrivers[index]?.driverDocFile;
-  if (!file) {
-    this.notifyService.showError('No driver document selected');
-    return;
+  previewDriverDocLocal(index: number) {
+    const file = this.assignedFleetDrivers[index]?.driverDocFile;
+    if (!file) {
+      this.notifyService.showError('No driver document selected');
+      return;
+    }
+    const objUrl = URL.createObjectURL(file);
+    window.open(objUrl, '_blank');
+    setTimeout(() => URL.revokeObjectURL(objUrl), 60000);
   }
-  const objUrl = URL.createObjectURL(file);
-  window.open(objUrl, '_blank');
-  setTimeout(() => URL.revokeObjectURL(objUrl), 60000);
-}
 
 
 }

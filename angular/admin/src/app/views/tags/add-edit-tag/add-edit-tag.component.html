@@ -3,16 +3,16 @@
   <div class="col-md-4">
     <div class="label_input">
       <label>Carrier Name <span class="mandatory">*</span></label>
-      <input type="text" class="form-control" name="carrierName"
-             [(ngModel)]="userDetails.carrierName" required maxlength="30">
+      <input type="text" class="form-control" name="carrierName" [(ngModel)]="userDetails.carrierName" required
+        maxlength="30">
     </div>
   </div>
 
   <div class="col-md-4">
     <div class="label_input">
       <label>No. of Buses <span class="mandatory">*</span></label>
-      <input type="number" class="form-control" name="noOfBuses"
-             [(ngModel)]="form.noOfBuses" (change)="generateFleetDriverRows()" min="1" required>
+      <input type="number" class="form-control" name="noOfBuses" [(ngModel)]="form.noOfBuses"
+        (change)="generateFleetDriverRows()" min="1" required>
     </div>
   </div>
 
@@ -73,7 +73,8 @@
         </td>
 
         <td>
-          <select class="form-control" [(ngModel)]="row.driverId" name="driver{{i}}" (change)="onDriverSelect(i)" required>
+          <select class="form-control" [(ngModel)]="row.driverId" name="driver{{i}}" (change)="onDriverSelect(i)"
+            required>
             <option value="">Select Driver</option>
             <option *ngFor="let d of drivers" [value]="d._id">{{ d.fullName }}</option>
           </select>
@@ -84,29 +85,21 @@
         </td>
 
         <td>
-  <div class="d-flex gap-2 align-items-center">
-    <input type="file" class="form-control" (change)="uploadDriverDoc($event, i)">
-    <!-- Server-hosted preview -->
-    <button
-      type="button"
-      class="btn btn-sm btn-primary"
-      *ngIf="assignedFleetDrivers[i]?.driverDocUrl"
-      (click)="previewDriverDoc(i)"
-    >
-      Preview
-    </button>
-    <!-- Fallback preview for freshly selected file (not yet uploaded) -->
-    <button
-      type="button"
-      class="btn btn-sm btn-secondary"
-      *ngIf="!assignedFleetDrivers[i]?.driverDocUrl && assignedFleetDrivers[i]?.driverDocFile"
-      (click)="previewDriverDocLocal(i)"
-      title="Local preview (not uploaded)"
-    >
-      Preview
-    </button>
-  </div>
-</td>
+          <div class="d-flex gap-2 align-items-center">
+            <input type="file" class="form-control" (change)="uploadDriverDoc($event, i)">
+            <!-- Server-hosted preview -->
+            <button type="button" class="btn btn-sm btn-primary" *ngIf="assignedFleetDrivers[i]?.driverDocUrl"
+              (click)="previewDriverDoc(i)">
+              Preview
+            </button>
+            <!-- Fallback preview for freshly selected file (not yet uploaded) -->
+            <button type="button" class="btn btn-sm btn-secondary"
+              *ngIf="!assignedFleetDrivers[i]?.driverDocUrl && assignedFleetDrivers[i]?.driverDocFile"
+              (click)="previewDriverDocLocal(i)" title="Local preview (not uploaded)">
+              Preview
+            </button>
+          </div>
+        </td>
 
       </tr>
     </tbody>
@@ -123,8 +116,7 @@
     <label>Document Type <span class="mandatory">*</span></label>
     <select class="form-control" [(ngModel)]="userDetails.documentType" name="documentType" required>
       <option value="">Select Type</option>
-      <option value="PDF">PDF</option>
-      <option value="DOC">DOC</option>
+      <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
     </select>
   </div>
 
