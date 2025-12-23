@@ -59,6 +59,9 @@ export class ActiveEmployeesComponent implements OnInit {
 
   // --- New method to filter employees for the active tab ---
   getEmployeesForTab(roleKey: string): any[] {
+    if (roleKey === 'Staff') {
+      return this.allEmployees;
+    }
     return this.allEmployees.filter(e => e.role === roleKey);
   }
 
