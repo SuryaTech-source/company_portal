@@ -272,7 +272,7 @@ module.exports = function () {
         nominee: body.nominee ? JSON.parse(body.nominee) : {},
         visaExpiry: body.visaExpiry ? new Date(body.visaExpiry) : null,
         licenseNo: body.licenseNo || null,
-        role: body.role || "Staff",
+        role: body.designation || "Staff",
         status: Number(body.status) || 1,
 
         civilId: body.civilId,
