@@ -35,7 +35,7 @@ EMPLOYEE_SCHEMA.EMPLOYEE = {
   licenseNo: String,
   licenseExpiry: Date,
 
-  role: { type: String, enum: ["Driver", "Staff","Mecahnic","Maid","Others"], required: true },
+  role: { type: String, enum: ["Driver", "Staff", "Mechanic", "Maid", "Supervisor", "Others"], required: true },
 
   documents: [{
     documentType: String,

@@ -18,11 +18,12 @@ export class ActiveEmployeesComponent implements OnInit {
     { key: 'Staff', display: 'Employees' },
     { key: 'Mechanic', display: 'Mechanics' },
     { key: 'Maid', display: 'Maids' },
+    { key: 'Supervisor', display: 'Supervisors' },
     { key: 'Others', display: 'Others' }
   ];
   activeTab: string = 'Staff'; // Default to 'Employees' (Staff)
   loading = false;
-  
+
   // Statistics
   stats: { [key: string]: { total: number, active?: number, inactive?: number, deployed?: number, vacation?: number } } = {};
 
@@ -30,12 +31,12 @@ export class ActiveEmployeesComponent implements OnInit {
     private apiService: ApiService,
     private notify: NotificationService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getAllEmployees();
   }
-  
+
   // --- Replaces getEmployees() and getDrivers() with a single call ---
   getAllEmployees(): void {
     this.loading = true;
@@ -64,7 +65,7 @@ export class ActiveEmployeesComponent implements OnInit {
   calculateStats(): void {
     this.roles.forEach(role => {
       const employeesForRole = this.getEmployeesForTab(role.key);
-      
+
       const total = employeesForRole.length;
       if (role.key === 'Driver') {
         this.stats[role.key] = {
@@ -74,11 +75,11 @@ export class ActiveEmployeesComponent implements OnInit {
           vacation: employeesForRole.filter(e => e.status === 'vacation').length,
         };
       } else {
-         this.stats[role.key] = {
-           total: total,
-           active: employeesForRole.filter(e => e.status === 1).length,
-           inactive: employeesForRole.filter(e => e.status === 2).length,
-         };
+        this.stats[role.key] = {
+          total: total,
+          active: employeesForRole.filter(e => e.status === 1).length,
+          inactive: employeesForRole.filter(e => e.status === 2).length,
+        };
       }
     });
   }
@@ -135,7 +136,7 @@ export class ActiveEmployeesComponent implements OnInit {
   editEmployee(employee: any): void {
     this.router.navigate(['/app/employees/edit', employee._id]);
   }
-  
+
   // --- New navigation method for salary view ---
   viewSalary(employee: any): void {
     this.router.navigate(['/app/employees/salary-view', employee._id]);
