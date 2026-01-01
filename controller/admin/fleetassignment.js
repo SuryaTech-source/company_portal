@@ -90,15 +90,15 @@ module.exports = function () {
    */
   controller.unassignFleet = async function (req, res) {
     try {
-      const { id, odometerReadingEnd, remarks } = req.body;
+      const { assignmentId, odometerReadingEnd, remarks } = req.body;
 
-      if (!id) return res.send({ status: false, message: "Assignment ID required" });
+      if (!assignmentId) return res.send({ status: false, message: "Assignment ID required" });
 
       const now = new Date();
 
       const result = await db.UpdateDocument(
         "fleetAssignment",
-        { _id: new mongoose.Types.ObjectId(id) },
+        { _id: new mongoose.Types.ObjectId(assignmentId) },
         {
           status: 2,
           dateUnassigned: now,

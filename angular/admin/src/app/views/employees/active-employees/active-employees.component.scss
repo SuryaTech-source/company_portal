@@ -111,3 +111,44 @@
         background: linear-gradient(135deg, #ef4444, #dc2626); // Red
     }
 }
+
+.logout_modal {
+    .h4_close {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        /* Helper for vertical alignment */
+    }
+
+    h4 {
+
+        font-weight: 900;
+        color: #1d1c1d;
+        font-size: 20px;
+    }
+
+    h6 {
+        font-size: 15px;
+        color: #1d1c1d;
+        margin: 20px 0;
+        font-weight: 500;
+    }
+
+    .modal-footer {
+        button:nth-child(1) {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 8px 30px;
+            margin-right: 10px;
+            font-weight: 700;
+        }
+
+        button:nth-child(2) {
+            background-color: #e01e5a;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 8px 30px;
+            font-weight: 700;
+        }
+    }
+}

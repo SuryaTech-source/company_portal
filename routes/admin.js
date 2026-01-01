@@ -1416,6 +1416,11 @@ module.exports = function (app, io) {
     );
     app.post("/admin/employee/view", ensureAuthorized, employee.viewemployee);
     app.post("/admin/employee/list", ensureAuthorized, employee.listEmployees);
+    app.post(
+      "/admin/employee/delete",
+      ensureAuthorized,
+      employee.deleteEmployee
+    );
 
     //vendor management
     app.post(
@@ -1458,7 +1463,7 @@ module.exports = function (app, io) {
       fuel.driverPerformanceChart
     );
 
-  
+
 
     //maintenance management
     app.post(
@@ -1593,7 +1598,7 @@ module.exports = function (app, io) {
     );
 
     //alert management
-    app.post( "/admin/alerts/list", ensureAuthorized, alertController.listAlerts );
+    app.post("/admin/alerts/list", ensureAuthorized, alertController.listAlerts);
   } catch (e) {
     console.log("erroe in index.js---------->>>>", e);
   }

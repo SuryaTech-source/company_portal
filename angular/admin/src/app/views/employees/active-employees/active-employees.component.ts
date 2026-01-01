@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { Router } from '@angular/router';
 import html2pdf from 'html2pdf.js';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-active-employees',
@@ -27,10 +28,14 @@ export class ActiveEmployeesComponent implements OnInit {
   // Statistics
   stats: { [key: string]: { total: number, active?: number, inactive?: number, deployed?: number, vacation?: number } } = {};
 
+  modalRef: BsModalRef;
+  deleteEmployeeData: any;
+
   constructor(
     private apiService: ApiService,
     private notify: NotificationService,
-    private router: Router
+    private router: Router,
+    private modalService: BsModalService
   ) { }
 
   ngOnInit(): void {
@@ -143,5 +148,38 @@ export class ActiveEmployeesComponent implements OnInit {
   // --- New navigation method for salary view ---
   viewSalary(employee: any): void {
     this.router.navigate(['/app/employees/salary-view', employee._id]);
+  }
+
+  openDeleteModal(template: TemplateRef<any>, employee: any) {
+    this.deleteEmployeeData = employee;
+    this.modalRef = this.modalService.show(template, { class: 'modal-md' });
+  }
+
+  closeModal() {
+    this.modalRef.hide();
+    this.deleteEmployeeData = null;
+  }
+
+  confirmDelete(): void {
+    if (this.deleteEmployeeData && this.deleteEmployeeData._id) {
+      this.apiService.CommonApi(Apiconfig.deleteEmployee.method, Apiconfig.deleteEmployee.url, { id: this.deleteEmployeeData._id })
+        .subscribe(
+          (res: any) => {
+            if (res && res.status) {
+              this.notify.showSuccess(res.message);
+              // Optimistically remove from list or refresh
+              this.allEmployees = this.allEmployees.filter(e => e._id !== this.deleteEmployeeData._id);
+              this.calculateStats();
+              this.closeModal();
+            } else {
+              this.notify.showError(res.message);
+            }
+          },
+          (error) => {
+            console.error('Error deleting employee:', error);
+            this.notify.showError("Failed to delete employee.");
+          }
+        );
+    }
   }
 }

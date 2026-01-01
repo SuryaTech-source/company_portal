@@ -1,9 +1,8 @@
 <div class="employees-active_employees">
   <!-- Dynamic Tabs -->
   <div class="driver_employees">
-    <button *ngFor="let role of roles" 
-            [ngClass]="{'active': activeTab === role.key, 'inactive': activeTab !== role.key}"
-            (click)="switchTab(role.key)">
+    <button *ngFor="let role of roles"
+      [ngClass]="{'active': activeTab === role.key, 'inactive': activeTab !== role.key}" (click)="switchTab(role.key)">
       {{ role.display | uppercase }}{{role.total !== undefined ? ' (' + role.total + ')' : ''}}
     </button>
   </div>
@@ -13,11 +12,26 @@
     <div *ngIf="activeTab === role.key">
       <!-- Stat Cards -->
       <div class="row text-center mb-4">
-        <div class="col-md-4"><div class="stat-card total"><h5>Total {{role.display}}</h5><h3>{{ stats[role.key]?.total || 0 }}</h3></div></div>
-        <div class="col-md-4"><div class="stat-card deployed"><h5>{{ role.key === 'Driver' ? 'Deployed' : 'Active' }}</h5><h3>{{ (role.key === 'Driver' ? stats[role.key]?.deployed : stats[role.key]?.active) || 0 }}</h3></div></div>
-        <div class="col-md-4"><div class="stat-card vacation"><h5>{{ role.key === 'Driver' ? 'On Vacation' : 'Inactive' }}</h5><h3>{{ (role.key === 'Driver' ? stats[role.key]?.vacation : stats[role.key]?.inactive) || 0 }}</h3></div></div>
+        <div class="col-md-4">
+          <div class="stat-card total">
+            <h5>Total {{role.display}}</h5>
+            <h3>{{ stats[role.key]?.total || 0 }}</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card deployed">
+            <h5>{{ role.key === 'Driver' ? 'Deployed' : 'Active' }}</h5>
+            <h3>{{ (role.key === 'Driver' ? stats[role.key]?.deployed : stats[role.key]?.active) || 0 }}</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card vacation">
+            <h5>{{ role.key === 'Driver' ? 'On Vacation' : 'Inactive' }}</h5>
+            <h3>{{ (role.key === 'Driver' ? stats[role.key]?.vacation : stats[role.key]?.inactive) || 0 }}</h3>
+          </div>
+        </div>
       </div>
-      
+
       <!-- Table -->
       <div [id]="role.key + 'Table'" class="table_section">
         <table class="table table-bordered table-striped text-center">
@@ -50,7 +64,8 @@
                 <button class="btn btn-sm btn-info mr-1" (click)="viewEmployee(emp)">View</button>
                 <button class="btn btn-sm btn-warning mr-1" (click)="editEmployee(emp)">Edit</button>
                 <!-- New Salary View Button -->
-                <button class="btn btn-sm btn-success" (click)="viewSalary(emp)">Salary</button>
+                <button class="btn btn-sm btn-success mr-1" (click)="viewSalary(emp)">Salary</button>
+                <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, emp)">Delete</button>
               </td>
             </tr>
             <tr *ngIf="getEmployeesForTab(role.key).length === 0">
@@ -69,3 +84,25 @@
     <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>
   </div>
 </div>
+
+<ng-template #deletePopup>
+  <div class="logout_modal">
+    <div class="modal-body login-body">
+      <div class="h4_close">
+        <h4>Delete Employee</h4>
+        <div (click)="closeModal()" style="cursor: pointer" title="close the popup" class="pop_cls_btn">
+          &#10006;
+        </div>
+      </div>
+      <h6 class="modal-title">Are you sure you want to delete {{ deleteEmployeeData?.fullName }}?</h6>
+    </div>
+    <div class="modal-footer border-0">
+      <button type="button" (click)="closeModal()" class="btn cancel-btn">
+        Cancel
+      </button>
+      <button type="button" (click)="confirmDelete()" class="btn btn-danger">
+        Delete
+      </button>
+    </div>
+  </div>
+</ng-template>

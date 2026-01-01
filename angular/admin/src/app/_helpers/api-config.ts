@@ -52,100 +52,104 @@ export const Apiconfig = {
         "method": "post"
     },
 
-    addFleets:{
+    addFleets: {
         "url": "admin/fleet/save",
         "method": "post"
     },
-    viewFleets:{
+    viewFleets: {
         "url": "admin/fleet/view",
         "method": "post"
     },
 
-    listFleets:{
+    listFleets: {
         "url": "admin/fleet/list",
         "method": "post"
     },
 
-    fleetassignments:{
+    fleetassignments: {
         "url": "admin/fleet/assignment/assign",
         "method": "post"
     },
 
-    fleetunassignments:{
+    fleetunassignments: {
         "url": "admin/fleet/assignment/unassign",
         "method": "post"
     },
-    listfleetassignments:{
+    listfleetassignments: {
         "url": "admin/fleet/assignment/list",
         "method": "post"
     },
-    fleetassignmentcount:{
+    fleetassignmentcount: {
         "url": "admin/fleet/assignment/assignment-stats",
         "method": "post"
     },
 
-    alertList:{
+    alertList: {
         "url": "admin/alerts/list",
         "method": "post"
     },
 
-   listFuels:{
+    listFuels: {
         "url": "admin/fuel/list",
         "method": "post"
     },
-    saveFuel:{
+    saveFuel: {
         "url": "admin/fuel/save",
         "method": "post"
     },
-   fuelUsageAnalytics:{
+    fuelUsageAnalytics: {
         "url": "admin/fuel/fuel-stats",
         "method": "post"
     },
 
-    fuelEfficiencyAnalytics:{
+    fuelEfficiencyAnalytics: {
         "url": "admin/fuel/fuel-efficieny",
         "method": "post"
     },
-    costPerKmAnalytics:{
+    costPerKmAnalytics: {
         "url": "admin/fuel/cost-per-km",
         "method": "post"
     },
 
 
-    driverPerformanceChart:{
+    driverPerformanceChart: {
         "url": "admin/performance/driver-performance-chart",
         "method": "post"
     },
 
-    saveContract:{
+    saveContract: {
         "url": "admin/contract/save",
         "method": "post"
     },
     contractListActive: {
-  method: 'post',
-  url: 'admin/contract/active-list'
-},
+        method: 'post',
+        url: 'admin/contract/active-list'
+    },
 
 
-deleteContract:{
+    deleteContract: {
         "url": "admin/contract/delete",
         "method": "post"
     },
 
-    listContracts:{
+    listContracts: {
         "url": "admin/contract/list",
         "method": "post"
     },
-    viewContract:{
+    viewContract: {
         "url": "admin/contract/view",
         "method": "post"
     },
 
-    listEmployees:{
+    listEmployees: {
         "url": "admin/employee/list",
         "method": "post",
     },
-    saveEmployee:{
+    deleteEmployee: {
+        "url": "admin/employee/delete",
+        "method": "post"
+    },
+    saveEmployee: {
         "url": "admin/employee/save",
         "method": "post"
     },
@@ -162,7 +166,7 @@ deleteContract:{
         "url": "admin/vendor/view",
         "method": "post"
     },
-    viewEmployee:{
+    viewEmployee: {
         "url": "admin/employee/view",
         "method": "post"
     },
@@ -188,7 +192,7 @@ deleteContract:{
         "method": "post"
     },
 
-  saveVendorPayment: {
+    saveVendorPayment: {
         "url": "admin/vendor/payment/save",
         "method": "post"
 
@@ -224,7 +228,7 @@ deleteContract:{
         "method": "post"
     },
 
-  addInvoice: {
+    addInvoice: {
         "url": "admin/invoice/add",
         "method": "post"
     },
@@ -245,7 +249,7 @@ deleteContract:{
         "method": "post"
     },
 
-    listInvoicesByContract:{
+    listInvoicesByContract: {
         "url": "admin/invoice/invoice-contract",
         "method": "post"
     },
@@ -259,21 +263,21 @@ deleteContract:{
         "method": "post"
     },
 
-   generateSalaryForEmployee:{
+    generateSalaryForEmployee: {
         "url": "admin/salary/generate",
         "method": "post"
     },
-    salaryEdit:{
+    salaryEdit: {
         "url": "admin/salary/edit",
         "method": "post"
 
     },
-    listSalariesOfEmployee:{
+    listSalariesOfEmployee: {
         "url": "admin/salaries/employee-list",
         "method": "post"
     },
 
-   
+
 
 
 
@@ -1565,7 +1569,7 @@ deleteContract:{
     salesReport: {
         "url": "admin/sales/report",
         "method": "post"
-        
+
     },
 
 }

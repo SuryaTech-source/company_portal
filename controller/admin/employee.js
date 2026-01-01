@@ -522,5 +522,40 @@ module.exports = function () {
     }
   };
 
+  /**
+   * @route POST /employee/delete
+   * @desc Soft delete employee (status = 0)
+   */
+  controller.deleteEmployee = async function (req, res) {
+    try {
+      const { id } = req.body;
+      if (!id) {
+        return res.send({
+          status: false,
+          message: "Employee ID is required",
+        });
+      }
+
+      const result = await db.UpdateDocument(
+        "employee",
+        { _id: new mongoose.Types.ObjectId(id) },
+        { status: 0 },
+        {}
+      );
+
+      return res.send({
+        status: true,
+        message: "Employee deleted successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.log(error, "ERROR deleteEmployee");
+      return res.send({
+        status: false,
+        message: "Something went wrong while deleting employee.",
+      });
+    }
+  };
+
   return controller;
 };
