@@ -24,33 +24,33 @@ export class ReportlistComponent implements OnInit {
   customerPayments: any[] = [];
   vendorPayments: any[] = [];
   clients: any[] = [];
-vendors: any[] = [];
-contracts: any[] = [];
-filteredContracts = [];
+  vendors: any[] = [];
+  contracts: any[] = [];
+  filteredContracts = [];
 
-invoices: any[] = [];
+  invoices: any[] = [];
   // Modal
   showModal = false;
   form: any = {
-  client: '',
-  contractId: '',
-  invoiceRef: '',
-  dueDate: '',
-  nextPaymentDue: '',
-  amountPaid: '',
-  status: 'Unpaid',
-  remarks: ''
-};
-;
+    client: '',
+    contractId: '',
+    invoiceRef: '',
+    dueDate: '',
+    nextPaymentDue: '',
+    amountPaid: '',
+    status: 'Unpaid',
+    remarks: ''
+  };
+  ;
   editData: any = null;
   // inside class ReportlistComponent
-selectedDate: string = new Date().toISOString().split('T')[0]; // default today
-selectedEmployees: string[] = []; // for bulk
+  selectedDate: string = new Date().toISOString().split('T')[0]; // default today
+  selectedEmployees: string[] = []; // for bulk
 
 
   @ViewChild('tableContent', { static: false }) tableContent!: ElementRef;
 
-  constructor(private apiService: ApiService, private notification:NotificationService) {}
+  constructor(private apiService: ApiService, private notification: NotificationService) { }
 
   ngOnInit(): void {
     this.loadRecords();
@@ -59,7 +59,7 @@ selectedEmployees: string[] = []; // for bulk
   // 🔹 Load records dynamically depending on tab
   loadRecords() {
     if (this.activeTab === 'attendance') {
-      this.apiService.CommonApi(Apiconfig.listAttendance.method, Apiconfig.listAttendance.url, {})
+      this.apiService.CommonApi(Apiconfig.listAttendance.method, Apiconfig.listAttendance.url, { date: this.selectedDate })
         .subscribe((res: any) => {
           if (res.status) this.attendanceData = res.data;
         });
@@ -75,28 +75,28 @@ selectedEmployees: string[] = []; // for bulk
         });
     }
 
-  // this.loadInvoices()
-  // this.loadContracts()
-  this.loadVendors()
-  this.getActiveContracts()
+    // this.loadInvoices()
+    // this.loadContracts()
+    this.loadVendors()
+    this.getActiveContracts()
   }
 
-//   loadInvoices() {
-//   this.apiService.CommonApi(Apiconfig.listInvoices.method, Apiconfig.listInvoices.url, { limit: 100 })
-//     .subscribe((res: any) => { if (res.status) this.invoices = res.data || []; });
-// }
+  //   loadInvoices() {
+  //   this.apiService.CommonApi(Apiconfig.listInvoices.method, Apiconfig.listInvoices.url, { limit: 100 })
+  //     .subscribe((res: any) => { if (res.status) this.invoices = res.data || []; });
+  // }
 
 
-loadVendors() {
-  this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, {})
-    .subscribe((res: any) => { if (res.status) this.vendors = res.data || []; });
-}
+  loadVendors() {
+    this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, {})
+      .subscribe((res: any) => { if (res.status) this.vendors = res.data || []; });
+  }
 
 
-loadContracts() {
-  this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
-    .subscribe((res: any) => { if (res.status) this.contracts = res.data.doc || []; });
-}
+  loadContracts() {
+    this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
+      .subscribe((res: any) => { if (res.status) this.contracts = res.data.doc || []; });
+  }
   // 🔹 Dynamic Filters & Sort
   get filterOptions() {
     if (this.activeTab === 'attendance') {
@@ -184,41 +184,41 @@ loadContracts() {
   }
 
   // 🔹 Modal
-openModal(row: any = null) {
-  this.showModal = true;
-  this.editData = row;
+  openModal(row: any = null) {
+    this.showModal = true;
+    this.editData = row;
 
-  if (this.activeTab === 'customers') {
-    this.form = row ? {
-      _id: row._id,
-      client: row.client || row.clientId || '',             // must be client _id
-      contractId: row.contractId || '',                     // contractId (string from API) or _id if you provided both
-      contractRef: row.contractRef?._id || row.contractRef || row.contractRefId || '', // prefer _id of contract
-      invoiceNo: row.invoiceNo || '',
-      invoiceRef: row.invoiceRef || '',
-      dueDate: row.dueDate ? row.dueDate.split('T')[0] : '',
-      amountPaid: row.amountPaid || 0,
-      status: row.status || 'Unpaid',
-      balance: row.balance || 0,
-      remarks: row.remarks || ''
-    } : { client: '', contractId: '', invoiceNo: '', invoiceRef: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
-  } else if (this.activeTab === 'vendors') {
-    this.form = row ? {
-      _id: row._id,
-      vendor: row.vendor || '',
-      contractId: row.contractId || '',
-      contractRef: row.contractRef || '',
-      invoiceNo: row.invoiceNo || '',
-      invoiceRef: row.invoiceRef || '',
-      dueDate: row.dueDate ? row.dueDate.split('T')[0] : '',
-      nextPaymentDue: row.nextPaymentDue ? row.nextPaymentDue.split('T')[0] : '',
-      amountPaid: row.amountPaid || 0,
-      status: row.status || 'Unpaid',
-      balance: row.balance || 0,
-      remarks: row.remarks || ''
-    } : { vendor: '', contractId: '', invoiceNo: '', invoiceRef: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
-  } else { /* attendance form remains same */ }
-}
+    if (this.activeTab === 'customers') {
+      this.form = row ? {
+        _id: row._id,
+        client: row.client || row.clientId || '',             // must be client _id
+        contractId: row.contractId || '',                     // contractId (string from API) or _id if you provided both
+        contractRef: row.contractRef?._id || row.contractRef || row.contractRefId || '', // prefer _id of contract
+        invoiceNo: row.invoiceNo || '',
+        invoiceRef: row.invoiceRef || '',
+        dueDate: row.dueDate ? row.dueDate.split('T')[0] : '',
+        amountPaid: row.amountPaid || 0,
+        status: row.status || 'Unpaid',
+        balance: row.balance || 0,
+        remarks: row.remarks || ''
+      } : { client: '', contractId: '', invoiceNo: '', invoiceRef: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
+    } else if (this.activeTab === 'vendors') {
+      this.form = row ? {
+        _id: row._id,
+        vendor: row.vendor || '',
+        contractId: row.contractId || '',
+        contractRef: row.contractRef || '',
+        invoiceNo: row.invoiceNo || '',
+        invoiceRef: row.invoiceRef || '',
+        dueDate: row.dueDate ? row.dueDate.split('T')[0] : '',
+        nextPaymentDue: row.nextPaymentDue ? row.nextPaymentDue.split('T')[0] : '',
+        amountPaid: row.amountPaid || 0,
+        status: row.status || 'Unpaid',
+        balance: row.balance || 0,
+        remarks: row.remarks || ''
+      } : { vendor: '', contractId: '', invoiceNo: '', invoiceRef: '', dueDate: '', amountPaid: 0, status: 'Unpaid', balance: 0, remarks: '' };
+    } else { /* attendance form remains same */ }
+  }
 
 
   closeModal() {
@@ -251,7 +251,7 @@ openModal(row: any = null) {
     });
   }
 
-  
+
   // 🔹 Export PDF
   downloadPDF() {
     const element = this.tableContent.nativeElement;
@@ -266,23 +266,17 @@ openModal(row: any = null) {
   }
 
   // load attendance for date
-loadAttendanceByDate() {
-  this.apiService.CommonApi(
-    Apiconfig.listAttendance.method,
-    Apiconfig.listAttendance.url,
-    { date: this.selectedDate }
-  ).subscribe((res: any) => {
-    if (res.status) {
-      this.attendanceData = res.data.map((e: any) => ({
-        employeeId: e.employeeData?._id,
-        employeeName: e.employeeData?.fullName,
-        idNo: e.employeeData?.employeeId,
-        status: e.status || 'A',
-        remarks: e.remarks || '',
-      }));
-    }
-  });
-}
+  loadAttendanceByDate() {
+    this.apiService.CommonApi(
+      Apiconfig.listAttendance.method,
+      Apiconfig.listAttendance.url,
+      { date: this.selectedDate }
+    ).subscribe((res: any) => {
+      if (res.status) {
+        this.attendanceData = res.data;
+      }
+    });
+  }
 
   getActiveContracts() {
     this.apiService.CommonApi(
@@ -293,140 +287,140 @@ loadAttendanceByDate() {
       if (res.status && res.data) {
         this.contracts = res.data.doc; // contains {_id, clientName,...}
         const allContracts = res.data.doc || [];
-         this.clients = [...new Map(allContracts.map(x => [x.clientName, x])).values()];
+        this.clients = [...new Map(allContracts.map(x => [x.clientName, x])).values()];
       }
     });
   }
 
 
-onClientSelect() {
-  const clientName = this.form.client; // comes from ngModel
-   console.log(clientName,"clientName");
-   
-  this.filteredContracts = this.contracts.filter(
-    c => c.clientName === clientName
-  );
+  onClientSelect() {
+    const clientName = this.form.client; // comes from ngModel
+    console.log(clientName, "clientName");
 
-  // Reset dependent fields
-  this.form.contractId = "";
-  this.form.invoiceRef = "";
-  this.invoices = [];
-}
-onContractChange() {
-  const contract = this.filteredContracts.find(c => c._id === this.form.contractId);
-  if (contract) {
-    this.loadInvoices(contract);
+    this.filteredContracts = this.contracts.filter(
+      c => c.clientName === clientName
+    );
+
+    // Reset dependent fields
+    this.form.contractId = "";
+    this.form.invoiceRef = "";
+    this.invoices = [];
   }
-}
-loadInvoices(contract: any) {
-  this.form.contractId = contract._id;
-  this.form.clientName = contract.clientName;
-
-  this.apiService.CommonApi(
-    Apiconfig.listInvoicesByContract.method,
-    Apiconfig.listInvoicesByContract.url,
-    { contract: contract._id }
-  ).subscribe((res:any) => {
-    this.invoices = res.data || [];
-  });
-}
-
-onInvoiceSelect() {
-  const selectedInvoice = this.invoices.find(
-    inv => inv._id === this.form.invoiceRef
-  );
-
-  if (selectedInvoice) {
-    this.form.invoiceNo = selectedInvoice.invoiceNo; // ✅ store invoice number
-  } else {
-    this.form.invoiceNo = "";
-  }
-}
-
-
-// mark/update single attendance
-updateAttendance(row: any) {
-
-  const payload = {
-    employee: row.employeeRefId,
-    date: this.selectedDate,
-    status: row.status,
-    remarks: row.remarks,
-  };
-
-  this.apiService.CommonApi(
-    Apiconfig.saveAttendance.method,
-    Apiconfig.saveAttendance.url,
-    payload
-  ).subscribe((res: any) => {
-    if (res.status) {
-      this.notification.showSuccess(`Attendance updated for ${row.employeeName}`);
-    } else {
-      this.notification.showError(res.message || 'Error updating attendance');
+  onContractChange() {
+    const contract = this.filteredContracts.find(c => c._id === this.form.contractId);
+    if (contract) {
+      this.loadInvoices(contract);
     }
-  });
-}
-
-// toggle single employee in selection
-toggleEmployee(empId: string, event: any) {
-  if (event.target.checked) {
-    this.selectedEmployees.push(empId);
-  } else {
-    this.selectedEmployees = this.selectedEmployees.filter((id) => id !== empId);
   }
-}
+  loadInvoices(contract: any) {
+    this.form.contractId = contract._id;
+    this.form.clientName = contract.clientName;
 
-// check/uncheck all
-toggleSelectAll(event: any) {
-  if (event.target.checked) {
-    this.selectedEmployees = this.attendanceData.map((e) => e.employeeId);
-  } else {
-    this.selectedEmployees = [];
+    this.apiService.CommonApi(
+      Apiconfig.listInvoicesByContract.method,
+      Apiconfig.listInvoicesByContract.url,
+      { contract: contract._id }
+    ).subscribe((res: any) => {
+      this.invoices = res.data || [];
+    });
   }
-}
-isAllSelected() {
-  return (
-    this.attendanceData.length > 0 &&
-    this.selectedEmployees.length === this.attendanceData.length
-  );
-}
 
+  onInvoiceSelect() {
+    const selectedInvoice = this.invoices.find(
+      inv => inv._id === this.form.invoiceRef
+    );
 
-markAllPresentToday() {
-  this.apiService.CommonApi(
-    Apiconfig.markallAttendance.method,
-    Apiconfig.markallAttendance.url,
-    {}
-  ).subscribe((res: any) => {
-    if (res.status) {
-      this.notification.showSuccess('All employees marked present for today');
-      this.loadRecords(); // refresh attendance list
+    if (selectedInvoice) {
+      this.form.invoiceNo = selectedInvoice.invoiceNo; // ✅ store invoice number
     } else {
-      this.notification.showError(res.message || 'Error marking attendance');
+      this.form.invoiceNo = "";
     }
-  });
-}
+  }
 
-// bulk mark attendance
-bulkMarkAttendance(status: 'P' | 'A' | 'L') {
-  const payload = {
-    employeeIds: this.selectedEmployees,
-    date: this.selectedDate,
-    status,
-  };
 
-  this.apiService.CommonApi(
-    Apiconfig.bulkMarkAttendance.method,
-    Apiconfig.bulkMarkAttendance.url,
-    payload
-  ).subscribe((res: any) => {
-    if (res.status) {
-      this.notification.showSuccess('Bulk attendance updated');
-      this.loadAttendanceByDate();
+  // mark/update single attendance
+  updateAttendance(row: any) {
+
+    const payload = {
+      employee: row.employeeRefId,
+      date: this.selectedDate,
+      status: row.status,
+      remarks: row.remarks,
+    };
+
+    this.apiService.CommonApi(
+      Apiconfig.saveAttendance.method,
+      Apiconfig.saveAttendance.url,
+      payload
+    ).subscribe((res: any) => {
+      if (res.status) {
+        this.notification.showSuccess(`Attendance updated for ${row.employeeName}`);
+      } else {
+        this.notification.showError(res.message || 'Error updating attendance');
+      }
+    });
+  }
+
+  // toggle single employee in selection
+  toggleEmployee(empId: string, event: any) {
+    if (event.target.checked) {
+      this.selectedEmployees.push(empId);
+    } else {
+      this.selectedEmployees = this.selectedEmployees.filter((id) => id !== empId);
+    }
+  }
+
+  // check/uncheck all
+  toggleSelectAll(event: any) {
+    if (event.target.checked) {
+      this.selectedEmployees = this.attendanceData.map((e) => e.employeeRefId);
+    } else {
       this.selectedEmployees = [];
-    } else {
-      this.notification.showError(res.message || 'Error marking attendance');
     }
-  });
-}
+  }
+  isAllSelected() {
+    return (
+      this.attendanceData.length > 0 &&
+      this.selectedEmployees.length === this.attendanceData.length
+    );
+  }
+
+
+  markAllPresentToday() {
+    this.apiService.CommonApi(
+      Apiconfig.markallAttendance.method,
+      Apiconfig.markallAttendance.url,
+      { date: this.selectedDate }
+    ).subscribe((res: any) => {
+      if (res.status) {
+        this.notification.showSuccess('All employees marked present for today');
+        this.loadRecords(); // refresh attendance list
+      } else {
+        this.notification.showError(res.message || 'Error marking attendance');
+      }
+    });
+  }
+
+  // bulk mark attendance
+  bulkMarkAttendance(status: 'P' | 'A' | 'L') {
+    const payload = {
+      employeeIds: this.selectedEmployees,
+      date: this.selectedDate,
+      status,
+    };
+
+    this.apiService.CommonApi(
+      Apiconfig.bulkMarkAttendance.method,
+      Apiconfig.bulkMarkAttendance.url,
+      payload
+    ).subscribe((res: any) => {
+      if (res.status) {
+        this.notification.showSuccess('Bulk attendance updated');
+        this.loadAttendanceByDate();
+        this.selectedEmployees = [];
+      } else {
+        this.notification.showError(res.message || 'Error marking attendance');
+      }
+    });
+  }
 }

@@ -116,12 +116,13 @@ module.exports = function () {
           arrayFilters: [{ "elem.date": targetDate }],
           new: true,
         };
-        await db.UpdateDocumentWithOptions(
+        await db.UpdateDocument(
           "attendance",
           { employee: employeeId },
           updateQuery,
           options
         );
+
         return res.send({
           status: true,
           message: "Attendance updated successfully",
@@ -158,6 +159,7 @@ module.exports = function () {
         status,
         startDate,
         endDate,
+        date, // ✅ single date support
         sortBy,
         sortOrder = "desc",
       } = req.body;
@@ -166,11 +168,13 @@ module.exports = function () {
 
       // 🔹 Sorting
       let sort = {};
-      if (sortBy === "date")
+      if (sortBy === "date") {
         sort["records.date"] = sortOrder === "asc" ? 1 : -1;
-      else if (sortBy === "employee")
+      } else if (sortBy === "employee") {
         sort["employeeData.fullName"] = sortOrder === "asc" ? 1 : -1;
-      else sort["records.date"] = -1; // default: latest date first
+      } else {
+        sort["records.date"] = -1; // default
+      }
 
       // 🔹 Base pipeline
       let pipeline = [
@@ -183,54 +187,88 @@ module.exports = function () {
           },
         },
         {
-          $unwind: { path: "$employeeData", preserveNullAndEmptyArrays: true },
+          $unwind: {
+            path: "$employeeData",
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $unwind: {
             path: "$records",
-            preserveNullAndEmptyArrays: true, // ✅ Keeps employees even if records is []
+            preserveNullAndEmptyArrays: true,
           },
         },
       ];
 
       // 🔹 Match filters
       let match = {};
+
       if (search) {
         match.$or = [
           { "records.remarks": { $regex: search, $options: "i" } },
           { "employeeData.fullName": { $regex: search, $options: "i" } },
         ];
       }
-      if (status) match["records.status"] = status;
-      if (startDate && endDate) {
-        match["records.date"] = {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate),
-        };
-      }
-      if (Object.keys(match).length > 0) pipeline.push({ $match: match });
 
-      // 🔹 Project
+      if (status) {
+        match["records.status"] = status;
+      }
+
+      // 🔹 Date filtering logic
+      if (date) {
+        // Single date
+        const dayStart = new Date(date);
+        dayStart.setHours(0, 0, 0, 0);
+
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        match["records.date"] = { $gte: dayStart, $lte: dayEnd };
+      } else if (startDate && endDate) {
+        // Date range
+        const rangeStart = new Date(startDate);
+        rangeStart.setHours(0, 0, 0, 0);
+
+        const rangeEnd = new Date(endDate);
+        rangeEnd.setHours(23, 59, 59, 999);
+
+        match["records.date"] = { $gte: rangeStart, $lte: rangeEnd };
+      } else {
+        // Default → today
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+
+        match["records.date"] = { $gte: todayStart, $lte: todayEnd };
+      }
+
+      if (Object.keys(match).length > 0) {
+        pipeline.push({ $match: match });
+      }
+
+      // 🔹 Projection
       pipeline.push({
         $project: {
           _id: 1,
           date: "$records.date",
           status: "$records.status",
           remarks: "$records.remarks",
-          employeeId: "$employeeData.employeeId", // flatten
-          employeeName: "$employeeData.fullName", // flatten
-          employeeRefId: "$employeeData._id", // keep ref for updates
+          employeeId: "$employeeData.employeeId",
+          employeeName: "$employeeData.fullName",
+          employeeRefId: "$employeeData._id",
         },
       });
 
-      // 🔹 Apply sorting + pagination
+      // 🔹 Sorting + pagination
       pipeline.push(
         { $sort: sort },
         { $skip: skip },
         { $limit: parseInt(limit) }
       );
 
-      // 🔹 Data + total count
+      // 🔹 Data + count
       const [data, total] = await Promise.all([
         db.GetAggregation("attendance", pipeline),
         db.GetAggregation("attendance", [
@@ -254,20 +292,20 @@ module.exports = function () {
               preserveNullAndEmptyArrays: true,
             },
           },
-          ...(Object.keys(match).length > 0 ? [{ $match: match }] : []),
+          { $match: match },
           { $count: "total" },
         ]),
       ]);
 
       return res.send({
         status: true,
-        count: total.length > 0 ? total[0].total : 0,
+        count: total.length ? total[0].total : 0,
         page: parseInt(page),
         limit: parseInt(limit),
         data,
       });
     } catch (error) {
-      console.log(error, "ERROR listAttendance");
+      console.error("ERROR listAttendance", error);
       return res.send({
         status: false,
         message: "Something went wrong while fetching attendance.",
@@ -333,12 +371,13 @@ module.exports = function () {
   // Mark ALL employees as present for today
   controller.markAllPresentToday = async function (req, res) {
     try {
-      const today = new Date();
+      const { date } = req.body;
+      const today = date ? new Date(date) : new Date();
       const todayDate = new Date(today.toISOString().split("T")[0]); // normalize date (no time)
 
       // Fetch all employees
       const employees = await db.GetDocument("employee", { status: 1 }, {}, {});
-      if (!employees.length) {
+      if (!employees.doc.length) {
         return res.send({
           status: false,
           message: "No active employees found",
@@ -346,7 +385,7 @@ module.exports = function () {
       }
 
       // Loop and insert/update attendance
-      const operations = employees.map((emp) => ({
+      const operations = employees.doc.map((emp) => ({
         updateOne: {
           filter: { employee: emp._id },
           update: {
@@ -358,7 +397,7 @@ module.exports = function () {
       }));
       await db.BulkWrite("attendance", operations);
 
-      const pushOps = employees.map((emp) => ({
+      const pushOps = employees.doc.map((emp) => ({
         updateOne: {
           filter: { employee: emp._id },
           update: {
@@ -445,106 +484,114 @@ module.exports = function () {
     }
   };
 
-controller.saveCustomerPayment = async function (req, res) {
-  try {
-    const body = req.body;
-
-    const data = {
-      clientName: body.clientName || "",
-      contractId: new mongoose.Types.ObjectId(body.contractId),
-      invoiceNo: body.invoiceNo || "",
-      invoiceRef: body.invoiceRef ? new mongoose.Types.ObjectId(body.invoiceRef) : null,
-      dueDate: body.dueDate ? new Date(body.dueDate) : null,
-      amountPaid: Number(body.amountPaid) || 0,
-      balance: Number(body.balance) || 0,
-      status: body.status || "Unpaid",
-      remarks: body.remarks || "",
-      updatedAt: new Date()
-    };
-
-    let result;
-    let msg;
-    if (body._id) {
-      result = await db.UpdateDocument(
-        "customerPayment",
-        { _id: new mongoose.Types.ObjectId(body._id) },
-        data
-      );
-      msg = "Customer payment updated";
-    } else {
-      data.createdAt = new Date();
-      result = await db.InsertDocument("customerPayment", data);
-      msg = "Customer payment saved";
-    }
-
-    // Optional: create alert for customers
+  controller.saveCustomerPayment = async function (req, res) {
     try {
-      if (data.dueDate) await createOrUpdateAlertForPayment(result, false);
+      const body = req.body;
+
+      const data = {
+        clientName: body.clientName || "",
+        contractId: new mongoose.Types.ObjectId(body.contractId),
+        invoiceNo: body.invoiceNo || "",
+        invoiceRef: body.invoiceRef
+          ? new mongoose.Types.ObjectId(body.invoiceRef)
+          : null,
+        dueDate: body.dueDate ? new Date(body.dueDate) : null,
+        amountPaid: Number(body.amountPaid) || 0,
+        balance: Number(body.balance) || 0,
+        status: body.status || "Unpaid",
+        remarks: body.remarks || "",
+        updatedAt: new Date(),
+      };
+
+      let result;
+      let msg;
+      if (body._id) {
+        result = await db.UpdateDocument(
+          "customerPayment",
+          { _id: new mongoose.Types.ObjectId(body._id) },
+          data
+        );
+        msg = "Customer payment updated";
+      } else {
+        data.createdAt = new Date();
+        result = await db.InsertDocument("customerPayment", data);
+        msg = "Customer payment saved";
+      }
+
+      // Optional: create alert for customers
+      try {
+        if (data.dueDate) await createOrUpdateAlertForPayment(result, false);
+      } catch (err) {
+        console.log("CUSTOMER ALERT ERROR:", err);
+      }
+
+      return res.send({ status: true, message: msg, data: result });
     } catch (err) {
-      console.log("CUSTOMER ALERT ERROR:", err);
+      console.log("ERROR saveCustomerPayment", err);
+      return res.send({
+        status: false,
+        message: "Error saving customer payment",
+      });
     }
-
-    return res.send({ status: true, message: msg, data: result });
-
-  } catch (err) {
-    console.log("ERROR saveCustomerPayment", err);
-    return res.send({ status: false, message: "Error saving customer payment" });
-  }
-};
-
-
+  };
 
   controller.saveVendorPayment = async function (req, res) {
-  try {
-    const body = req.body;
-
-    const data = {
-      vendor: body.vendor ? new mongoose.Types.ObjectId(body.vendor) : null,
-      contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null,
-      invoiceNo: body.invoiceNo || "",
-      invoiceRef: body.invoiceRef ? new mongoose.Types.ObjectId(body.invoiceRef) : null,
-      dueDate: body.dueDate ? new Date(body.dueDate) : null,
-      nextPaymentDue: body.nextPaymentDue ? new Date(body.nextPaymentDue) : null, // NEW
-      amountPaid: Number(body.amountPaid) || 0,
-      status: body.status || "Unpaid",
-      balance: Number(body.balance) || 0,
-      remarks: body.remarks || "",
-      updatedAt: new Date(),
-    };
-
-    let result;
-    if (body._id) {
-      result = await db.UpdateDocument(
-        "vendorPayment",
-        { _id: new mongoose.Types.ObjectId(body._id) },
-        data
-      );
-    } else {
-      data.createdAt = new Date();
-      result = await db.InsertDocument("vendorPayment", data);
-    }
-
-    // If Partial or dueDate/nextPaymentDue exists -> create/update alert for payment
     try {
-      await createOrUpdateAlertForPayment(result); // helper below
-    } catch (err) {
-      console.error('Failed to create/update payment alert:', err);
-      // don't fail the request if alert creation fails
-    }
+      const body = req.body;
 
-    return res.send({
-      status: true,
-      message: body._id ? "Vendor payment updated" : "Vendor payment saved",
-      data: result,
-    });
-  } catch (err) {
-    console.log("ERROR saveVendorPayment", err);
-    return res.send({
-      status: false,
-      message: "Error saving vendor payment",
-    });
-  }
-};
+      const data = {
+        vendor: body.vendor ? new mongoose.Types.ObjectId(body.vendor) : null,
+        contractId: body.contractId
+          ? new mongoose.Types.ObjectId(body.contractId)
+          : null,
+        invoiceNo: body.invoiceNo || "",
+        invoiceRef: body.invoiceRef
+          ? new mongoose.Types.ObjectId(body.invoiceRef)
+          : null,
+        dueDate: body.dueDate ? new Date(body.dueDate) : null,
+        nextPaymentDue: body.nextPaymentDue
+          ? new Date(body.nextPaymentDue)
+          : null, // NEW
+        amountPaid: Number(body.amountPaid) || 0,
+        status: body.status || "Unpaid",
+        balance: Number(body.balance) || 0,
+        remarks: body.remarks || "",
+        updatedAt: new Date(),
+      };
+
+      let result;
+      if (body._id) {
+        result = await db.UpdateDocument(
+          "vendorPayment",
+          { _id: new mongoose.Types.ObjectId(body._id) },
+          data
+        );
+      } else {
+        data.createdAt = new Date();
+        result = await db.InsertDocument("vendorPayment", data);
+      }
+
+      // If Partial or dueDate/nextPaymentDue exists -> create/update alert for payment
+      try {
+        await createOrUpdateAlertForPayment(result); // helper below
+      } catch (err) {
+        console.error("Failed to create/update payment alert:", err);
+        // don't fail the request if alert creation fails
+      }
+
+      return res.send({
+        status: true,
+        message: body._id ? "Vendor payment updated" : "Vendor payment saved",
+        data: result,
+      });
+    } catch (err) {
+      console.log("ERROR saveVendorPayment", err);
+      return res.send({
+        status: false,
+        message: "Error saving vendor payment",
+      });
+    }
+  };
   controller.listCustomerPayments = async function (req, res) {
     try {
       const {
