@@ -30,20 +30,25 @@ module.exports = function () {
         });
       }
 
-      // ✅ Driver docs upload
-      let driverDocs = [];
-      if (body.driverDocs) {
-        let driverDocsArray = typeof body.driverDocs === "string"
-          ? JSON.parse(body.driverDocs)
-          : body.driverDocs;
+      // ✅ Drivers & Buses (Manual Entry)
+      let drivers = [];
+      if (body.drivers) {
+        let driversArray = typeof body.drivers === "string"
+          ? JSON.parse(body.drivers)
+          : body.drivers;
 
-        driverDocs = driverDocsArray.map((doc, idx) => {
-          const matchFile = req.files?.find(
-            f => f.fieldname === `driverDocs[${idx}][file]`
+        drivers = driversArray.map((drv, index) => {
+          // Find uploaded doc for this driver index
+          let file = req.files?.find(
+            (f) => f.fieldname === `drivers[${index}][file]`
           );
+
           return {
-            driverId: new mongoose.Types.ObjectId(doc.driverId),
-            fileUrl: matchFile ? matchFile.destination + matchFile.filename : doc.fileUrl || null,
+            busRegisterNumber: drv.busRegisterNumber,
+            driverName: drv.driverName,
+            driverContact: drv.driverContact,
+            driverCivilId: drv.driverCivilId,
+            driverDocUrl: file ? file.destination + file.filename : drv.driverDocUrl || null,
           };
         });
       }
@@ -53,9 +58,9 @@ module.exports = function () {
         contractId: body.contractId ? new mongoose.Types.ObjectId(body.contractId) : null,
         startDate: body.startDate ? new Date(body.startDate) : null,
         endDate: body.endDate ? new Date(body.endDate) : null,
-        buses: body.buses ? JSON.parse(body.buses).map(id => new mongoose.Types.ObjectId(id)) : [],
-        drivers: body.drivers ? JSON.parse(body.drivers).map(id => new mongoose.Types.ObjectId(id)) : [],
-        driverDocs, // ✅ save driver docs
+
+        drivers, // ✅ save manual driver entries
+
         noOfBuses: body.noOfBuses || 0,
         noOfDrivers: body.noOfDrivers || 0,
         contactOfficer: body.contactOfficer || "",
@@ -113,22 +118,6 @@ module.exports = function () {
         },
         { $unwind: { path: "$contractDetails", preserveNullAndEmptyArrays: true } },
         {
-          $lookup: {
-            from: "fleet",
-            localField: "buses",
-            foreignField: "_id",
-            as: "busesDetails",
-          },
-        },
-        {
-          $lookup: {
-            from: "employee",
-            localField: "drivers",
-            foreignField: "_id",
-            as: "driversDetails",
-          },
-        },
-        {
           $project: {
             vendorName: 1,
             startDate: 1,
@@ -138,14 +127,8 @@ module.exports = function () {
             invoicingDate: 1,
             lastPayment: 1,
             status: 1,
-            driverDocs: 1,
             documents: 1,
-            drivers: 1, // Include raw drivers array
-            buses: 1,   // Include raw buses array
-            "busesDetails._id": 1,
-            "busesDetails.vehicleName": 1,
-            "driversDetails._id": 1,
-            "driversDetails.fullName": 1,
+            drivers: 1, // Include complete driver/bus structure
             "contractDetails._id": 1,
             "contractDetails.contractId": 1,
             "contractDetails.clientName": 1,
@@ -198,22 +181,6 @@ module.exports = function () {
           },
         },
         { $unwind: { path: "$contractDetails", preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: "fleet",
-            localField: "buses",
-            foreignField: "_id",
-            as: "busesDetails",
-          },
-        },
-        {
-          $lookup: {
-            from: "employee",
-            localField: "drivers",
-            foreignField: "_id",
-            as: "driversDetails",
-          },
-        },
       ];
 
       // Search logic (vendorName, contractId, clientName)
@@ -240,10 +207,9 @@ module.exports = function () {
           invoicingDate: 1,
           lastPayment: 1,
           status: 1,
+          drivers: 1, // now contains bus info too
           "contractDetails.contractId": 1,
           "contractDetails.clientName": 1,
-          "busesDetails.vehicleName": 1,
-          "driversDetails.fullName": 1,
         },
       });
 

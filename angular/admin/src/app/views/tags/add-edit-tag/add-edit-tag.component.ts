@@ -30,9 +30,10 @@ export class AddEditTagComponent implements OnInit {
   selectedVendorDocFile: File | null = null;
 
   assignedFleetDrivers: Array<{
-    busId: string;
-    driverId: string;
-    contactNumber: string;
+    busRegisterNumber: string;
+    driverName: string;
+    driverContact: string;
+    driverCivilId: string;
     driverDocFile: File | null;
     driverDocUrl?: string; // relative URL from API, if any
   }> = [];
@@ -56,9 +57,6 @@ export class AddEditTagComponent implements OnInit {
     if (this.id && !this.viewpage) {
       this.getVendor();
     }
-
-    this.loadFleets();
-    this.loadDrivers();
   }
 
   generateFleetDriverRows() {
@@ -67,24 +65,25 @@ export class AddEditTagComponent implements OnInit {
       this.assignedFleetDrivers = [];
       return;
     }
-    while (this.assignedFleetDrivers.length < count) {
-      this.assignedFleetDrivers.push({
-        busId: '',
-        driverId: '',
-        contactNumber: '',
-        driverDocFile: null,
 
-      });
-    }
-    while (this.assignedFleetDrivers.length > count) {
-      this.assignedFleetDrivers.pop();
+    // Adjust array length while preserving existing data
+    if (this.assignedFleetDrivers.length > count) {
+      this.assignedFleetDrivers.length = count;
+    } else {
+      while (this.assignedFleetDrivers.length < count) {
+        this.assignedFleetDrivers.push({
+          busRegisterNumber: '',
+          driverName: '',
+          driverContact: '',
+          driverCivilId: '',
+          driverDocFile: null,
+          driverDocUrl: ''
+        });
+      }
     }
   }
 
-  onDriverSelect(i: number) {
-    const selectedDriver = this.drivers.find(d => d._id === this.assignedFleetDrivers[i].driverId);
-    this.assignedFleetDrivers[i].contactNumber = selectedDriver?.contactNumber || '';
-  }
+
 
   uploadDriverDoc(event: Event, i: number) {
     const input = event.target as HTMLInputElement;
@@ -115,22 +114,6 @@ export class AddEditTagComponent implements OnInit {
       });
   }
 
-  loadFleets() {
-    this.apiService
-      .CommonApi(Apiconfig.listFleets.method, Apiconfig.listFleets.url, { status: 1 })
-      .subscribe((res: any) => {
-        if (res.status) this.fleets = res.data;
-      });
-  }
-
-  loadDrivers() {
-    this.apiService
-      .CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1, role: 'Driver' })
-      .subscribe((res: any) => {
-        if (res.status) this.drivers = res.data;
-      });
-  }
-
   // Basic field validations (template-driven adds required too)
   private validateFormModel(f: NgForm): string | null {
     const u = this.userDetails;
@@ -149,8 +132,9 @@ export class AddEditTagComponent implements OnInit {
     // per-row validations
     for (let i = 0; i < this.assignedFleetDrivers.length; i++) {
       const row = this.assignedFleetDrivers[i];
-      if (!row.busId) return `Row ${i + 1}: Bus is required.`;
-      if (!row.driverId) return `Row ${i + 1}: Driver is required.`;
+      if (!row.busRegisterNumber) return `Row ${i + 1}: Bus Number is required.`;
+      if (!row.driverName) return `Row ${i + 1}: Driver Name is required.`;
+      if (!row.driverContact) return `Row ${i + 1}: Driver Contact is required.`;
     }
     // vendor document: require both type and either file or existing URL
     if (!u.documentType) return 'Document Type is required.';
@@ -176,12 +160,17 @@ export class AddEditTagComponent implements OnInit {
     fd.append('startDate', this.userDetails.startDate);
     fd.append('endDate', this.userDetails.endDate);
 
-    const buses = this.assignedFleetDrivers.map(r => r.busId);
-    const drivers = this.assignedFleetDrivers.map(r => r.driverId);
-    fd.append('buses', JSON.stringify(buses));                    // JSON for arrays
-    fd.append('drivers', JSON.stringify(drivers));                // JSON for arrays
-    fd.append('noOfBuses', String(buses.length));
-    fd.append('noOfDrivers', String(drivers.length));
+    const driversMeta = this.assignedFleetDrivers.map(d => ({
+      busRegisterNumber: d.busRegisterNumber,
+      driverName: d.driverName,
+      driverContact: d.driverContact,
+      driverCivilId: d.driverCivilId,
+      driverDocUrl: d.driverDocUrl // Preserve existing URL if no new file
+    }));
+
+    fd.append('drivers', JSON.stringify(driversMeta));
+    fd.append('noOfBuses', String(driversMeta.length));
+    fd.append('noOfDrivers', String(driversMeta.length));
 
     // Vendor documents: send metadata JSON + file for index 0
     const docsMeta = [{ documentType: this.userDetails.documentType }];
@@ -197,20 +186,10 @@ export class AddEditTagComponent implements OnInit {
       fd.set('documents', JSON.stringify(docsWithUrl));
     }
 
-    // Driver documents: align to driverDocs[i][file] + driverDocs meta JSON
-    const driverDocsMeta: Array<{ driverId: string }> = [];
-    this.assignedFleetDrivers.forEach((d, logicalIndex) => {
+    // append driver files with continuous indexes based on meta order
+    this.assignedFleetDrivers.forEach((d, idx) => {
       if (d.driverDocFile) {
-        driverDocsMeta.push({ driverId: d.driverId });
-      }
-    });
-    fd.append('driverDocs', JSON.stringify(driverDocsMeta));
-    // append files with continuous indexes based on meta order
-    let fileIdx = 0;
-    this.assignedFleetDrivers.forEach(d => {
-      if (d.driverDocFile) {
-        fd.append(`driverDocs[${fileIdx}][file]`, d.driverDocFile, d.driverDocFile.name);
-        fileIdx++;
+        fd.append(`drivers[${idx}][file]`, d.driverDocFile, d.driverDocFile.name);
       }
     });
 
@@ -253,39 +232,21 @@ export class AddEditTagComponent implements OnInit {
           documentFile: v.documents?.[0]?.fileUrl || '', // existing URL (for preview/download)
         };
 
-        this.form.noOfBuses = v.busesDetails?.length || 0;
+        this.form.noOfBuses = v.drivers?.length || 0; // Length is based on drivers array now
 
-        // Correctly map based on the ORDERED buses array, not the unordered busesDetails from lookup
-        const busIds = v.buses || []; // The preserved order of buses
-        const driverIds = v.drivers || []; // The preserved order of drivers
+        // Map manual drivers
+        this.assignedFleetDrivers = (v.drivers || []).map((d: any) => ({
+          busRegisterNumber: d.busRegisterNumber || '',
+          driverName: d.driverName || '',
+          driverContact: d.driverContact || '',
+          driverCivilId: d.driverCivilId || '',
+          driverDocFile: null,
+          driverDocUrl: d.driverDocUrl || ''
+        }));
 
-        this.assignedFleetDrivers = busIds.map((busId: string, i: number) => {
-          // Find bus details by ID
-          const busDetail = (v.busesDetails || []).find((b: any) => b._id === busId);
-          const driverId = driverIds[i]; // Matching driver ID at same index
-          const driverDetail = (v.driversDetails || []).find((d: any) => d._id === driverId);
-
-          // Find driver doc by driverID
-          // console.log(`Mapping Driver ${i}: driverId=${driverId}`);
-          // console.log(`Available Driver Docs:`, v.driverDocs);
-
-          const driverDoc = (v.driverDocs || []).find((doc: any) =>
-            // Compare as strings to ensure matching works even if types differ
-            String(doc.driverId) === String(driverId)
-          );
-
-          return {
-            busId: busId, // Use the ID from the ordered array
-            driverId: driverId, // Use the ID from the ordered array
-            contactNumber: '', // Will be populated by onDriverSelect or we can find it if driverDetail has it
-            driverDocFile: null,
-            driverDocUrl: driverDoc ? driverDoc.fileUrl : ''
-          };
-        });
-
-        setTimeout(() => {
-          this.assignedFleetDrivers.forEach((_, i) => this.onDriverSelect(i));
-        }, 0);
+        // setTimeout(() => {
+        //   this.assignedFleetDrivers.forEach((_, i) => this.onDriverSelect(i));
+        // }, 0);
       });
   }
 

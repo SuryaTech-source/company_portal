@@ -10,15 +10,14 @@ VENDOR_SCHEMA.VENDOR = {
   startDate: Date,
   endDate: Date,
 
-  // ✅ Assigned fleets & drivers
-  buses: [{ type: Schema.Types.ObjectId, ref: "Fleet" }],
-  drivers: [{ type: Schema.Types.ObjectId, ref: "Employee" }],
-
-  // ✅ Individual driver documents
-  driverDocs: [
+  // ✅ Assigned fleets & drivers (Manual Entry)
+  drivers: [
     {
-      driverId: { type: Schema.Types.ObjectId, ref: "Employee" },
-      fileUrl: String,
+      busRegisterNumber: { type: String },
+      driverName: { type: String },
+      driverContact: { type: String },
+      driverCivilId: { type: String },
+      driverDocUrl: { type: String }, // File URL
     }
   ],
 

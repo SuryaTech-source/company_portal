@@ -675,15 +675,15 @@ export class TaglistComponent {
           busesDetails: {
             title: 'Buses Under Contract',
             filter: false,
-            valuePrepareFunction: value => {
-              return value ? value.length : 0;
+            valuePrepareFunction: (value, row) => {
+              return row.drivers ? row.drivers.length : 0;
             }
           },
           driversDetails: {
             title: 'Drivers Under Contract',
             filter: false,
-            valuePrepareFunction: value => {
-              return value ? value.length : 0;
+            valuePrepareFunction: (value, row) => {
+              return row.drivers ? row.drivers.length : 0;
             }
           },
           contactOfficer: {
@@ -781,15 +781,15 @@ export class TaglistComponent {
           busesDetails: {
             title: 'Buses Under Contract',
             filter: false,
-            valuePrepareFunction: value => {
-              return value ? value.length : 0;
+            valuePrepareFunction: (value, row) => {
+              return row.drivers ? row.drivers.length : 0;
             }
           },
           driversDetails: {
             title: 'Drivers Under Contract',
             filter: false,
-            valuePrepareFunction: value => {
-              return value ? value.length : 0;
+            valuePrepareFunction: (value, row) => {
+              return row.drivers ? row.drivers.length : 0;
             }
           },
           contactOfficer: {

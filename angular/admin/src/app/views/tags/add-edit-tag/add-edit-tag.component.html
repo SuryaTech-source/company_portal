@@ -59,6 +59,7 @@
       <tr>
         <th>Bus Register Number</th>
         <th>Driver Name</th>
+        <th>Civil ID</th>
         <th>Driver Contact</th>
         <th>Driver Document</th>
       </tr>
@@ -66,22 +67,23 @@
     <tbody>
       <tr *ngFor="let row of assignedFleetDrivers; let i = index;">
         <td>
-          <select class="form-control" [(ngModel)]="row.busId" name="bus{{i}}" required>
-            <option value="">Select Bus</option>
-            <option *ngFor="let f of fleets" [value]="f._id">{{ f.registrationNo }}</option>
-          </select>
+          <input type="text" class="form-control" [(ngModel)]="row.busRegisterNumber" name="bus{{i}}" required
+            placeholder="Enter Bus No.">
         </td>
 
         <td>
-          <select class="form-control" [(ngModel)]="row.driverId" name="driver{{i}}" (change)="onDriverSelect(i)"
-            required>
-            <option value="">Select Driver</option>
-            <option *ngFor="let d of drivers" [value]="d._id">{{ d.fullName }}</option>
-          </select>
+          <input type="text" class="form-control" [(ngModel)]="row.driverName" name="driver{{i}}" required
+            placeholder="Enter Driver Name">
         </td>
 
         <td>
-          <input type="text" class="form-control" [(ngModel)]="row.contactNumber" name="contact{{i}}" readonly>
+          <input type="text" class="form-control" [(ngModel)]="row.driverCivilId" name="civilId{{i}}" required
+            placeholder="Enter Civil ID">
+        </td>
+
+        <td>
+          <input type="text" class="form-control" [(ngModel)]="row.driverContact" name="contact{{i}}" required
+            placeholder="Enter Contact">
         </td>
 
         <td>
