@@ -26,6 +26,7 @@ export class AssignmentComponent implements OnInit {
   // Modal controls
   showAssignModal = false;
   showUnassignModal = false;
+  showEditModal = false;
 
   // Assignment form
   assignForm: any = {
@@ -39,11 +40,22 @@ export class AssignmentComponent implements OnInit {
 
   unassignForm: any = {
     assignmentId: '',
+    dateUnassigned: '',
+    odometerReadingEnd: '',
+    remarks: '',
+    odometerReadingStart: 0 // Added for validation
+  };
+
+  editForm: any = {
+    assignmentId: '',
+    dateAssigned: '',
+    dateUnassigned: '',
+    odometerReadingStart: '',
     odometerReadingEnd: '',
     remarks: ''
   };
 
-  constructor(private apiService: ApiService, private notify: NotificationService) {}
+  constructor(private apiService: ApiService, private notify: NotificationService) { }
 
   ngOnInit(): void {
     this.loadFleetAssignments();
@@ -71,11 +83,11 @@ export class AssignmentComponent implements OnInit {
   }
 
   loadContracts() {
-  this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
-    .subscribe((res: any) => {
-      if (res.status) this.contracts = res.data.doc;
-    });
-}
+    this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
+      .subscribe((res: any) => {
+        if (res.status) this.contracts = res.data.doc;
+      });
+  }
   /** 🔹 Load top counts */
   loadCounts() {
     this.apiService.CommonApi(Apiconfig.fleetassignmentcount.method, Apiconfig.fleetassignmentcount.url, {})
@@ -147,14 +159,20 @@ export class AssignmentComponent implements OnInit {
   /** 🔹 Open Unassign Modal */
   openUnassignModal(assignment: any) {
     this.unassignForm.assignmentId = assignment._id;
+    this.unassignForm.dateUnassigned = new Date().toISOString().substring(0, 10);
     this.unassignForm.odometerReadingEnd = '';
     this.unassignForm.remarks = '';
+    this.unassignForm.odometerReadingStart = assignment.odometerReadingStart || 0;
     this.showUnassignModal = true;
   }
 
   /** 🔹 Unassign Fleet */
   unassignFleet() {
     if (!this.unassignForm.assignmentId) return;
+    if (this.unassignForm.odometerReadingEnd < this.unassignForm.odometerReadingStart) {
+      this.notify.showError('End reading cannot be less than start reading (' + this.unassignForm.odometerReadingStart + ')');
+      return;
+    }
 
     this.apiService.CommonApi(Apiconfig.fleetunassignments.method, Apiconfig.fleetunassignments.url, this.unassignForm)
       .subscribe((res: any) => {
@@ -180,5 +198,37 @@ export class AssignmentComponent implements OnInit {
       jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
     };
     html2pdf().from(element).set(opt).save();
+  }
+
+  /** 🔹 Open Edit Modal */
+  openEditModal(assignment: any) {
+    this.editForm = {
+      assignmentId: assignment._id,
+      dateAssigned: assignment.dateAssigned ? new Date(assignment.dateAssigned).toISOString().substring(0, 10) : '',
+      dateUnassigned: assignment.dateUnassigned ? new Date(assignment.dateUnassigned).toISOString().substring(0, 10) : '',
+      odometerReadingStart: assignment.odometerReadingStart,
+      odometerReadingEnd: assignment.odometerReadingEnd,
+      remarks: assignment.remarks
+    };
+    this.showEditModal = true;
+  }
+
+  /** 🔹 Save Edit Assignment */
+  saveEditAssignment() {
+    if (this.editForm.odometerReadingEnd < this.editForm.odometerReadingStart) {
+      this.notify.showError('End reading cannot be less than start reading');
+      return;
+    }
+
+    this.apiService.CommonApi(Apiconfig.editFleetAssignment.method, Apiconfig.editFleetAssignment.url, this.editForm)
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.notify.showSuccess('Assignment updated successfully');
+          this.showEditModal = false;
+          this.loadFleetAssignments();
+        } else {
+          this.notify.showError(res.message || 'Failed to update assignment');
+        }
+      });
   }
 }

@@ -1584,12 +1584,22 @@ module.exports = function (app, io) {
       ensureAuthorized,
       fleetAssignment.fleetAssignmentCounts
     );
+    app.post(
+      "/admin/fleet/assignment/edit",
+      ensureAuthorized,
+      fleetAssignment.editAssignment
+    );
 
     //salary
     app.post(
       "/admin/salaries/employee-list",
       ensureAuthorized,
       salaryController.listByEmployee
+    );
+    app.post(
+      "/admin/salaries/list",
+      ensureAuthorized,
+      salaryController.listSalaries
     );
     app.post(
       "/admin/salary/edit",

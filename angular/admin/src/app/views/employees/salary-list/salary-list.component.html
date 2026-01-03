@@ -1,0 +1,107 @@
+<div class="salary-list-page">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page_title">Salary List</h2>
+
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4 align-items-end">
+        <div class="col-md-3">
+            <label>Year</label>
+            <select class="form-select" [(ngModel)]="selectedYear" (change)="onFilterChange()">
+                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Month</label>
+            <select class="form-select" [(ngModel)]="selectedMonth" (change)="onFilterChange()">
+                <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label>Search Employee</label>
+            <input type="text" class="form-control" placeholder="Name or ID" [(ngModel)]="searchQuery"
+                (keyup.enter)="onFilterChange()">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100" (click)="onFilterChange()">Search</button>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3">
+        <button class="export_btn" (click)="downloadPDF()">
+            Download PDF
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div id="salaryTable" class="table_section">
+        <table class="table table-bordered table-striped text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th class="sortable" (click)="sort('employeeName')">
+                        Employee Name
+                        <span *ngIf="sortBy === 'employeeName'">{{ sortOrder === 1 ? '▲' : '▼' }}</span>
+                    </th>
+                    <th class="sortable" (click)="sort('employeeId')">
+                        Employee ID
+                        <span *ngIf="sortBy === 'employeeId'">{{ sortOrder === 1 ? '▲' : '▼' }}</span>
+                    </th>
+                    <th>Month/Year</th>
+                    <th>Base Salary</th>
+                    <th class="sortable" (click)="sort('daysPresent')">
+                        Days Present
+                        <span *ngIf="sortBy === 'daysPresent'">{{ sortOrder === 1 ? '▲' : '▼' }}</span>
+                    </th>
+                    <th class="sortable" (click)="sort('overtime')">
+                        Overtime
+                        <span *ngIf="sortBy === 'overtime'">{{ sortOrder === 1 ? '▲' : '▼' }}</span>
+                    </th>
+                    <th>Total Deductions</th>
+                    <th class="sortable" (click)="sort('salary')">
+                        Total Payout
+                        <span *ngIf="sortBy === 'salary'">{{ sortOrder === 1 ? '▲' : '▼' }}</span>
+                    </th>
+                    <th class="sortable" (click)="sort('status')">
+                        Status
+                        <span *ngIf="sortBy === 'status'">{{ sortOrder === 1 ? '▲' : '▼' }}</span>
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let salary of salaries">
+                    <td>{{ salary.employeeDetails?.fullName }}</td>
+                    <td>{{ salary.employeeDetails?.employeeId }}</td>
+                    <td>{{ salary.month }}/{{ salary.year }}</td>
+                    <td>{{ salary.baseSalary | currency:'KWD':'KD ' }}</td>
+                    <td>{{ salary.daysPresent }}</td>
+                    <td>{{ salary.overtimeAmount | currency:'KWD':'KD ' }}</td>
+                    <td>{{ salary.totalPenaltyAmount | currency:'KWD':'KD ' }}</td>
+                    <td class="fw-bold">{{ salary.finalSalary | currency:'KWD':'KD ' }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="{
+                          'bg-success': salary.paymentStatus === 'Paid',
+                          'bg-warning': salary.paymentStatus === 'Pending',
+                          'bg-danger': salary.paymentStatus === 'Failed'
+                      }">
+                            {{ salary.paymentStatus }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info" (click)="viewSalary(salary.employee)">
+                            View Salary
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="salaries.length === 0">
+                    <td colspan="10">No salary records found for the selected criteria.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="loading" class="text-center mt-4">
+        <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>
+    </div>
+</div>

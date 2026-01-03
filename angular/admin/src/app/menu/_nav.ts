@@ -86,6 +86,12 @@ export const navItems: INavData[] = [
             url: '/app/employees/active-list',
             icon: '',
             id: 'list'
+          },
+          {
+            name: 'Salary List',
+            url: '/app/employees/salary-list',
+            icon: '',
+            id: 'list'
           }
         ]
       },

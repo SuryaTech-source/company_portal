@@ -83,6 +83,10 @@ export const Apiconfig = {
         "url": "admin/fleet/assignment/assignment-stats",
         "method": "post"
     },
+    editFleetAssignment: {
+        "url": "admin/fleet/assignment/edit",
+        "method": "post"
+    },
 
     alertList: {
         "url": "admin/alerts/list",
@@ -242,6 +246,10 @@ export const Apiconfig = {
     },
     deleteInvoice: {
         "url": "admin/invoice/delete",
+        "method": "post"
+    },
+    listAllSalaries: {
+        "url": "admin/salaries/list",
         "method": "post"
     },
     updateInvoiceStatus: {

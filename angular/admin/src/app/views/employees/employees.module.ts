@@ -7,13 +7,15 @@ import { ActiveEmployeesComponent } from './active-employees/active-employees.co
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SalaryViewComponent } from './salary-view/salary-view.component';
+import { SalaryListComponent } from './salary-list/salary-list.component';
 
 
 @NgModule({
   declarations: [
     AddNewEmployeesComponent,
     ActiveEmployeesComponent,
-    SalaryViewComponent
+    SalaryViewComponent,
+    SalaryListComponent
   ],
   imports: [
     CommonModule,

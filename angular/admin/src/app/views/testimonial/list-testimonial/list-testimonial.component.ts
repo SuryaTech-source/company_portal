@@ -126,22 +126,22 @@ export class ListTestimonialComponent {
     // )
 
   }
-getdata(data) {
-  console.log(data, 'filtering data,,,,')
-  this.apiService.CommonApi(Apiconfig.listFleets.method, Apiconfig.listFleets.url, data)
-    .subscribe(response => {
-      console.log(response, "fleet list response");
+  getdata(data) {
+    console.log(data, 'filtering data,,,,')
+    this.apiService.CommonApi(Apiconfig.listFleets.method, Apiconfig.listFleets.url, data)
+      .subscribe(response => {
+        console.log(response, "fleet list response");
 
-      if (response && response.status) {
-        this.categorylist = response.data;   // fleet array
-        this.count = response.count;         // count number
-        this.source.load(this.categorylist); // load into table
-        this.cd.detectChanges();
-      } else {
-        this.notifyService.showError(response.message || "Failed to fetch fleets");
-      }
-    });
-}
+        if (response && response.status) {
+          this.categorylist = response.data;   // fleet array
+          this.count = response.count;         // count number
+          this.source.load(this.categorylist); // load into table
+          this.cd.detectChanges();
+        } else {
+          this.notifyService.showError(response.message || "Failed to fetch fleets");
+        }
+      });
+  }
 
 
   onDeleteChange(event) {
@@ -345,143 +345,143 @@ getdata(data) {
   loadsettings(event) {
     if (event == 'delete') {
       this.settings = {
-  hideSubHeader: true,
-  columns: {
-    index: {
-      title: 'S.No',
-      type: 'text',
-      valuePrepareFunction: (value, row, cell) => {
-        return this.skip + cell.row.index + 1 + '.';
-      }
-    },
-    vehicleName: {
-      title: 'Vehicle Name',
-      filter: true
-    },
-    registrationNo: {
-      title: 'Registration No',
-      filter: true
-    },
-    insuranceNo: {
-      title: 'Insurance No',
-      filter: true
-    },
-    makerName: {
-      title: 'Maker Name',
-      filter: true
-    },
-    seatingCapacity: {
-      title: 'Seating Capacity',
-      type: 'number'
-    },
-    manufactureDate: {
-      title: 'Manufacture Date',
-      valuePrepareFunction: (date) => {
-        return date ? new DatePipe('en-US').transform(date, 'dd/MM/yyyy') : '-';
-      }
-    },
-    passingExpiry: {
-      title: 'Passing Expiry',
-      valuePrepareFunction: (date) => {
-        return date ? new DatePipe('en-US').transform(date, 'dd/MM/yyyy') : '-';
-      }
-    },
-    status: {
-      title: 'Status',
-      type: 'html',
-      valuePrepareFunction: (value) => {
-        if (value === 1) {
-          return `<span class='badge badge-success badge-pill'>Active</span>`;
-        } else if (value === 2) {
-          return `<span class='badge badge-warning badge-pill'>Inactive</span>`;
-        } else {
-          return `<span class='badge badge-danger badge-pill'>Deleted</span>`;
+        hideSubHeader: true,
+        columns: {
+          index: {
+            title: 'S.No',
+            type: 'text',
+            valuePrepareFunction: (value, row, cell) => {
+              return this.skip + cell.row.index + 1 + '.';
+            }
+          },
+          vehicleName: {
+            title: 'Vehicle Name',
+            filter: true
+          },
+          registrationNo: {
+            title: 'Registration No',
+            filter: true
+          },
+          insuranceNo: {
+            title: 'Insurance No',
+            filter: true
+          },
+          makerName: {
+            title: 'Maker Name',
+            filter: true
+          },
+          seatingCapacity: {
+            title: 'Seating Capacity',
+            type: 'number'
+          },
+          manufactureDate: {
+            title: 'Model & Year',
+            valuePrepareFunction: (date) => {
+              return date ? new DatePipe('en-US').transform(date, 'MMMM, yyyy') : '-';
+            }
+          },
+          passingExpiry: {
+            title: 'Passing Expiry',
+            valuePrepareFunction: (date) => {
+              return date ? new DatePipe('en-US').transform(date, 'dd/MM/yyyy') : '-';
+            }
+          },
+          status: {
+            title: 'Status',
+            type: 'html',
+            valuePrepareFunction: (value) => {
+              if (value === 1) {
+                return `<span class='badge badge-success badge-pill'>Active</span>`;
+              } else if (value === 2) {
+                return `<span class='badge badge-warning badge-pill'>Inactive</span>`;
+              } else {
+                return `<span class='badge badge-danger badge-pill'>Deleted</span>`;
+              }
+            }
+          }
+        },
+        pager: {
+          display: true,
+          perPage: this.default_limit
+        },
+        actions: {
+          add: true,
+          edit: false,
+          delete: false,
+          position: 'right'
         }
-      }
-    }
-  },
-  pager: {
-    display: true,
-    perPage: this.default_limit
-  },
-  actions: {
-    add: true,
-    edit: false,
-    delete: false,
-    position: 'right'
-  }
-};
+      };
       this.settings.actions.custom = this.getSettings.loadSettings(event, this.curentUser, '/app/tags/list', this.userPrivilegeDetails, this.delete_btn, this.edit_btn, this.view_btn);
     } else {
       this.settings = {
-  hideSubHeader: true,
-  columns: {
-    index: {
-      title: 'S.No',
-      type: 'text',
-      valuePrepareFunction: (value, row, cell) => {
-        return this.skip + cell.row.index + 1 + '.';
-      }
-    },
-    vehicleName: {
-      title: 'Vehicle Name',
-      filter: true
-    },
-    registrationNo: {
-      title: 'Registration No',
-      filter: true
-    },
-    insuranceNo: {
-      title: 'Insurance No',
-      filter: true
-    },
-    makerName: {
-      title: 'Maker Name',
-      filter: true
-    },
-    seatingCapacity: {
-      title: 'Seating Capacity',
-      type: 'number'
-    },
-    manufactureDate: {
-      title: 'Manufacture Date',
-      valuePrepareFunction: (date) => {
-        return date ? new DatePipe('en-US').transform(date, 'dd/MM/yyyy') : '-';
-      }
-    },
-    passingExpiry: {
-      title: 'Passing Expiry',
-      valuePrepareFunction: (date) => {
-        return date ? new DatePipe('en-US').transform(date, 'dd/MM/yyyy') : '-';
-      }
-    },
-    status: {
-      title: 'Status',
-      type: 'html',
-      valuePrepareFunction: (value) => {
-        if (value === 1) {
-          return `<span class='badge badge-success badge-pill'>Active</span>`;
-        } else if (value === 2) {
-          return `<span class='badge badge-warning badge-pill'>Inactive</span>`;
-        } else {
-          return `<span class='badge badge-danger badge-pill'>Deleted</span>`;
+        hideSubHeader: true,
+        columns: {
+          index: {
+            title: 'S.No',
+            type: 'text',
+            valuePrepareFunction: (value, row, cell) => {
+              return this.skip + cell.row.index + 1 + '.';
+            }
+          },
+          vehicleName: {
+            title: 'Vehicle Name',
+            filter: true
+          },
+          registrationNo: {
+            title: 'Registration No',
+            filter: true
+          },
+          insuranceNo: {
+            title: 'Insurance No',
+            filter: true
+          },
+          makerName: {
+            title: 'Maker Name',
+            filter: true
+          },
+          seatingCapacity: {
+            title: 'Seating Capacity',
+            type: 'number'
+          },
+          manufactureDate: {
+            title: 'Model & Year',
+            valuePrepareFunction: (date) => {
+              return date ? new DatePipe('en-US').transform(date, 'MMMM, yyyy') : '-';
+            }
+          },
+          passingExpiry: {
+            title: 'Passing Expiry',
+            valuePrepareFunction: (date) => {
+              return date ? new DatePipe('en-US').transform(date, 'dd/MM/yyyy') : '-';
+            }
+          },
+          status: {
+            title: 'Status',
+            type: 'html',
+            valuePrepareFunction: (value) => {
+              if (value === 1) {
+                return `<span class='badge badge-success badge-pill'>Active</span>`;
+              } else if (value === 2) {
+                return `<span class='badge badge-warning badge-pill'>Inactive</span>`;
+              } else {
+                return `<span class='badge badge-danger badge-pill'>Deleted</span>`;
+              }
+            }
+          }
+        },
+        pager: {
+          display: true,
+          perPage: this.default_limit
+        },
+        actions: {
+          add: true,
+          edit: false,
+          delete: false,
+          position: 'right'
         }
-      }
-    }
-  },
-  pager: {
-    display: true,
-    perPage: this.default_limit
-  },
-  actions: {
-    add: true,
-    edit: false,
-    delete: false,
-    position: 'right'
-  }
-};
-      if(this.edit_btn){
-        this.settings.columns.status={
+      };
+      if (this.edit_btn) {
+        this.settings.columns.status = {
           title: 'Status',
           filter: true,
           type: 'custom',
@@ -494,17 +494,17 @@ getdata(data) {
             });
           }
         }
-      }else{
-        this.settings.columns.status= {
+      } else {
+        this.settings.columns.status = {
           title: 'Status',
           filter: true,
-          type:'html',
-          valuePrepareFunction:( value,rowData) => {
-           if(rowData && rowData.status == 1){
-            return `<span style="cursor: pointer;" class='badge badge-success badge-pill mb-1' >Active</span>`
-           }else if(rowData && rowData.status == 2){
-            return `<span style="cursor: pointer;" class='badge badge-pill badge-warning mb-1' >Inactive</span>`
-           }
+          type: 'html',
+          valuePrepareFunction: (value, rowData) => {
+            if (rowData && rowData.status == 1) {
+              return `<span style="cursor: pointer;" class='badge badge-success badge-pill mb-1' >Active</span>`
+            } else if (rowData && rowData.status == 2) {
+              return `<span style="cursor: pointer;" class='badge badge-pill badge-warning mb-1' >Inactive</span>`
+            }
           }
         }
       }

@@ -90,21 +90,21 @@ module.exports = function () {
    */
   controller.unassignFleet = async function (req, res) {
     try {
-      const { assignmentId, odometerReadingEnd, remarks } = req.body;
+      const { assignmentId, odometerReadingEnd, remarks, dateUnassigned } = req.body;
 
       if (!assignmentId) return res.send({ status: false, message: "Assignment ID required" });
 
-      const now = new Date();
+      const nowDate = dateUnassigned ? new Date(dateUnassigned) : new Date();
 
       const result = await db.UpdateDocument(
         "fleetAssignment",
         { _id: new mongoose.Types.ObjectId(assignmentId) },
         {
           status: 2,
-          dateUnassigned: now,
+          dateUnassigned: nowDate,
           odometerReadingEnd: odometerReadingEnd || 0,
           remarks: remarks || "",
-          updatedAt: now
+          updatedAt: new Date()
         }
       );
 
@@ -126,90 +126,127 @@ module.exports = function () {
   };
 
   /**
+   * @route POST /fleet/assignment-edit
+   * @desc Edit assignment details (dates, odometer) even after unassignment
+   */
+  controller.editAssignment = async function (req, res) {
+    try {
+      const { assignmentId, dateAssigned, dateUnassigned, odometerReadingStart, odometerReadingEnd, remarks } = req.body;
+
+      if (!assignmentId) return res.send({ status: false, message: "Assignment ID required" });
+
+      const updateData = {
+        updatedAt: new Date(),
+        remarks: remarks || ""
+      };
+
+      if (dateAssigned) updateData.dateAssigned = new Date(dateAssigned);
+      if (dateUnassigned) updateData.dateUnassigned = new Date(dateUnassigned);
+      if (odometerReadingStart !== undefined) updateData.odometerReadingStart = odometerReadingStart;
+      if (odometerReadingEnd !== undefined) updateData.odometerReadingEnd = odometerReadingEnd;
+
+      const result = await db.UpdateDocument(
+        "fleetAssignment",
+        { _id: new mongoose.Types.ObjectId(assignmentId) },
+        updateData
+      );
+
+      return res.send({
+        status: true,
+        message: "Assignment updated successfully",
+        data: result
+      });
+    } catch (err) {
+      console.log("ERROR editAssignment", err);
+      return res.send({ status: false, message: "Error while updating assignment" });
+    }
+  };
+
+  /**
    * @route POST /fleet/assignments
    * @desc Paginated list with driver/fleet info
    */
   controller.listFleetAssignments = async function (req, res) {
-  try {
-    const { page = 1, limit = 10, search = "", sortBy = "dateAssigned", sortOrder = "desc" } = req.body;
-    const skip = (page - 1) * limit;
+    try {
+      const { page = 1, limit = 10, search = "", sortBy = "dateAssigned", sortOrder = "desc" } = req.body;
+      const skip = (page - 1) * limit;
 
-    const match = { status: { $in: [1, 2] } };
+      const match = { status: { $in: [1, 2] } };
 
-    if (search) {
-      match.$or = [
-        { "fleet.vehicleName": { $regex: search, $options: "i" } },
-        { "fleet.registrationNo": { $regex: search, $options: "i" } },
-        { "driver.fullName": { $regex: search, $options: "i" } },
-        { "contract.contractId": { $regex: search, $options: "i" } } // updated to search in contract details
+      if (search) {
+        match.$or = [
+          { "fleet.vehicleName": { $regex: search, $options: "i" } },
+          { "fleet.registrationNo": { $regex: search, $options: "i" } },
+          { "driver.fullName": { $regex: search, $options: "i" } },
+          { "contract.contractId": { $regex: search, $options: "i" } } // updated to search in contract details
+        ];
+      }
+
+      const pipeline = [
+        {
+          $lookup: {
+            from: "fleet",
+            localField: "fleetId",
+            foreignField: "_id",
+            as: "fleet"
+          }
+        },
+        { $unwind: "$fleet" },
+        {
+          $lookup: {
+            from: "employee",
+            localField: "driverId",
+            foreignField: "_id",
+            as: "driver"
+          }
+        },
+        { $unwind: "$driver" },
+        {
+          $lookup: {
+            from: "contract", // join with contract collection
+            localField: "contractId",
+            foreignField: "_id",
+            as: "contract"
+          }
+        },
+        { $unwind: { path: "$contract", preserveNullAndEmptyArrays: true } },
+        { $match: match },
+        {
+          $project: {
+            vehicleName: "$fleet.vehicleName",
+            registrationNo: "$fleet.registrationNo",
+            assetCode: "$fleet.assetCode",
+            assignedTo: "$driver.fullName",
+            driverId: "$driver._id",
+            contractId: "$contract.contractId", // ✅ show actual contractId string
+            clientName: "$contract.clientName", // optional extra field
+            dateAssigned: 1,
+            dateUnassigned: 1,
+            odometerReadingStart: 1,
+            odometerReadingEnd: 1,
+            remarks: 1,
+            status: 1
+          }
+        },
+        { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
+        { $skip: skip },
+        { $limit: parseInt(limit) }
       ];
+
+      const data = await db.GetAggregation("fleetAssignment", pipeline);
+      const totalCount = await db.GetCount("fleetAssignment", { status: { $in: [1, 2] } });
+
+      return res.send({
+        status: true,
+        count: totalCount,
+        page,
+        data
+      });
+    } catch (err) {
+      console.log("ERROR listFleetAssignments", err);
+      return res.send({ status: false, message: "Error while listing assignments" });
     }
-
-    const pipeline = [
-      {
-        $lookup: {
-          from: "fleet",
-          localField: "fleetId",
-          foreignField: "_id",
-          as: "fleet"
-        }
-      },
-      { $unwind: "$fleet" },
-      {
-        $lookup: {
-          from: "employee",
-          localField: "driverId",
-          foreignField: "_id",
-          as: "driver"
-        }
-      },
-      { $unwind: "$driver" },
-      {
-        $lookup: {
-          from: "contract", // join with contract collection
-          localField: "contractId",
-          foreignField: "_id",
-          as: "contract"
-        }
-      },
-      { $unwind: { path: "$contract", preserveNullAndEmptyArrays: true } },
-      { $match: match },
-      {
-        $project: {
-          vehicleName: "$fleet.vehicleName",
-          registrationNo: "$fleet.registrationNo",
-          assetCode: "$fleet.assetCode",
-          assignedTo: "$driver.fullName",
-          driverId: "$driver._id",
-          contractId: "$contract.contractId", // ✅ show actual contractId string
-          clientName: "$contract.clientName", // optional extra field
-          dateAssigned: 1,
-          dateUnassigned: 1,
-          odometerReadingStart: 1,
-          odometerReadingEnd: 1,
-          remarks: 1,
-          status: 1
-        }
-      },
-      { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
-      { $skip: skip },
-      { $limit: parseInt(limit) }
-    ];
-
-    const data = await db.GetAggregation("fleetAssignment", pipeline);
-    const totalCount = await db.GetCount("fleetAssignment", { status: { $in: [1, 2] } });
-
-    return res.send({
-      status: true,
-      count: totalCount,
-      page,
-      data
-    });
-  } catch (err) {
-    console.log("ERROR listFleetAssignments", err);
-    return res.send({ status: false, message: "Error while listing assignments" });
-  }
-};
+  };
 
   /**
    * @route POST /fleet/assignment-stats
@@ -223,8 +260,8 @@ module.exports = function () {
         "maintenance.nextMaintenanceDue": { $lte: new Date() },
         status: 1
       });
-    console.log(totalVehicles, deployed, maintenance);
-    
+      console.log(totalVehicles, deployed, maintenance);
+
       return res.send({
         status: true,
         data: {
@@ -240,7 +277,7 @@ module.exports = function () {
   };
 
 
-  
+
 
   return controller;
 };
