@@ -87,9 +87,33 @@ module.exports = function () {
 
     } catch (error) {
       console.log("ERROR saveVendor", error);
-      if (error.code === 11000) {
-        return res.send({ status: false, message: "This Contract ID is already assigned to a vendor.", error });
+
+      // 🛠️ Auto-Fix: If duplicate key error on contractId, drop the index and retry
+      if (error.code === 11000 && error.keyPattern && error.keyPattern.contractId) {
+        try {
+          console.log("⚠️ Detected duplicate key error on contractId. Removing unique index...");
+          await mongoose.connection.collection("vendor").dropIndex("contractId_1");
+          console.log("✅ Unique index 'contractId_1' dropped. Retrying save...");
+
+          // Retry saving
+          if (req.body.id) {
+            result = await db.UpdateDocument(
+              "vendor",
+              { _id: new mongoose.Types.ObjectId(req.body.id) },
+              vendorData
+            );
+            return res.send({ status: true, message: "Vendor updated", data: result });
+          } else {
+            result = await db.InsertDocument("vendor", vendorData);
+            return res.send({ status: true, message: "Vendor saved", data: result });
+          }
+
+        } catch (retryError) {
+          console.error("❌ Retry failed:", retryError);
+          return res.send({ status: false, message: "Error saving vendor even after index fix", error: retryError });
+        }
       }
+
       return res.send({ status: false, message: "Error saving vendor", error });
     }
   };
