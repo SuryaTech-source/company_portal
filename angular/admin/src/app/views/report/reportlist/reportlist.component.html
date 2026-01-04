@@ -71,8 +71,9 @@
     </h5>
 
     <div class="input_select">
-      <input type="text" [placeholder]="'🔍 ' + filterOptions.placeholder" [(ngModel)]="searchText" />
-      <select [(ngModel)]="filterStatus">
+      <input type="text" [placeholder]="'🔍 ' + filterOptions.placeholder" [(ngModel)]="searchText"
+        (change)="onFilterChange()" (keyup.enter)="onFilterChange()" />
+      <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
         <option value="">All Status</option>
         <option *ngIf="activeTab === 'attendance'" value="P">Present</option>
         <option *ngIf="activeTab === 'attendance'" value="A">Absent</option>
@@ -85,9 +86,9 @@
           Partial
         </option>
       </select>
-      <input type="date" class="date_input" [(ngModel)]="startDate" />
-      <input type="date" class="date_input" [(ngModel)]="endDate" />
-      <select [(ngModel)]="sortBy">
+      <input type="date" class="date_input" [(ngModel)]="startDate" (change)="onFilterChange()" />
+      <input type="date" class="date_input" [(ngModel)]="endDate" (change)="onFilterChange()" />
+      <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
         <option value="">Sort ⬍</option>
         <option *ngFor="let opt of sortOptions" [value]="opt.value">
           {{ opt.label }}

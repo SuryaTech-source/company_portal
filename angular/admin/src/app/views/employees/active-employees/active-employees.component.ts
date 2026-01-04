@@ -147,7 +147,10 @@ export class ActiveEmployeesComponent implements OnInit {
 
   // --- New navigation method for salary view ---
   viewSalary(employee: any): void {
-    this.router.navigate(['/app/employees/salary-view', employee._id]);
+    const currentYear = new Date().getFullYear();
+    this.router.navigate(['/app/employees/salary-view', employee._id], {
+      queryParams: { year: currentYear }
+    });
   }
 
   openDeleteModal(template: TemplateRef<any>, employee: any) {

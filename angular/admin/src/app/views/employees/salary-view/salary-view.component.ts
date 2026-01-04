@@ -15,15 +15,15 @@ export class SalaryViewComponent implements OnInit {
   employee: any = null;
   salaries: any[] = [];
   filteredSalaries: any[] = [];
-  
+
   // Filters
   filterYear: number = new Date().getFullYear();
   filterStatus: string = '';
-  
+
   // Modal
   modalRef?: BsModalRef;
   editingSalary: any = null;
-  
+
   loading = false;
 
   constructor(
@@ -36,6 +36,16 @@ export class SalaryViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params.year) {
+        this.filterYear = parseInt(params.year);
+      }
+      // Re-apply filters if salaries are already loaded
+      if (this.salaries.length > 0) {
+        this.applyFilters();
+      }
+    });
+
     this.getEmployeeDetails();
     this.getSalaries();
   }
@@ -50,7 +60,7 @@ export class SalaryViewComponent implements OnInit {
 
   getSalaries(): void {
     this.loading = true;
-    this.apiService.CommonApi(Apiconfig.listSalariesOfEmployee.method, Apiconfig.listSalariesOfEmployee.url,{ employeeId:this.employeeId})
+    this.apiService.CommonApi(Apiconfig.listSalariesOfEmployee.method, Apiconfig.listSalariesOfEmployee.url, { employeeId: this.employeeId })
       .subscribe((res: any) => {
         this.loading = false;
         if (res.status) {
@@ -59,7 +69,7 @@ export class SalaryViewComponent implements OnInit {
         }
       }, () => this.loading = false);
   }
-  
+
   applyFilters(): void {
     this.filteredSalaries = this.salaries.filter(s => {
       const yearMatch = this.filterYear ? s.year === this.filterYear : true;
@@ -67,12 +77,12 @@ export class SalaryViewComponent implements OnInit {
       return yearMatch && statusMatch;
     });
   }
-  
+
   openEditModal(template: TemplateRef<any>, salary: any): void {
     this.editingSalary = JSON.parse(JSON.stringify(salary)); // Deep copy
     this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
-  
+
   addPenalty(): void {
     if (!this.editingSalary.penalties) this.editingSalary.penalties = [];
     this.editingSalary.penalties.push({ type: 'Other', description: '', amount: 0, date: new Date() });
@@ -83,7 +93,7 @@ export class SalaryViewComponent implements OnInit {
   }
 
   saveSalaryUpdate(): void {
-    this.apiService.CommonApi(Apiconfig.salaryEdit.method, Apiconfig.salaryEdit.url,{salaryId:this.editingSalary._id,data:  this.editingSalary})
+    this.apiService.CommonApi(Apiconfig.salaryEdit.method, Apiconfig.salaryEdit.url, { salaryId: this.editingSalary._id, data: this.editingSalary })
       .subscribe((res: any) => {
         if (res.status) {
           this.notify.showSuccess("Salary updated successfully.");
@@ -94,7 +104,7 @@ export class SalaryViewComponent implements OnInit {
         }
       });
   }
-  
+
   getMonthName(monthNumber: number): string {
     const d = new Date();
     d.setMonth(monthNumber - 1);

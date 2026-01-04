@@ -132,7 +132,9 @@ export class SalaryListComponent implements OnInit {
     }
 
     viewSalary(employeeId: string): void {
-        this.router.navigate(['/app/employees/salary-view', employeeId]);
+        this.router.navigate(['/app/employees/salary-view', employeeId], {
+            queryParams: { year: this.selectedYear }
+        });
     }
 
     downloadPDF(): void {

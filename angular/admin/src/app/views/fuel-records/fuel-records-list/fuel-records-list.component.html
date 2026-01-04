@@ -82,14 +82,14 @@
     </thead>
     <tbody>
       <tr *ngFor="let row of filteredRecords">
-        
+
         <td>{{ row.vehicleNo }}</td>
         <td>{{ row.driverName }}</td>
         <td>{{ row.contractId }}</td>
         <td>{{ row.startOdometer }}</td>
         <td>{{ row.endOdometer }}</td>
         <td>{{ row.prevDate | date:'dd/MM/yyyy' }}</td>
-        <td>{{ row.amountPaid | currency : 'INR':'symbol':'1.0-0' }}</td>
+        <td>{{ row.amountPaid | currency : 'KWD':'KD ' }}</td>
         <td>{{ row.issuedBy }}</td>
         <td>{{ row.fuelConsumed }}</td>
         <td>{{ calcMileage(row) | number:'1.1-2' }}</td>
@@ -129,16 +129,16 @@
       </div>
 
       <div class="col-md-6">
-  <div class="label_input">
-    <label>Contract</label>
-    <select class="form-select" [(ngModel)]="newFuel.contractId" name="contractId" required>
-      <option value="">Select Contract</option>
-      <option *ngFor="let c of contracts" [value]="c._id">
-        {{ c.contractId || '' }} - {{ c.clientName || ''}}
-      </option>
-    </select>
-  </div>
-</div>
+        <div class="label_input">
+          <label>Contract</label>
+          <select class="form-select" [(ngModel)]="newFuel.contractId" name="contractId" required>
+            <option value="">Select Contract</option>
+            <option *ngFor="let c of contracts" [value]="c._id">
+              {{ c.contractId || '' }} - {{ c.clientName || ''}}
+            </option>
+          </select>
+        </div>
+      </div>
 
       <div class="col-md-6">
         <div class="label_input">

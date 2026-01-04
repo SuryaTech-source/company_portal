@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
+import { ActivatedRoute, Router } from '@angular/router'; // Added imports
 import html2pdf from 'html2pdf.js';
 import { NotificationService } from 'src/app/_services/notification.service';
 
@@ -50,10 +51,61 @@ export class ReportlistComponent implements OnInit {
 
   @ViewChild('tableContent', { static: false }) tableContent!: ElementRef;
 
-  constructor(private apiService: ApiService, private notification: NotificationService) { }
+  constructor(
+    private apiService: ApiService,
+    private notification: NotificationService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
-    this.loadRecords();
+    // Subscribe to query params to govern state
+    this.route.queryParams.subscribe(params => {
+      this.activeTab = params['tab'] || 'attendance';
+      this.searchText = params['search'] || '';
+      this.filterStatus = params['status'] || '';
+      this.startDate = params['start'] || '';
+      this.endDate = params['end'] || '';
+      this.sortBy = params['sort'] || '';
+      this.selectedDate = params['date'] || new Date().toISOString().split('T')[0];
+
+      this.loadRecords();
+    });
+  }
+
+  // Update URL on any state change
+  updateUrl() {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        tab: this.activeTab,
+        search: this.searchText || null,
+        status: this.filterStatus || null,
+        start: this.startDate || null,
+        end: this.endDate || null,
+        sort: this.sortBy || null,
+        date: this.activeTab === 'attendance' ? this.selectedDate : null
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  // Called by UI events
+  onFilterChange() {
+    this.updateUrl();
+  }
+
+  // Override setTab to just update URL
+  setTab(tab: string) {
+    this.activeTab = tab;
+    // Clear filters on tab switch (optional, but often desired UX)
+    this.searchText = '';
+    this.filterStatus = '';
+    this.startDate = '';
+    this.endDate = '';
+    this.sortBy = '';
+
+    this.updateUrl();
   }
 
   // 🔹 Load records dynamically depending on tab
@@ -75,28 +127,16 @@ export class ReportlistComponent implements OnInit {
         });
     }
 
-    // this.loadInvoices()
-    // this.loadContracts()
-    this.loadVendors()
-    this.getActiveContracts()
+    // Load common resources if needed (can be optimized to load once)
+    this.loadVendors();
+    this.getActiveContracts();
   }
-
-  //   loadInvoices() {
-  //   this.apiService.CommonApi(Apiconfig.listInvoices.method, Apiconfig.listInvoices.url, { limit: 100 })
-  //     .subscribe((res: any) => { if (res.status) this.invoices = res.data || []; });
-  // }
-
 
   loadVendors() {
     this.apiService.CommonApi(Apiconfig.vendorList.method, Apiconfig.vendorList.url, {})
       .subscribe((res: any) => { if (res.status) this.vendors = res.data || []; });
   }
 
-
-  loadContracts() {
-    this.apiService.CommonApi(Apiconfig.contractListActive.method, Apiconfig.contractListActive.url, {})
-      .subscribe((res: any) => { if (res.status) this.contracts = res.data.doc || []; });
-  }
   // 🔹 Dynamic Filters & Sort
   get filterOptions() {
     if (this.activeTab === 'attendance') {
@@ -171,16 +211,6 @@ export class ReportlistComponent implements OnInit {
     if (this.sortBy === 'amountDesc') data.sort((a, b) => b.amountPaid - a.amountPaid);
     if (this.sortBy === 'nameAsc') data.sort((a, b) => a.name.localeCompare(b.name));
     return data;
-  }
-
-  setTab(tab: string) {
-    this.activeTab = tab;
-    this.searchText = '';
-    this.filterStatus = '';
-    this.startDate = '';
-    this.endDate = '';
-    this.sortBy = '';
-    this.loadRecords();
   }
 
   // 🔹 Modal
@@ -267,15 +297,7 @@ export class ReportlistComponent implements OnInit {
 
   // load attendance for date
   loadAttendanceByDate() {
-    this.apiService.CommonApi(
-      Apiconfig.listAttendance.method,
-      Apiconfig.listAttendance.url,
-      { date: this.selectedDate }
-    ).subscribe((res: any) => {
-      if (res.status) {
-        this.attendanceData = res.data;
-      }
-    });
+    this.updateUrl();
   }
 
   getActiveContracts() {
