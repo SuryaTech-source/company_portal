@@ -18,7 +18,7 @@ export class AddEditTagComponent implements OnInit {
   id: string | null = null;
 
   contractTypes = ['Monthly', 'Yearly'];
-  documentTypes = ['PDF', 'DOC', 'Image', 'Other'];
+
   contracts: any[] = [];
 
   form: any = { noOfBuses: 0 };
@@ -27,7 +27,7 @@ export class AddEditTagComponent implements OnInit {
   apiUrl = environment.apiUrl
 
   // hold actual File objects selected in UI
-  selectedVendorDocFile: File | null = null;
+
 
   assignedFleetDrivers: Array<{
     busRegisterNumber: string;
@@ -91,15 +91,7 @@ export class AddEditTagComponent implements OnInit {
     this.assignedFleetDrivers[i].driverDocFile = file;
   }
 
-  onVendorDocSelect(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.selectedVendorDocFile = input?.files?.[0] || null;
-    // store preview URL string separately if server returned earlier upload
-    if (this.selectedVendorDocFile) {
-      // when user selects new file, clear old URL to avoid confusion
-      this.userDetails.documentFile = '';
-    }
-  }
+
 
   onlyNumbers(event: KeyboardEvent) {
     const charCode = event.which ? event.which : event.keyCode;
@@ -136,10 +128,7 @@ export class AddEditTagComponent implements OnInit {
       if (!row.driverName) return `Row ${i + 1}: Driver Name is required.`;
       if (!row.driverContact) return `Row ${i + 1}: Driver Contact is required.`;
     }
-    // vendor document: require both type and either file or existing URL
-    if (!u.documentType) return 'Document Type is required.';
-    const hasVendorDoc = !!this.selectedVendorDocFile || !!u.documentFile;
-    if (!hasVendorDoc) return 'Please upload a vendor document.';
+
     return null;
   }
 
@@ -172,19 +161,7 @@ export class AddEditTagComponent implements OnInit {
     fd.append('noOfBuses', String(driversMeta.length));
     fd.append('noOfDrivers', String(driversMeta.length));
 
-    // Vendor documents: send metadata JSON + file for index 0
-    const docsMeta = [{ documentType: this.userDetails.documentType }];
-    fd.append('documents', JSON.stringify(docsMeta));             // meta as JSON
 
-    // If a new vendor file is selected, append it under an array-style key
-    if (this.selectedVendorDocFile) {
-      fd.append('documents[0][file]', this.selectedVendorDocFile, this.selectedVendorDocFile.name);
-    } else if (this.userDetails.documentFile) {
-      // keep existing file by sending url in metadata if backend expects it
-      // If backend expects fileUrl in documents meta:
-      const docsWithUrl = [{ documentType: this.userDetails.documentType, fileUrl: this.userDetails.documentFile }];
-      fd.set('documents', JSON.stringify(docsWithUrl));
-    }
 
     // append driver files with continuous indexes based on meta order
     this.assignedFleetDrivers.forEach((d, idx) => {
@@ -228,8 +205,7 @@ export class AddEditTagComponent implements OnInit {
           contractType: v.contractType,
           startDate: v.startDate?.split('T')[0],
           endDate: v.endDate?.split('T')[0],
-          documentType: v.documents?.[0]?.documentType || 'PDF',
-          documentFile: v.documents?.[0]?.fileUrl || '', // existing URL (for preview/download)
+
         };
 
         this.form.noOfBuses = v.drivers?.length || 0; // Length is based on drivers array now
@@ -250,19 +226,7 @@ export class AddEditTagComponent implements OnInit {
       });
   }
 
-  // previewDoc() {
-  //   if (this.userDetails.documentFile) {
-  //     window.open(+this.userDetails.documentFile, '_blank');
-  //   }
-  // }
 
-  previewDoc() {
-    if (this.userDetails.documentFile) {
-      const fullUrl = this.getFullFileUrl(this.userDetails.documentFile);
-      console.log('Opening file at:', fullUrl);
-      window.open(fullUrl, '_blank');
-    }
-  }
 
   getFullFileUrl(fileUrl: string): string {
     if (!fileUrl) return '';
@@ -277,14 +241,6 @@ export class AddEditTagComponent implements OnInit {
     const baseUrl = this.apiUrl.replace(/\/$/, '');
 
     return `${baseUrl}/${cleanPath}`;
-  }
-
-  downloadDoc() {
-    if (!this.userDetails.documentFile) return;
-    const a = document.createElement('a');
-    a.href = this.userDetails.documentFile;
-    a.download = this.userDetails.documentFile.split('/').pop() || 'document';
-    a.click();
   }
 
   previewDriverDoc(index: number) {

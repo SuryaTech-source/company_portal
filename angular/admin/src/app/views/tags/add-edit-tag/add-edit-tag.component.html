@@ -107,28 +107,7 @@
     </tbody>
   </table>
 
-  <h5 class="col-12">Documents</h5>
 
-  <div class="col-md-4">
-    <label>Upload Document <span class="mandatory">*</span></label>
-    <input type="file" class="form-control" (change)="onVendorDocSelect($event)">
-  </div>
-
-  <div class="col-md-4">
-    <label>Document Type <span class="mandatory">*</span></label>
-    <select class="form-control" [(ngModel)]="userDetails.documentType" name="documentType" required>
-      <option value="">Select Type</option>
-      <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
-    </select>
-  </div>
-
-  <div class="col-md-4" *ngIf="userDetails.documentFile">
-    <label>Uploaded File:</label>
-    <div>
-      <button type="button" class="btn btn-sm btn-primary" (click)="previewDoc()">Preview</button>
-      <button type="button" class="btn btn-sm btn-success" (click)="downloadDoc()">Download</button>
-    </div>
-  </div>
 
   <div class="page_footer">
     <button type="button" routerLink="/app/carrier/list" class="close_btn">Cancel</button>

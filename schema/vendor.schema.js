@@ -36,13 +36,7 @@ VENDOR_SCHEMA.VENDOR = {
   // ✅ Status
   status: { type: Number, default: 1 },  // 1 active, 2 inactive, etc.
 
-  // ✅ Vendor uploaded files (old field kept)
-  documents: [
-    {
-      documentType: String,
-      fileUrl: String,
-    }
-  ],
+
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

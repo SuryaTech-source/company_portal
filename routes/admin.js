@@ -1476,6 +1476,11 @@ module.exports = function (app, io) {
       ensureAuthorized,
       maintance.listMaintenances
     );
+    app.post(
+      "/admin/maintenance/delete",
+      ensureAuthorized,
+      maintance.deleteMaintenance
+    );
 
     //sapre parts management
     app.post(

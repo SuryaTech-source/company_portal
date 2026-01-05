@@ -195,6 +195,10 @@ export const Apiconfig = {
         "url": "admin/maintenance/save",
         "method": "post"
     },
+    deleteMaintenance: {
+        "url": "admin/maintenance/delete",
+        "method": "post"
+    },
 
     saveVendorPayment: {
         "url": "admin/vendor/payment/save",

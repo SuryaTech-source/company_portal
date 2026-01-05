@@ -12,23 +12,28 @@ module.exports = function () {
     try {
       const body = req.body;
 
-      // ✅ Vendor documents upload
-      let documents = [];
-      if (body.documents) {
-        let docsArray = typeof body.documents === "string"
-          ? JSON.parse(body.documents)
-          : body.documents;
+      // 🔍 Check for duplicate Vendor Name
+      if (body.vendorName) {
+        const duplicateCheck = await db.GetOneDocument(
+          "vendor",
+          {
+            vendorName: { $regex: new RegExp(`^${body.vendorName.trim()}$`, "i") },
+            status: { $ne: 0 }, // Check active vendors
+          },
+          {},
+          {}
+        );
 
-        documents = docsArray.map((doc, index) => {
-          let file = req.files?.find(
-            (f) => f.fieldname === `documents[${index}][file]`
-          );
-          return {
-            documentType: doc.documentType || doc.type,
-            fileUrl: file ? file.destination + file.filename : doc.fileUrl || null,
-          };
-        });
+        if (duplicateCheck.status && duplicateCheck.doc) {
+          const existing = duplicateCheck.doc;
+          // If creating new OR updating diff ID
+          if (!body.id || existing._id.toString() !== body.id) {
+            return res.send({ status: false, message: "Vendor name already exists." });
+          }
+        }
       }
+
+
 
       // ✅ Drivers & Buses (Manual Entry)
       let drivers = [];
@@ -67,7 +72,7 @@ module.exports = function () {
         contractType: body.contractType || "",
         invoicingDate: body.invoicingDate ? new Date(body.invoicingDate) : null,
         lastPayment: body.lastPayment ? new Date(body.lastPayment) : null,
-        documents,
+
         status: Number(body.status) || 1
       };
 
@@ -82,31 +87,26 @@ module.exports = function () {
         return res.send({ status: true, message: "Vendor updated", data: result });
       }
 
+      // Try Inserting
       result = await db.InsertDocument("vendor", vendorData);
-      return res.send({ status: true, message: "Vendor saved", data: result });
 
-    } catch (error) {
-      console.log("ERROR saveVendor", error);
-
-      // 🛠️ Auto-Fix: If duplicate key error on contractId, drop the index and retry
-      if (error.code === 11000 && error.keyPattern && error.keyPattern.contractId) {
+      // Check if result is a duplicate key error on contractId
+      // InsertDocument returns the error object itself if it fails
+      if (result && result.code === 11000 && result.keyPattern && result.keyPattern.contractId) {
         try {
           console.log("⚠️ Detected duplicate key error on contractId. Removing unique index...");
           await mongoose.connection.collection("vendor").dropIndex("contractId_1");
           console.log("✅ Unique index 'contractId_1' dropped. Retrying save...");
 
-          // Retry saving
-          if (req.body.id) {
-            result = await db.UpdateDocument(
-              "vendor",
-              { _id: new mongoose.Types.ObjectId(req.body.id) },
-              vendorData
-            );
-            return res.send({ status: true, message: "Vendor updated", data: result });
-          } else {
-            result = await db.InsertDocument("vendor", vendorData);
-            return res.send({ status: true, message: "Vendor saved", data: result });
+          // Retry Insert
+          result = await db.InsertDocument("vendor", vendorData);
+
+          // If retry fails again with error
+          if (result && (result.code || result instanceof Error)) {
+            return res.send({ status: false, message: "Error saving vendor", error: result });
           }
+
+          return res.send({ status: true, message: "Vendor saved", data: result });
 
         } catch (retryError) {
           console.error("❌ Retry failed:", retryError);
@@ -114,6 +114,15 @@ module.exports = function () {
         }
       }
 
+      // Check for other errors
+      if (result && (result.code || result instanceof Error)) {
+        return res.send({ status: false, message: "Error saving vendor", error: result });
+      }
+
+      return res.send({ status: true, message: "Vendor saved", data: result });
+
+    } catch (error) {
+      console.log("ERROR saveVendor", error);
       return res.send({ status: false, message: "Error saving vendor", error });
     }
   };
@@ -151,7 +160,7 @@ module.exports = function () {
             invoicingDate: 1,
             lastPayment: 1,
             status: 1,
-            documents: 1,
+
             drivers: 1, // Include complete driver/bus structure
             "contractDetails._id": 1,
             "contractDetails.contractId": 1,
