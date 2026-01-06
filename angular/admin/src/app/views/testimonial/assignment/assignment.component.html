@@ -129,7 +129,7 @@
     <div class="modal-content">
       <form (ngSubmit)="saveAssignment()">
         <div class="modal-header">
-          <h5 class="modal-title">Assign Fleet to Driver</h5>
+          <h5 class="modal-title">Assign Fleet to Employee</h5>
           <button type="button" class="btn-close" (click)="showAssignModal = false"></button>
         </div>
         <div class="modal-body">
@@ -147,9 +147,19 @@
             </div>
             <div class="col-12">
               <div class="label_input">
-                <label>Driver</label>
+                <label>Designation</label>
+                <select class="form-select" [(ngModel)]="selectedDesignation"
+                  (change)="loadEmployees(selectedDesignation)" name="designation">
+                  <option *ngFor="let d of designationOptions" [value]="d">{{ d }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="label_input">
+                <label>Employee</label>
                 <select class="form-select" [(ngModel)]="assignForm.driverId" name="driverId" required>
-                  <option value="">Select Driver</option>
+                  <option value="">Select Employee</option>
                   <option *ngFor="let d of drivers" [value]="d._id">
                     {{ d.fullName }}
                   </option>

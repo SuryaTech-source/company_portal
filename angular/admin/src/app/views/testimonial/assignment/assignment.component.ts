@@ -60,7 +60,7 @@ export class AssignmentComponent implements OnInit {
   ngOnInit(): void {
     this.loadFleetAssignments();
     this.loadCounts();
-    this.loadDrivers();
+    this.loadEmployees(this.selectedDesignation);
   }
 
   /** 🔹 Load all assignments */
@@ -100,9 +100,13 @@ export class AssignmentComponent implements OnInit {
       });
   }
 
-  /** 🔹 Load all available drivers */
-  loadDrivers() {
-    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1, role: 'Driver' })
+  designationOptions = ['Driver', 'Staff', 'Mechanic', 'Maid', 'Supervisor', 'Others'];
+  selectedDesignation = 'Driver';
+
+  /** 🔹 Load employees based on designation */
+  loadEmployees(role: string) {
+    this.drivers = []; // Clear previous list
+    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1, role: role })
       .subscribe((res: any) => {
         if (res.status) this.drivers = res.data;
       });
@@ -128,6 +132,8 @@ export class AssignmentComponent implements OnInit {
       contractId: '',
       remarks: ''
     };
+    this.selectedDesignation = 'Driver';
+    this.loadEmployees(this.selectedDesignation);
     this.loadFleets();
     this.loadContracts();
     this.showAssignModal = true;
