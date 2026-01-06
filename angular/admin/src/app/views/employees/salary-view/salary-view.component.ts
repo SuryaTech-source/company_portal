@@ -5,6 +5,8 @@ import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
+
 @Component({
   selector: 'app-salary-view',
   templateUrl: './salary-view.component.html',
@@ -15,6 +17,8 @@ export class SalaryViewComponent implements OnInit {
   employee: any = null;
   salaries: any[] = [];
   filteredSalaries: any[] = [];
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
   // Filters
   filterYear: number = new Date().getFullYear();
@@ -30,12 +34,20 @@ export class SalaryViewComponent implements OnInit {
     private route: ActivatedRoute,
     private apiService: ApiService,
     private notify: NotificationService,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private store: DefaultStoreService
   ) {
     this.employeeId = this.route.snapshot.paramMap.get('id') || '';
   }
 
   ngOnInit(): void {
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
+
     this.route.queryParams.subscribe(params => {
       if (params.year) {
         this.filterYear = parseInt(params.year);

@@ -4,6 +4,7 @@ import { Apiconfig } from 'src/app/_helpers/api-config';
 import html2pdf from 'html2pdf.js';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { Router } from '@angular/router';
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
 
 @Component({
   selector: 'app-invoice-list',
@@ -16,6 +17,8 @@ export class InvoiceListComponent implements OnInit {
   limit: number = 10;
   count: number = 0;
   totalPages: number = 0;
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
   // Filters
   searchText: string = '';
@@ -28,10 +31,17 @@ export class InvoiceListComponent implements OnInit {
   constructor(
     private api: ApiService,
     private notify: NotificationService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private store: DefaultStoreService
+  ) { }
 
   ngOnInit(): void {
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
     this.loadInvoices();
   }
 
@@ -98,7 +108,7 @@ export class InvoiceListComponent implements OnInit {
       });
   }
 
- downloadTablePDF() {
+  downloadTablePDF() {
     // Check if there are any invoices to export
     if (!this.invoices || this.invoices.length === 0) {
       this.notify.showWarning("No invoice data available to export");
@@ -153,10 +163,10 @@ export class InvoiceListComponent implements OnInit {
       if (isNaN(dt.getTime())) return String(d);
       return dt.toLocaleDateString();
     };
-    
+
     const fmtCurrency = (v: number) => {
       if (typeof v !== 'number') v = Number(v) || 0;
-      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(v);
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: this.currency_code }).format(v);
     };
 
     console.log(invoice);
@@ -288,7 +298,7 @@ export class InvoiceListComponent implements OnInit {
           </table>
         </div>
 
-        ${invoice.remarks ? `<div style="margin-top:12px;"><strong>Remarks:</strong><div class="small">${(invoice.remarks||'').replace(/\n/g,'<br>')}</div></div>` : ''}
+        ${invoice.remarks ? `<div style="margin-top:12px;"><strong>Remarks:</strong><div class="small">${(invoice.remarks || '').replace(/\n/g, '<br>')}</div></div>` : ''}
 
         <div class="footer">
           This is a system generated invoice. If you have any queries, contact accounts@company.com
@@ -306,7 +316,7 @@ export class InvoiceListComponent implements OnInit {
 
     // html2pdf options
     const opt = {
-      margin: 12/72,
+      margin: 12 / 72,
       filename,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },

@@ -1,9 +1,10 @@
-import { Component, ElementRef, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, ViewChild, TemplateRef, ViewEncapsulation, OnInit } from '@angular/core';
 import html2pdf from 'html2pdf.js';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { ApiService } from 'src/app/_services/api.service';
 import { NotificationService } from 'src/app/_services/notification.service';
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
 
 interface FuelRecord {
   _id?: string;
@@ -26,10 +27,13 @@ interface FuelRecord {
   styleUrls: ['./fuel-records-list.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class FuelRecordsListComponent {
+export class FuelRecordsListComponent implements OnInit {
   @ViewChild('fuelTable', { static: false }) fuelTable!: ElementRef;
   @ViewChild('fuelForm', { static: false }) fuelForm!: TemplateRef<any>;
   modalRef?: BsModalRef;
+  fuelRecords: FuelRecord[] = [];
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
   // Filters
   searchVehicle = '';
@@ -52,10 +56,21 @@ export class FuelRecordsListComponent {
   constructor(
     private modalService: BsModalService,
     private apiService: ApiService,
-    private notifyService: NotificationService
+    private notifyService: NotificationService,
+    private store: DefaultStoreService
   ) { }
 
   ngOnInit() {
+    this.initialLoad();
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
+  }
+
+  initialLoad() {
     this.loadFuelRecords();
     this.loadVehicles();
     this.loadDrivers();

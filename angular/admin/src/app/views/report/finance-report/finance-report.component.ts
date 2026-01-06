@@ -23,6 +23,8 @@ export type ChartOptions = {
   title: ApexTitleSubtitle;
 };
 
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
+
 @Component({
   selector: 'app-finance-report',
   templateUrl: './finance-report.component.html',
@@ -37,12 +39,17 @@ export class FinanceReportComponent {
   public paymentsChartOptions: Partial<ChartOptions>;
   public salesData: any;
   public paymentsData: any;
-  
+
   selectedYear: number = 2024;
   selectedMonth: number = 12; // 0 for 'All'
-  curreny_symbol: any;
+  curreny_symbol: any = 'KD';
 
-  constructor(private http: HttpClient,private apiService: ApiService,    private cdRef: ChangeDetectorRef) {
+  constructor(
+    private http: HttpClient,
+    private apiService: ApiService,
+    private cdRef: ChangeDetectorRef,
+    private store: DefaultStoreService
+  ) {
     this.salesChartOptions = {
       series: [],
       chart: {
@@ -67,7 +74,7 @@ export class FinanceReportComponent {
       },
       xaxis: {
         categories: [],
-        tickAmount:16
+        tickAmount: 16
       }
     };
 
@@ -95,12 +102,16 @@ export class FinanceReportComponent {
       },
       xaxis: {
         categories: [],
-        tickAmount:16
+        tickAmount: 16
       }
     };
-		this.apiService.CommonApi(Apiconfig.landingData.method, Apiconfig.landingData.url, {}).subscribe(result => {
-			this.curreny_symbol = result && result.currency_symbol != (undefined || null) && result.currency_symbol ? result.currency_symbol : "₹"
-		})
+
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings && settings.currency_symbol) {
+        this.curreny_symbol = settings.currency_symbol;
+      }
+    });
+
     this.fetchData();
   }
 
@@ -122,38 +133,38 @@ export class FinanceReportComponent {
     // const salesUrl = `/api/sales?year=${year}&month=${month}`;
     // const paymentsUrl = `/api/payments?year=${year}&month=${month}`;
 
-    this.apiService.CommonApi(Apiconfig.paymentReport.method, Apiconfig.paymentReport.url, {year:Number(year),month:month}).subscribe(result => {
+    this.apiService.CommonApi(Apiconfig.paymentReport.method, Apiconfig.paymentReport.url, { year: Number(year), month: month }).subscribe(result => {
       this.paymentsData = result;  // Assume response is in the expected format
       this.updatePaymentsChart();
 
     })
 
-    this.apiService.CommonApi(Apiconfig.salesReport.method, Apiconfig.salesReport.url, {year:Number(year),month:Number(month)}).subscribe(result => {
-      if(result.status){
+    this.apiService.CommonApi(Apiconfig.salesReport.method, Apiconfig.salesReport.url, { year: Number(year), month: Number(month) }).subscribe(result => {
+      if (result.status) {
         this.salesData = result;  // Assume response is in the expected format
         this.updateSalesChart();
       }
-     
+
     })
     // Fetch payments data
   }
 
   updateSalesChart(): void {
     console.log(this.salesData, 'this.salesData');
-  
+
     // Update the x-axis categories
     const months = this.salesData.category.map(item => item.label);
-  console.log(months,'sales months');
+    console.log(months, 'sales months');
 
     this.salesChartOptions.xaxis.categories = months;
-  
+
     // Update series data
     const totalSales = this.salesData.category.map(item => item.total_sale);
     const grossSales = this.salesData.category.map(item => item.gross_sale);
     const discounts = this.salesData.category.map(item => item.discount);
     const shippingCosts = this.salesData.category.map(item => item.shipping);
     const taxes = this.salesData.category.map(item => item.taxes);
-  
+
     this.salesChartOptions = {
       ...this.salesChartOptions,  // Keep existing chart options
       series: [
@@ -174,17 +185,17 @@ export class FinanceReportComponent {
     // Ensure Angular change detection is triggered
     this.cdRef.detectChanges();
   }
-  
-  
+
+
   updatePaymentsChart(): void {
     const months = this.paymentsData.data.map(item => item.label);
     this.paymentsChartOptions.xaxis.categories = months;
-  console.log(months,'monthsmonthsmonthsmonths');
-  
+    console.log(months, 'monthsmonthsmonthsmonths');
+
     // Update series data
     const cod = this.paymentsData.data.map(item => item.cod_amount);
     const razorpay = this.paymentsData.data.map(item => item.razorpay_amount);
-  
+
     this.paymentsChartOptions = {
       ...this.paymentsChartOptions,  // Keep existing chart options
       series: [
@@ -202,6 +213,6 @@ export class FinanceReportComponent {
     // Ensure Angular change detection is triggered
     this.cdRef.detectChanges();
   }
-  
-  
+
+
 }

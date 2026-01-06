@@ -5,6 +5,8 @@ import { Apiconfig } from 'src/app/_helpers/api-config';
 import { ApiService } from 'src/app/_services/api.service';
 import { NotificationService } from 'src/app/_services/notification.service';
 
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
+
 @Component({
   selector: 'app-spare-parts-new',
   templateUrl: './spare-parts-new.component.html',
@@ -15,16 +17,25 @@ export class SparePartsNewComponent implements OnInit {
   loading = false;
   isEdit = false;
   id: string | null = null;
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
     private route: ActivatedRoute,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private store: DefaultStoreService
   ) { }
 
   ngOnInit(): void {
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
     this.sparePartForm = this.fb.group({
       _id: [null],
       name: ['', Validators.required],
@@ -44,15 +55,15 @@ export class SparePartsNewComponent implements OnInit {
     }
 
     this.sparePartForm.get('unitPrice')?.valueChanges.subscribe(() => this.calculateFinalPrice());
-this.sparePartForm.get('discount')?.valueChanges.subscribe(() => this.calculateFinalPrice());
+    this.sparePartForm.get('discount')?.valueChanges.subscribe(() => this.calculateFinalPrice());
 
   }
-calculateFinalPrice() {
-  const price = this.sparePartForm.get('unitPrice')?.value || 0;
-  const discount = this.sparePartForm.get('discount')?.value || 0;
-  const final = price - (price * discount / 100);
-  this.sparePartForm.patchValue({ finalPrice: final }, { emitEvent: false });
-}
+  calculateFinalPrice() {
+    const price = this.sparePartForm.get('unitPrice')?.value || 0;
+    const discount = this.sparePartForm.get('discount')?.value || 0;
+    const final = price - (price * discount / 100);
+    this.sparePartForm.patchValue({ finalPrice: final }, { emitEvent: false });
+  }
 
   getSparePartById(id: string) {
     this.loading = true;
@@ -86,9 +97,9 @@ calculateFinalPrice() {
     this.loading = true;
 
     // const payload = this.sparePartForm.value;
-      const payload = {
-    ...this.sparePartForm.getRawValue(), // ✅ includes final price
-  };
+    const payload = {
+      ...this.sparePartForm.getRawValue(), // ✅ includes final price
+    };
 
     this.apiService.CommonApi(
       Apiconfig.saveSparePart.method,

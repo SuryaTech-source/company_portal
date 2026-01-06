@@ -2,13 +2,8 @@
   <div class="title_sec">
     <h4 class="page_title">Spare Parts Inventory</h4>
     <div class="d-flex gap-10">
-      <input
-        type="text"
-        class="form-control me-2"
-        placeholder="🔍 Search by name / part number"
-        [(ngModel)]="search"
-        (ngModelChange)="onSearchChange()"
-      />
+      <input type="text" class="form-control me-2" placeholder="🔍 Search by name / part number" [(ngModel)]="search"
+        (ngModelChange)="onSearchChange()" />
       <button class="btn btn-primary" (click)="getSpareParts()">Search</button>
     </div>
   </div>
@@ -39,22 +34,19 @@
           <td>{{ part.totalQuantity }}</td>
           <td>
             {{
-              part.addedBatches?.length
-                ? part.addedBatches[part.addedBatches.length - 1].pricePerUnit
-                : ("-" | currency : "INR")
+            part.addedBatches?.length
+            ? part.addedBatches[part.addedBatches.length - 1].pricePerUnit
+            : ("-" | currency : currency_code : currency_symbol)
             }}
           </td>
           <td>{{ part.discount || 0 }}%</td>
-          <td>{{ part.finalPrice | currency : "INR" }}</td>
-          <td>{{ part.totalQuantity * part.finalPrice | currency : "INR" }}</td>
+          <td>{{ part.finalPrice | currency : currency_code : currency_symbol }}</td>
+          <td>{{ part.totalQuantity * part.finalPrice | currency : currency_code : currency_symbol }}</td>
           <td>
-            <button
-              class="btn btn-sm btn-warning"
-              (click)="editSparePart(part._id)"
-            >
+            <button class="btn btn-sm btn-warning" (click)="editSparePart(part._id)">
               ✏️ Edit
             </button>
-            
+
           </td>
         </tr>
 
@@ -72,26 +64,16 @@
         <a class="page-link" (click)="onPageChange(page - 1)">Prev</a>
       </li>
 
-      <li
-        class="page-item"
-        *ngFor="
+      <li class="page-item" *ngFor="
           let p of [].constructor(Math.ceil(total / limit));
           let idx = index
-        "
-        [class.active]="page === idx + 1"
-      >
+        " [class.active]="page === idx + 1">
         <a class="page-link" (click)="onPageChange(idx + 1)">{{ idx + 1 }}</a>
       </li>
 
-      <li
-        class="page-item"
-        [class.disabled]="page === Math.ceil(total / limit)"
-      >
+      <li class="page-item" [class.disabled]="page === Math.ceil(total / limit)">
         <a class="page-link" (click)="onPageChange(page + 1)">Next</a>
       </li>
     </ul>
   </nav>
 </div>
-
-
-

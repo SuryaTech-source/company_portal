@@ -10,7 +10,7 @@ EMPLOYEE_SCHEMA.EMPLOYEE = {
   dob: Date,
   permanentAddress: String,
   contactNumber: String,
-  designation: { type: String, enum: ["Mechanic", "Maid", "Supervisor", "Driver", "Others"] },
+  designation: { type: String, enum: ["Mechanic", "Helper", "Supervisor", "Driver", "Others"] },
   employeeId: { type: String, unique: true },
   employmentType: { type: String, enum: ["Full-Time", "Part-Time", "Contract"] },
   dateOfJoining: Date,
@@ -35,7 +35,7 @@ EMPLOYEE_SCHEMA.EMPLOYEE = {
   licenseNo: String,
   licenseExpiry: Date,
 
-  role: { type: String, enum: ["Driver", "Staff", "Mechanic", "Maid", "Supervisor", "Others"], required: true },
+  role: { type: String, enum: ["Driver", "Staff", "Mechanic", "Helper", "Supervisor", "Others"], required: true },
 
   documents: [{
     documentType: String,

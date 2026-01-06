@@ -51,7 +51,7 @@
             <tr *ngFor="let emp of getEmployeesForTab(role.key); trackBy: trackByEmployeeId">
               <td>{{ emp.fullName }}</td>
               <td>{{ emp.employeeId }}</td>
-              <td>{{ emp.salary | currency:'KWD':'KD ' }}</td>
+              <td>{{ emp.salary | currency:currency_code:currency_symbol }}</td>
               <td>{{ emp.dateOfJoining | date:'dd/MM/yyyy' }}</td>
               <td *ngIf="role.key === 'Driver'">{{ emp.licenseNo || '-' }}</td>
               <td *ngIf="role.key !== 'Driver'">{{ emp.designation || '-' }}</td>

@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
 import html2pdf from 'html2pdf.js';
 
 @Component({
@@ -13,6 +14,8 @@ import html2pdf from 'html2pdf.js';
 export class SalaryListComponent implements OnInit {
     salaries: any[] = [];
     loading = false;
+    currency_code = 'KWD';
+    currency_symbol = 'KD';
 
     // Filters
     years: number[] = [];
@@ -44,10 +47,18 @@ export class SalaryListComponent implements OnInit {
         private apiService: ApiService,
         private notify: NotificationService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private store: DefaultStoreService
     ) { }
 
     ngOnInit(): void {
+        this.store.generalSettings.subscribe((settings) => {
+            if (settings) {
+                this.currency_code = settings.currency_code;
+                this.currency_symbol = settings.currency_symbol;
+            }
+        });
+
         // Initialize Years (current year - 5 to current year + 1)
         const currentYear = new Date().getFullYear();
         for (let i = currentYear - 5; i <= currentYear + 1; i++) {

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { ApiService } from 'src/app/_services/api.service';
 import { NotificationService } from 'src/app/_services/notification.service';
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
 
 @Component({
   selector: 'app-spare-parts-list',
@@ -16,10 +17,23 @@ export class SparePartsListComponent implements OnInit {
   limit: number = 10;
   total: number = 0;
   loading = false;
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
-  constructor(private apiService: ApiService, private router: Router ,  private notifyService: NotificationService) {}
+  constructor(
+    private apiService: ApiService,
+    private router: Router,
+    private notifyService: NotificationService,
+    private store: DefaultStoreService
+  ) { }
 
   ngOnInit(): void {
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
     this.getSpareParts();
   }
 

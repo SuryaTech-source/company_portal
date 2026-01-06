@@ -57,17 +57,18 @@
       </button>
     </div>
     <div class="col-md-4 col-sm-12">
-  <div class="label_input">
-    <label class="form-label">Discount (%)</label>
-    <input type="number" class="form-control" formControlName="discount" min="0" max="100">
-  </div>
-</div>
+      <div class="label_input">
+        <label class="form-label">Discount (%)</label>
+        <input type="number" class="form-control" formControlName="discount" min="0" max="100">
+      </div>
+    </div>
 
-<div class="col-md-4 col-sm-12">
-  <div class="label_input">
-    <label class="form-label">Final Price</label>
-    <input type="number" class="form-control" formControlName="finalPrice" readonly>
-  </div>
-</div>
+    <div class="col-md-4 col-sm-12">
+      <div class="label_input">
+        <label class="form-label">Final Price</label>
+        <input type="number" class="form-control" formControlName="finalPrice" readonly
+          [placeholder]="'Final Price (' + currency_code + ')'">
+      </div>
+    </div>
   </form>
 </div>

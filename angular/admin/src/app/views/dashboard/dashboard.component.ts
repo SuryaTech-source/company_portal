@@ -50,6 +50,8 @@ export type ChartOptioncard = {
 };
 
 
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -403,6 +405,7 @@ export class DashboardComponent implements OnInit {
   //     //   }
   //     // }
   //   ]
+  //   ]
   // };
   barChartData: ApexAxisChartSeries = [
     {
@@ -470,7 +473,7 @@ export class DashboardComponent implements OnInit {
   tax_total: any;
   delivery_amount: any;
   coupon_total: any;
-  curreny_symbol: any;
+  curreny_symbol: any = 'KD';
   dashBoardDetails: any = {
     orders: 0 as Number,
     completedOrders: 0 as Number,
@@ -493,13 +496,15 @@ export class DashboardComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     public datepipe: DatePipe,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private store: DefaultStoreService
   ) {
 
-    this.apiService.CommonApi(Apiconfig.landingData.method, Apiconfig.landingData.url, {}).subscribe(result => {
-      console.log(result.currency_symbol, "settingssettingssettingssettingssettingssettingssettingssettings");
-      this.curreny_symbol = result && result.currency_symbol != (undefined || null) && result.currency_symbol ? result.currency_symbol : "₹"
-    })
+    this.store.generalSettings.subscribe((result) => {
+      if (result && result.currency_symbol) {
+        this.curreny_symbol = result.currency_symbol;
+      }
+    });
 
   }
 
@@ -659,6 +664,7 @@ export class DashboardComponent implements OnInit {
 
 
   setFuelChart(labels: string[], fuel: number[], amount: number[]): void {
+    const currency = this.curreny_symbol || '';
     this.fuelChartOptions = {
       series: [
         {
@@ -667,7 +673,7 @@ export class DashboardComponent implements OnInit {
           data: fuel
         },
         {
-          name: 'Amount Paid (₹)',
+          name: `Amount Paid (${currency})`,
           type: 'line',
           data: amount
         }
@@ -722,10 +728,10 @@ export class DashboardComponent implements OnInit {
         {
           opposite: true,
           title: {
-            text: 'Amount (₹)'
+            text: `Amount (${currency})`
           },
           labels: {
-            formatter: (val) => `₹${val.toFixed(0)}`
+            formatter: (val) => `${currency}${val.toFixed(0)}`
           }
         }
       ],
@@ -734,7 +740,7 @@ export class DashboardComponent implements OnInit {
         intersect: false,
         y: {
           formatter: (val, { seriesIndex }) =>
-            seriesIndex === 0 ? `${val} L` : `₹${val.toFixed(2)}`
+            seriesIndex === 0 ? `${val} L` : `${currency}${val.toFixed(2)}`
         }
       },
       title: {

@@ -4,6 +4,8 @@ import { ApiService } from 'src/app/_services/api.service';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
+
 @Component({
   selector: 'app-add-invoice',
   templateUrl: './add-invoice.component.html',
@@ -15,6 +17,8 @@ export class AddInvoiceComponent implements OnInit {
   showItemModal = false;
   invoiceId: string | null = null; // <-- for edit mode
   isEditMode = false;
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
   // Form values
   invoiceForm: any = {
@@ -46,7 +50,8 @@ export class AddInvoiceComponent implements OnInit {
     private apiService: ApiService,
     private notification: NotificationService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: DefaultStoreService
   ) {
     const d = new Date();
     this.today = d.toISOString().substring(0, 10);
@@ -54,6 +59,12 @@ export class AddInvoiceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
 
     this.getActiveContracts();
     this.route.paramMap.subscribe(params => {

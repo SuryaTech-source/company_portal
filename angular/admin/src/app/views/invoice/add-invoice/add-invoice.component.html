@@ -9,20 +9,17 @@
     </div>
 
     <div class="col-lg-6 col-sm-12">
-  <div class="label_input">
-    <label>Client Name <span class="color_red">*</span></label>
-    <select class="form-control"
-            name="contract"
-            [(ngModel)]="invoiceForm.contract"
-            (change)="onContractChange($event)"
-            required>
-      <option value="" disabled>Select Client</option>
-      <option *ngFor="let c of contractList" [value]="c._id">
-        {{ c.clientName }}
-      </option>
-    </select>
-  </div>
-</div>
+      <div class="label_input">
+        <label>Client Name <span class="color_red">*</span></label>
+        <select class="form-control" name="contract" [(ngModel)]="invoiceForm.contract"
+          (change)="onContractChange($event)" required>
+          <option value="" disabled>Select Client</option>
+          <option *ngFor="let c of contractList" [value]="c._id">
+            {{ c.clientName }}
+          </option>
+        </select>
+      </div>
+    </div>
 
     <div class="col-lg-6 col-sm-12">
       <div class="label_input ">
@@ -79,8 +76,8 @@
           <tr *ngFor="let item of invoiceForm.items; let i = index">
             <td>{{ item.description }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.unitPrice | currency:'INR' }}</td>
-            <td>{{ item.total | currency:'INR' }}</td>
+            <td>{{ item.unitPrice | currency:currency_code:currency_symbol }}</td>
+            <td>{{ item.total | currency:currency_code:currency_symbol }}</td>
             <td>
               <button class="table_delete" (click)="deleteItem(i)">
                 <svg class="bin-top" viewBox="0 0 39 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -104,7 +101,7 @@
         <tfoot>
           <tr>
             <th colspan="3">Grand Total</th>
-            <th colspan="2">{{ invoiceForm.totalAmount | currency:'INR' }}</th>
+            <th colspan="2">{{ invoiceForm.totalAmount | currency:currency_code:currency_symbol }}</th>
           </tr>
         </tfoot>
       </table>

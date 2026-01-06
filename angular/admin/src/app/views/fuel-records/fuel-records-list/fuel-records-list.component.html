@@ -89,7 +89,7 @@
         <td>{{ row.startOdometer }}</td>
         <td>{{ row.endOdometer }}</td>
         <td>{{ row.prevDate | date:'dd/MM/yyyy' }}</td>
-        <td>{{ row.amountPaid | currency : 'KWD':'KD ' }}</td>
+        <td>{{ row.amountPaid | currency : currency_code : currency_symbol }}</td>
         <td>{{ row.issuedBy }}</td>
         <td>{{ row.fuelConsumed }}</td>
         <td>{{ calcMileage(row) | number:'1.1-2' }}</td>

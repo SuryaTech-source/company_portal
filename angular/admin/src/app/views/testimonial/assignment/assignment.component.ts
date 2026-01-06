@@ -100,7 +100,7 @@ export class AssignmentComponent implements OnInit {
       });
   }
 
-  designationOptions = ['Driver', 'Staff', 'Mechanic', 'Maid', 'Supervisor', 'Others'];
+  designationOptions = ['Driver', 'Staff', 'Mechanic', 'Helper', 'Supervisor', 'Others'];
   selectedDesignation = 'Driver';
 
   /** 🔹 Load employees based on designation */

@@ -4,6 +4,7 @@ import html2pdf from 'html2pdf.js';
 import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
 
 @Component({
   selector: 'app-maintenance-list',
@@ -19,6 +20,8 @@ export class MaintenanceListComponent implements OnInit {
   vehicles: any[] = [];
   drivers: any[] = [];
   spareParts: any[] = [];
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
   // Filters
   searchVehicle: string = '';
@@ -39,10 +42,17 @@ export class MaintenanceListComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private notification: NotificationService,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private store: DefaultStoreService
   ) { }
 
   ngOnInit(): void {
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
     this.loadRecords();
     this.loadVehicles();
     this.loadDrivers();

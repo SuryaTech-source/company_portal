@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import html2pdf from 'html2pdf.js';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
+import { DefaultStoreService } from 'src/app/_services/default-store.service';
+
 @Component({
   selector: 'app-active-employees',
   templateUrl: './active-employees.component.html',
@@ -18,12 +20,14 @@ export class ActiveEmployeesComponent implements OnInit {
     { key: 'Driver', display: 'Drivers' },
     { key: 'Staff', display: 'Employees' },
     { key: 'Mechanic', display: 'Mechanics' },
-    { key: 'Maid', display: 'Maids' },
+    { key: 'Helper', display: 'Helpers' },
     { key: 'Supervisor', display: 'Supervisors' },
     { key: 'Others', display: 'Others' }
   ];
   activeTab: string = 'Staff'; // Default to 'Employees' (Staff)
   loading = false;
+  currency_code = 'KWD';
+  currency_symbol = 'KD';
 
   // Statistics
   stats: { [key: string]: { total: number, active?: number, inactive?: number, deployed?: number, vacation?: number } } = {};
@@ -35,10 +39,17 @@ export class ActiveEmployeesComponent implements OnInit {
     private apiService: ApiService,
     private notify: NotificationService,
     private router: Router,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private store: DefaultStoreService
   ) { }
 
   ngOnInit(): void {
+    this.store.generalSettings.subscribe((settings) => {
+      if (settings) {
+        this.currency_code = settings.currency_code;
+        this.currency_symbol = settings.currency_symbol;
+      }
+    });
     this.getAllEmployees();
   }
 
@@ -67,7 +78,7 @@ export class ActiveEmployeesComponent implements OnInit {
     if (roleKey === 'Staff') {
       return this.allEmployees;
     }
-    return this.allEmployees.filter(e => e.role === roleKey);
+    return this.allEmployees.filter(e => e.role === roleKey || (roleKey === 'Helper' && e.role === 'Maid'));
   }
 
   calculateStats(): void {

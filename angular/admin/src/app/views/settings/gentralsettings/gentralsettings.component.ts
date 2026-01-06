@@ -52,9 +52,9 @@ export class GentralsettingsComponent implements OnInit {
   currency: any;
   faviconName: string;
   appIconName: string;
-  footerIconName:string
-  siteIconName:string
-  allCatIconName:string
+  footerIconName: string
+  siteIconName: string
+  allCatIconName: string
   logoName: string;
   footerLogoName: string;
   shipLogoName: string;
@@ -77,7 +77,7 @@ export class GentralsettingsComponent implements OnInit {
   register_image_preview: any;
   isImageSelected: boolean;
   environment: any = environment.apiUrl;
-  viewOnly:boolean=false;
+  viewOnly: boolean = false;
   constructor(
     private apiService: ApiService,
     private notifyService: NotificationService,
@@ -121,7 +121,7 @@ export class GentralsettingsComponent implements OnInit {
             this.form.form.controls['phone'].setValue(this.general.phone);
             this.form.form.controls['meta_title'].setValue(this.general && this.general.meta && this.general.meta.meta_title != (undefined || null || '') ? this.general.meta.meta_title : '');
             this.form.form.controls['meta_description'].setValue(this.general && this.general.meta && this.general.meta.meta_description != (undefined || null || '') ? this.general.meta.meta_description : '');
-            this.metakeyList = this.general && this.general.meta && this.general.meta.meta_keyword != (undefined || null || '') ? this.general.meta.meta_keyword : ''
+            this.metakeyList = this.general && this.general.meta && this.general.meta.meta_keyword != (undefined || null || '') ? this.general.meta.meta_keyword : []
             this.form.form.controls['email_address'].setValue(this.general.email_address);
             this.form.form.controls['report_email'].setValue(this.general.report_email ? this.general.report_email : '');
             this.form.form.controls['booking_id'].setValue(this.general.bookingIdPrefix);
@@ -134,8 +134,9 @@ export class GentralsettingsComponent implements OnInit {
             this.number_of_days = this.general.delivery_days
             // this.form.form.controls['number_of_days'].setValue(this.general.delivery_days)
             // this.form.form.controls['mobile_header'].setValue(this.general.mrcategory);
-            this.form.form.controls['currency_code'].setValue(this.general.currency_code);
-            this.form.form.controls['currency_symbol'].setValue(this.general.currency_symbol);
+            // this.form.form.controls['currency_code'].setValue(this.general.currency_code);
+            // this.form.form.controls['currency_symbol'].setValue(this.general.currency_symbol);
+            this.setCurrencyValue(); // Call helper to bind if currency list ready
             // this.form.form.controls['site_publish'].setValue(this.general.site_publish);
             // this.form.form.controls['date_format'].setValue(this.general.date_format);
             // this.form.form.controls['time_format'].setValue(this.general.time_format);
@@ -156,8 +157,8 @@ export class GentralsettingsComponent implements OnInit {
 
             if (this.general && this.general.login_image) {
               this.login_image_preview = this.environment + this.general.login_image
-              console.log(this.login_image_preview,"this.login_image_preview");
-              
+              console.log(this.login_image_preview, "this.login_image_preview");
+
             }
             if (this.general && this.general.register_image) {
               this.register_image_preview = this.environment + this.general.register_image
@@ -214,7 +215,7 @@ export class GentralsettingsComponent implements OnInit {
                 this.finalfooterIcon = this.general.footer_icon;
                 var iconname = this.general.footer_icon.split('/');
                 this.footerIconName = iconname[iconname.length - 1];
-               
+
               }
             })
             this.apiService.imageExists(environment.apiUrl + this.general.site_logo, (exists) => {
@@ -225,7 +226,7 @@ export class GentralsettingsComponent implements OnInit {
                 this.sitefinalLogo = this.general.site_logo;
                 var iconname = this.general.site_logo.split('/');
                 this.siteIconName = iconname[iconname.length - 1];
-               
+
               }
             })
             this.apiService.imageExists(environment.apiUrl + this.general.allcat_banner, (exists) => {
@@ -236,7 +237,7 @@ export class GentralsettingsComponent implements OnInit {
                 this.finalcatIcon = this.general.allcat_banner;
                 var iconname = this.general.allcat_banner.split('/');
                 this.allCatIconName = iconname[iconname.length - 1];
-               
+
               }
             })
 
@@ -274,14 +275,15 @@ export class GentralsettingsComponent implements OnInit {
           // this.curency()
         } else if (result.error == 0 && result.data) {
           this.currency = result.data.currency;
+          this.setCurrencyValue(); // Ensure binding happens if general loaded first
         }
       })
 
     console.log(this.Preview_files, "privewfiles ....");
-    if(this.viewOnly){
-    console.log("This is what I am talking about...");
+    if (this.viewOnly) {
+      console.log("This is what I am talking about...");
 
-    this.form?.form.disable();
+      this.form?.form.disable();
     }
     // this.apiService.CommonApi(Apiconfig.time_zone.method, Apiconfig.time_zone.url, {}).subscribe(time => {
     //   this.time_zone = time
@@ -310,7 +312,7 @@ export class GentralsettingsComponent implements OnInit {
   logoChange(event) {
     if (event) {
       var file = event.target.files[0];
-      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp' ) {
+      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp') {
         var reader = new FileReader();
         reader.onload = (evt) => {
           this.logoPriview = evt.target.result;
@@ -325,7 +327,7 @@ export class GentralsettingsComponent implements OnInit {
   siteLogoChange(event) {
     if (event) {
       var file = event.target.files[0];
-      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp' ) {
+      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp') {
         var reader = new FileReader();
         reader.onload = (evt) => {
           this.sitelogoPriview = evt.target.result;
@@ -340,7 +342,7 @@ export class GentralsettingsComponent implements OnInit {
   footerLogoChange(event) {
     if (event) {
       var file = event.target.files[0];
-      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp' ) {
+      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp') {
         var reader = new FileReader();
         reader.onload = (evt) => {
           this.footerLogoPriview = evt.target.result;
@@ -427,7 +429,7 @@ export class GentralsettingsComponent implements OnInit {
   appIconChange(event) {
     if (event) {
       var file = event.target.files[0];
-      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp' ) {
+      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp') {
         var reader = new FileReader();
         reader.onload = (evt) => {
           this.appIconPriview = evt.target.result;
@@ -444,7 +446,7 @@ export class GentralsettingsComponent implements OnInit {
   footerIconChange(event) {
     if (event) {
       var file = event.target.files[0];
-      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp' ) {
+      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp') {
         var reader = new FileReader();
         reader.onload = (evt) => {
           this.footerIconPreview = evt.target.result;
@@ -467,7 +469,7 @@ export class GentralsettingsComponent implements OnInit {
   shippingIconChange(event) {
     if (event) {
       var file = event.target.files[0];
-      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp' ) {
+      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp') {
         var reader = new FileReader();
         reader.onload = (evt) => {
           this.shipIconPreview = evt.target.result;
@@ -485,20 +487,20 @@ export class GentralsettingsComponent implements OnInit {
 
     // Allow only numbers (0-9), spaces (32), and plus (+) symbol (43)
     if (
-        (charCode >= 48 && charCode <= 57) || // Numbers
-        charCode === 32 || // Space
-        charCode === 43 // Plus symbol
+      (charCode >= 48 && charCode <= 57) || // Numbers
+      charCode === 32 || // Space
+      charCode === 43 // Plus symbol
     ) {
-        return true;
+      return true;
     } else {
-        event.preventDefault();
-        return false;
+      event.preventDefault();
+      return false;
     }
-}
+  }
   allcatIconChange(event) {
     if (event) {
       var file = event.target.files[0];
-      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp' ) {
+      if (file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/jpg' || file.type == 'image/webp') {
         var reader = new FileReader();
         reader.onload = (evt) => {
           this.allcatIconPreview = evt.target.result;
@@ -544,13 +546,37 @@ export class GentralsettingsComponent implements OnInit {
   }
 
   currencyChange(value) {
-    if (value && value.code != '') {
-      var seletedCode = this.currency.filter(x => x.code == value.code);
-      if (seletedCode && seletedCode.length > 0) {
-        this.form.form.controls['currency_symbol'].setValue(seletedCode[0].symbol);
+    let code = value;
+    if (value && typeof value === 'object' && value.code) {
+      code = value.code;
+    }
+
+    if (code && this.currency) {
+      const selectedCurrency = this.currency.find(x => x.code == code);
+      if (selectedCurrency) {
+        this.form.form.controls['currency_symbol'].setValue(selectedCurrency.symbol);
       }
     }
   }
+
+  setCurrencyValue() {
+    if (this.general && this.general.currency_code && this.currency && this.currency.length > 0) {
+      // Only set if we haven't touched it or if it's empty/needs setting
+      // But for initialization, we just want to ensure the form control has the value
+      // that matches the list.
+      const code = this.general.currency_code;
+      // Check if code exists in list to avoid selecting something invalid?
+      // Usually ng-select handles that, but setting it explicitly helps.
+      this.form.form.controls['currency_code'].setValue(code);
+
+      // Also set the symbol initially
+      const selectedCurrency = this.currency.find(x => x.code == code);
+      if (selectedCurrency) {
+        this.form.form.controls['currency_symbol'].setValue(selectedCurrency.symbol);
+      }
+    }
+  }
+
   reloadComponent() {
     let currentUrl = this.router.url;
     window.location.reload()
@@ -753,11 +779,11 @@ export class GentralsettingsComponent implements OnInit {
   public onFormSubmit(gentrelSettingForm: UntypedFormGroup) {
     this.submitted = true;
 
-    console.log(this.metakeyList,"this.metakeyList");
-    
-    console.log(gentrelSettingForm.value,'form value....')
-    console.log(gentrelSettingForm,"gentrelSettingForm.valid");
-    
+    console.log(this.metakeyList, "this.metakeyList");
+
+    console.log(gentrelSettingForm.value, 'form value....')
+    console.log(gentrelSettingForm, "gentrelSettingForm.valid");
+
     if (gentrelSettingForm.valid) {
       if (this.time_slot === 'disable' && (!this.number_of_days || this.number_of_days <= 0)) {
         return this.notifyService.showError("Invalid Number of day delivery")
@@ -800,8 +826,8 @@ export class GentralsettingsComponent implements OnInit {
       // this.formdata.meta_keyword = this.metakeyList;
       // this.formdata.meta_description = details.meta_description;
       formData.append('meta_title', data.meta_title);
-      console.log(this.metakeyList,"this.metakeyList");
-      
+      console.log(this.metakeyList, "this.metakeyList");
+
       formData.append('meta_keyword', JSON.stringify(this.metakeyList));
       formData.append('meta_description', data.meta_description);
       formData.append('site_title', data.site_title);
@@ -857,7 +883,7 @@ export class GentralsettingsComponent implements OnInit {
       //   formData.append(`mrcategory[${index}]`, data.mobile_header[index]);
       // }
       // console.log(formData,"formData");
-      
+
       // return
       this.apiService.CommonApi(Apiconfig.save_general.method, Apiconfig.save_general.url, formData).subscribe(
         (result) => {
