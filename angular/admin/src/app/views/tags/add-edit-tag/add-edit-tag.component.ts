@@ -177,15 +177,18 @@ export class AddEditTagComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (!res.status) {
+            // Show duplicate/validation error from backend
             this.notifyService.showError(res.message || 'Failed to save');
+            this.submitebtn = false; // Re-enable button so user can fix and retry
           } else {
             this.notifyService.showSuccess(res?.message || 'Saved successfully');
             this.router.navigate(['/app/tags/list']);
+            // Button stays disabled during redirect
           }
-          this.submitebtn = false;
         },
-        error: () => {
-          this.notifyService.showError('Failed to save');
+        error: (err) => {
+          console.error("Save error:", err);
+          this.notifyService.showError('Failed to save. Please try again.');
           this.submitebtn = false;
         },
       });

@@ -91,26 +91,49 @@ module.exports = function () {
       result = await db.InsertDocument("vendor", vendorData);
 
       // Check if result is a duplicate key error on contractId
-      // InsertDocument returns the error object itself if it fails
-      if (result && result.code === 11000 && result.keyPattern && result.keyPattern.contractId) {
+      // InsertDocument returns the error object itself if it fails (not throws)
+      if (
+        result &&
+        (result.code === 11000 || result.code === "11000") &&
+        (
+          (result.keyPattern && result.keyPattern.contractId) ||
+          (result.message && result.message.includes("contractId"))
+        )
+      ) {
         try {
           console.log("⚠️ Detected duplicate key error on contractId. Removing unique index...");
-          await mongoose.connection.collection("vendor").dropIndex("contractId_1");
+
+          // Drop by key pattern is safer than by name
+          // Use the native collection driver check
+          const collection = mongoose.connection.collection("vendor");
+
+          // Check if index exists before dropping to avoid error? 
+          // dropIndex throws if index doesn't exist, so wrap in try/catch or just let it fail if not found (but we know it exists cause of the error)
+
+          // Try dropping by name first as it's most common, then by specification
+          try {
+            await collection.dropIndex("contractId_1");
+          } catch (e) {
+            console.log("Could not drop by name 'contractId_1', trying by key pattern...");
+            await collection.dropIndex({ contractId: 1 });
+          }
+
           console.log("✅ Unique index 'contractId_1' dropped. Retrying save...");
 
           // Retry Insert
           result = await db.InsertDocument("vendor", vendorData);
 
-          // If retry fails again with error
+          // If retry fails again with same error, it might be persistent or something else
           if (result && (result.code || result instanceof Error)) {
-            return res.send({ status: false, message: "Error saving vendor", error: result });
+            console.error("❌ Retry failed with error:", result);
+            return res.send({ status: false, message: "Error saving vendor after index fix", error: result });
           }
 
           return res.send({ status: true, message: "Vendor saved", data: result });
 
         } catch (retryError) {
-          console.error("❌ Retry failed:", retryError);
-          return res.send({ status: false, message: "Error saving vendor even after index fix", error: retryError });
+          console.error("❌ Retry process failed:", retryError);
+          return res.send({ status: false, message: "Error saving vendor during retry logic", error: retryError });
         }
       }
 
