@@ -1,8 +1,9 @@
-import { Component, ElementRef, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ElementRef, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
 import html2pdf from 'html2pdf.js';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { ApiService } from 'src/app/_services/api.service';
+import { NotificationService } from 'src/app/_services/notification.service';
 
 interface FuelRecord {
   _id?: string;
@@ -22,7 +23,8 @@ interface FuelRecord {
 @Component({
   selector: 'app-fuel-records-list',
   templateUrl: './fuel-records-list.component.html',
-  styleUrls: ['./fuel-records-list.component.scss']
+  styleUrls: ['./fuel-records-list.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class FuelRecordsListComponent {
   @ViewChild('fuelTable', { static: false }) fuelTable!: ElementRef;
@@ -47,7 +49,11 @@ export class FuelRecordsListComponent {
   newFuel: FuelRecord = this.getEmptyFuel();
   editingFuelId: string | null = null;
 
-  constructor(private modalService: BsModalService, private apiService: ApiService) {}
+  constructor(
+    private modalService: BsModalService,
+    private apiService: ApiService,
+    private notifyService: NotificationService
+  ) { }
 
   ngOnInit() {
     this.loadFuelRecords();
@@ -95,7 +101,7 @@ export class FuelRecordsListComponent {
   }
 
   loadDrivers() {
-    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1, role: 'Driver' })
+    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1 })
       .subscribe((res: any) => {
         if (res.status) this.drivers = res.data;
       });
@@ -119,7 +125,7 @@ export class FuelRecordsListComponent {
       alert('Please select Vehicle, Driver, and Contract.');
       return;
     }
-    if (this.newFuel.startOdometer <= 0 || this.newFuel.endOdometer <= 0) {
+    if (this.newFuel.startOdometer < 0 || this.newFuel.endOdometer < 0) {
       alert('Please enter valid odometer readings.');
       return;
     }
@@ -139,6 +145,56 @@ export class FuelRecordsListComponent {
           this.modalRef?.hide();
           this.loadFuelRecords();
           this.editingFuelId = null;
+        }
+      });
+  }
+
+  /** 🔹 Auto-bind Driver when vehicle is selected */
+  onVehicleChange(vehicleId: string) {
+    if (!vehicleId) return;
+
+    this.apiService.CommonApi(Apiconfig.getActiveAssignment.method, Apiconfig.getActiveAssignment.url, { fleetId: vehicleId })
+      .subscribe((res: any) => {
+        if (res.status && res.data) {
+          // Handle both populated object and direct string ID
+          const driverData = res.data.driverId;
+          this.newFuel.driverId = (driverData && typeof driverData === 'object') ? driverData._id : driverData || '';
+
+          const contractData = res.data.contractId;
+          if (contractData) {
+            this.newFuel.contractId = (contractData && typeof contractData === 'object') ? contractData._id : contractData || '';
+          }
+        } else {
+          // 🔸 Show notification if no active assignment
+          this.notifyService.showError(res.message || 'No active assignment found');
+          // Clear fields if no assignment
+          this.newFuel.driverId = '';
+        }
+      });
+  }
+
+  // --- Delete Modal Logic ---
+  deleteData: any;
+  openDeleteModal(template: TemplateRef<any>, row: any) {
+    this.deleteData = row;
+    this.modalRef = this.modalService.show(template, { class: 'modal-sm logout_modal' });
+  }
+
+  closeDeleteModal() {
+    this.modalRef?.hide();
+    this.deleteData = null;
+  }
+
+  confirmDelete() {
+    if (!this.deleteData?._id) return;
+
+    this.apiService.CommonApi(Apiconfig.deleteFuel.method, Apiconfig.deleteFuel.url, { id: this.deleteData._id })
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.loadFuelRecords();
+          this.closeDeleteModal();
+        } else {
+          alert(res.message || 'Failed to delete record');
         }
       });
   }

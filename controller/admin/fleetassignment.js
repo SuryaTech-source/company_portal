@@ -279,5 +279,35 @@ module.exports = function () {
 
 
 
+  /**
+   * @route POST /fleet/active-assignment
+   * @desc Get active driver for a fleet
+   */
+  controller.getActiveAssignment = async function (req, res) {
+    try {
+      const { fleetId } = req.body;
+      if (!fleetId) return res.send({ status: false, message: "Fleet ID required" });
+
+      const assignment = await db.GetOneDocument(
+        "fleetAssignment",
+        { fleetId: new mongoose.Types.ObjectId(fleetId), status: 1 },
+        {},
+        { populate: ["driverId", "contractId"] }
+      );
+
+      if (assignment.status && assignment.doc) {
+        return res.send({
+          status: true,
+          data: assignment.doc
+        });
+      } else {
+        return res.send({ status: false, message: "No active assignment found" });
+      }
+    } catch (err) {
+      console.log("ERROR getActiveAssignment", err);
+      return res.send({ status: false, message: "Error fetching assignment" });
+    }
+  };
+
   return controller;
 };

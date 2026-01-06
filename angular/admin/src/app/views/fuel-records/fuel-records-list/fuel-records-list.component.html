@@ -94,7 +94,8 @@
         <td>{{ row.fuelConsumed }}</td>
         <td>{{ calcMileage(row) | number:'1.1-2' }}</td>
         <td>
-          <button class="btn btn-sm btn-warning" (click)="editFuel(row)">✏️ Edit</button>
+          <button class="btn btn-sm btn-warning me-1" (click)="editFuel(row)">✏️ Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, row)">🗑️ Delete</button>
         </td>
       </tr>
     </tbody>
@@ -111,8 +112,8 @@
       <div class="col-md-6">
         <div class="label_input">
           <label>Vehicle</label>
-          <select class="form-select" [(ngModel)]="newFuel.vehicleId" name="vehicleId" [disabled]="editingFuelId"
-            required>
+          <select class="form-select" [(ngModel)]="newFuel.vehicleId" (change)="onVehicleChange(newFuel.vehicleId!)"
+            name="vehicleId" [disabled]="!!editingFuelId" required>
             <option *ngFor="let v of vehicles" [value]="v._id">{{ v.registrationNo }}</option>
           </select>
         </div>
@@ -120,9 +121,8 @@
 
       <div class="col-md-6">
         <div class="label_input">
-          <label>Driver</label>
-          <select class="form-select" [(ngModel)]="newFuel.driverId" name="driverId" [disabled]="editingFuelId"
-            required>
+          <label>Employee (Auto-assigned)</label>
+          <select class="form-select" [(ngModel)]="newFuel.driverId" name="driverId" [disabled]="true" required>
             <option *ngFor="let d of drivers" [value]="d._id">{{ d.fullName }}</option>
           </select>
         </div>
@@ -144,7 +144,7 @@
         <div class="label_input">
           <label>Start Odometer</label>
           <input type="number" class="form-control" [(ngModel)]="newFuel.startOdometer" name="startOdometer"
-            [disabled]="editingFuelId" />
+            [disabled]="!!editingFuelId" />
         </div>
       </div>
       <div class="col-md-6">
@@ -195,4 +195,21 @@
   </div>
 
 
+</ng-template>
+
+<!-- Delete Modal -->
+<ng-template #deletePopup>
+  <div class="modal_header">
+    <div class="h4_close">
+      <h4>Delete Fuel Record</h4>
+      <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+    </div>
+  </div>
+  <div class="modal_body">
+    <p>Are you sure you want to delete this record?</p>
+  </div>
+  <div class="modal_footer">
+    <button type="button" class="close_btn" (click)="closeDeleteModal()">Cancel</button>
+    <button type="button" class="delete_btn" (click)="confirmDelete()">Delete</button>
+  </div>
 </ng-template>

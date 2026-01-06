@@ -1462,6 +1462,7 @@ module.exports = function (app, io) {
       ensureAuthorized,
       fuel.driverPerformanceChart
     );
+    app.post("/admin/fuel/delete", ensureAuthorized, fuel.deleteFuel);
 
 
 
@@ -1593,6 +1594,11 @@ module.exports = function (app, io) {
       "/admin/fleet/assignment/edit",
       ensureAuthorized,
       fleetAssignment.editAssignment
+    );
+    app.post(
+      "/admin/fleet/assignment/active-assignment",
+      ensureAuthorized,
+      fleetAssignment.getActiveAssignment
     );
 
     //salary

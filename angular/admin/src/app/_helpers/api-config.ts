@@ -87,6 +87,10 @@ export const Apiconfig = {
         "url": "admin/fleet/assignment/edit",
         "method": "post"
     },
+    getActiveAssignment: {
+        "url": "admin/fleet/assignment/active-assignment",
+        "method": "post"
+    },
 
     alertList: {
         "url": "admin/alerts/list",
@@ -99,6 +103,10 @@ export const Apiconfig = {
     },
     saveFuel: {
         "url": "admin/fuel/save",
+        "method": "post"
+    },
+    deleteFuel: {
+        "url": "admin/fuel/delete",
         "method": "post"
     },
     fuelUsageAnalytics: {
