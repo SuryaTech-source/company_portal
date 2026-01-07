@@ -557,5 +557,43 @@ module.exports = function () {
     }
   };
 
+  controller.addVacation = async function (req, res) {
+    try {
+      const { employeeId, startDate, endDate, type, remarks } = req.body;
+
+      if (!employeeId || !startDate || !endDate) {
+        return res.send({
+          status: false,
+          message: "Employee ID, Start Date and End Date are required",
+        });
+      }
+
+      const vacationData = {
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        type: type || "Vacation",
+        remarks: remarks || "",
+      };
+
+      const result = await db.UpdateDocument(
+        "employee",
+        { _id: new mongoose.Types.ObjectId(employeeId) },
+        { $push: { vacations: vacationData } }
+      );
+
+      return res.send({
+        status: true,
+        message: "Vacation added successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.log(error, "ERROR addVacation");
+      return res.send({
+        status: false,
+        message: "Error adding vacation",
+      });
+    }
+  };
+
   return controller;
 };

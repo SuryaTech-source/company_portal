@@ -42,6 +42,14 @@ EMPLOYEE_SCHEMA.EMPLOYEE = {
     fileUrl: String
   }],
 
+  vacations: [{
+    startDate: Date,
+    endDate: Date,
+    type: { type: String, enum: ["Vacation", "Sick Leave"], default: "Vacation" },
+    remarks: String,
+    createdAt: { type: Date, default: Date.now }
+  }],
+
   status: { type: Number, default: 1 }
 };
 

@@ -95,9 +95,11 @@
         </option>
       </select>
 
-      <!-- Show Mark All button only in attendance tab -->
       <button *ngIf="activeTab === 'attendance'" class="btn btn-sm btn-success" (click)="markAllPresentToday()">
         <i class="bi bi-check-all"></i> Mark All Present
+      </button>
+      <button *ngIf="activeTab === 'attendance'" class="btn btn-sm btn-info text-white" (click)="openVacationModal()">
+        <i class="bi bi-airplane"></i> Vacation
       </button>
       <button class="btn btn-sm btn-success" (click)="openModal()">
         <i class="bi bi-plus-lg"></i> Add
@@ -116,9 +118,14 @@
           [disabled]="selectedEmployees.length === 0">
           Mark Absent
         </button>
-        <button class="btn btn-sm btn-warning" (click)="bulkMarkAttendance('L')"
+
+        <button class="btn btn-sm btn-info text-white" (click)="bulkMarkAttendance('SL')"
           [disabled]="selectedEmployees.length === 0">
-          Mark Leave
+          Sick Leave
+        </button>
+        <button class="btn btn-sm btn-primary" (click)="bulkMarkAttendance('V')"
+          [disabled]="selectedEmployees.length === 0">
+          Mark Vacation
         </button>
       </div>
       <div class="table_section">
@@ -146,7 +153,9 @@
                 <select class="form-select form-select-sm" [(ngModel)]="row.status" (change)="updateAttendance(row)">
                   <option value="P">Present</option>
                   <option value="A">Absent</option>
-                  <option value="L">Leave</option>
+
+                  <option value="SL">Sick Leave</option>
+                  <option value="V">Vacation</option>
                 </select>
               </td>
               <td>
@@ -228,6 +237,8 @@
       </table>
     </div>
   </div>
+
+  <!-- Regular Add/Edit Modal (Attendance, Customers, Vendors) -->
   <div class="modal fade show" tabindex="-1" [ngClass]="{ 'd-block': showModal }" *ngIf="showModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -259,7 +270,9 @@
                     <select class="form-select mb-2" [(ngModel)]="form.status" name="status">
                       <option value="P">Present</option>
                       <option value="A">Absent</option>
-                      <option value="L">Leave</option>
+
+                      <option value="SL">Sick Leave</option>
+                      <option value="V">Vacation</option>
                     </select>
                   </div>
                 </div>
@@ -429,17 +442,65 @@
             </button>
             <button type="submit" class="bg_green">
               {{ editData ? "Update" : "Save" }}
-              <div class="icon">
-                <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
             </button>
           </div>
         </form>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Vacation Modal -->
+  <div class="modal fade show" tabindex="-1" [ngClass]="{ 'd-block': showVacationModal }" *ngIf="showVacationModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form (ngSubmit)="saveVacation()">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Vacation / Sick Leave</h5>
+            <button type="button" class="btn-close" (click)="closeVacationModal()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="label_input">
+              <label>Employee</label>
+              <select class="form-control mb-2" [(ngModel)]="vacationForm.employeeId" name="v_employee" required>
+                <option value="">Select Employee</option>
+                <option *ngFor="let emp of allEmployees" [value]="emp._id">
+                  {{ emp.fullName }} ({{ emp.employeeId }})
+                </option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="label_input">
+                  <label>From Date</label>
+                  <input type="date" class="form-control mb-2" [(ngModel)]="vacationForm.startDate" name="v_startDate"
+                    required />
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="label_input">
+                  <label>To Date</label>
+                  <input type="date" class="form-control mb-2" [(ngModel)]="vacationForm.endDate" name="v_endDate"
+                    required />
+                </div>
+              </div>
+            </div>
+            <div class="label_input">
+              <label>Type</label>
+              <select class="form-control mb-2" [(ngModel)]="vacationForm.type" name="v_type">
+                <option value="Vacation">Vacation</option>
+                <option value="Sick Leave">Sick Leave</option>
+              </select>
+            </div>
+            <div class="label_input">
+              <label>Remarks</label>
+              <textarea class="form-control" [(ngModel)]="vacationForm.remarks" name="v_remarks"></textarea>
+            </div>
+          </div>
+          <div class="page_footer mb-3 p-3">
+            <button type="button" (click)="closeVacationModal()" class="close_btn">Cancel</button>
+            <button type="submit" class="bg_green">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

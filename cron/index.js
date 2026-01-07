@@ -25,91 +25,170 @@ module.exports = function (io, app) {
 		userRefer();
 	})
 
+	CronJob.schedule('0 0 * * *', async () => {
+		console.log('--- Running Daily Attendance Marking Cron Job ---');
+		try {
+			const today = new Date();
+			const todayDate = new Date(today.toISOString().split("T")[0]); // normalize date
+
+			// Fetch all active employees
+			const employees = await db.GetDocument("employee", { status: 1 }, {}, {});
+			if (!employees.doc || !employees.doc.length) {
+				console.log("No active employees found for attendance.");
+				return;
+			}
+
+			// Loop and insert/update attendance
+			// 1. Remove existing record for today (if any) to avoid duplicates
+			const operations = employees.doc.map((emp) => ({
+				updateOne: {
+					filter: { employee: emp._id },
+					update: {
+						$setOnInsert: { employee: emp._id },
+						$pull: { records: { date: todayDate } },
+					},
+					upsert: true,
+				},
+			}));
+			await db.BulkWrite("attendance", operations);
+
+			// 2. Loop and push new record
+			const pushOps = employees.doc.map((emp) => {
+				let status = "P";
+				let remarks = "Auto-marked by System";
+
+				// Check if employee is on vacation today
+				if (emp.vacations && emp.vacations.length > 0) {
+					for (const vacation of emp.vacations) {
+						const startDate = new Date(vacation.startDate);
+						const endDate = new Date(vacation.endDate);
+						const checkDate = new Date(todayDate);
+
+						// Reset time parts to ensure accurate date comparison
+						startDate.setHours(0, 0, 0, 0);
+						endDate.setHours(0, 0, 0, 0);
+						checkDate.setHours(0, 0, 0, 0);
+
+						if (checkDate >= startDate && checkDate <= endDate) {
+							status = vacation.type === "Sick Leave" ? "SL" : "V";
+							remarks = vacation.remarks || (status === "SL" ? "Sick Leave" : "Vacation");
+							break; // Found a matching vacation, stop checking
+						}
+					}
+				}
+
+				return {
+					updateOne: {
+						filter: { employee: emp._id },
+						update: {
+							$push: {
+								records: {
+									date: todayDate,
+									status: status,
+									remarks: remarks
+								}
+							},
+						},
+					},
+				};
+			});
+			await db.BulkWrite("attendance", pushOps);
+
+			console.log(`✅ Automatically marked ${employees.doc.length} employees with Present/Vacation/Sick Leave.`);
+
+		} catch (error) {
+			console.error('--- CRON JOB FAILED: Daily Attendance Marking ---', error);
+		}
+	}, {
+		scheduled: true,
+		timezone: "Asia/Kolkata"
+	});
+
 	CronJob.schedule('0 1 1 * *', async () => {
-    console.log('--- Running Monthly Salary Generation Cron Job ---');
-    try {
-        const today = new Date();
-        // Calculate the previous month
-        const prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        const year = prevMonthDate.getFullYear();
-        const month = prevMonthDate.getMonth() + 1; // 1-12
+		console.log('--- Running Monthly Salary Generation Cron Job ---');
+		try {
+			const today = new Date();
+			// Calculate the previous month
+			const prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+			const year = prevMonthDate.getFullYear();
+			const month = prevMonthDate.getMonth() + 1; // 1-12
 
-        // Fetch active employees
-        const activeEmployeesResult = await db.GetDocument("employee", { status: 1 }, {}, {});
-        const activeEmployees = activeEmployeesResult.doc || []; // Ensure it's an array
+			// Fetch active employees
+			const activeEmployeesResult = await db.GetDocument("employee", { status: 1 }, {}, {});
+			const activeEmployees = activeEmployeesResult.doc || []; // Ensure it's an array
 
-        if (activeEmployees.length === 0) {
-            console.log('No active employees found. Exiting job.');
-            return;
-        }
-        
-        for (const employee of activeEmployees) {
-            // 1. Check if salary for this period already exists
-            const existingSalary = await db.GetOneDocument("salary", { employee: employee._id, month, year },{}, {});
-            if (existingSalary.doc && existingSalary.status) {
-                console.log(`Salary for ${employee.fullName} for ${month}/${year} already exists. Skipping.`);
-                continue;
-            }
+			if (activeEmployees.length === 0) {
+				console.log('No active employees found. Exiting job.');
+				return;
+			}
 
-            // 2. Get attendance for the previous month
-            const attendanceResult = await db.GetOneDocument("attendance", { employee: employee._id },{}, {});
-            const attendanceData = attendanceResult.doc;
+			for (const employee of activeEmployees) {
+				// 1. Check if salary for this period already exists
+				const existingSalary = await db.GetOneDocument("salary", { employee: employee._id, month, year }, {}, {});
+				if (existingSalary.doc && existingSalary.status) {
+					console.log(`Salary for ${employee.fullName} for ${month}/${year} already exists. Skipping.`);
+					continue;
+				}
 
-            let daysPresent = 0;
-            // Total days in the previous month
-            const totalWorkingDays = new Date(year, month, 0).getDate(); 
-            
-            // 3. Robustly check for the attendance records array
-            if (attendanceData && Array.isArray(attendanceData.records)) {
-                const monthRecords = attendanceData.records.filter(r => {
-                    // Safety check for date property existence
-                    if (!r.date) return false;
+				// 2. Get attendance for the previous month
+				const attendanceResult = await db.GetOneDocument("attendance", { employee: employee._id }, {}, {});
+				const attendanceData = attendanceResult.doc;
 
-                    const recordDate = new Date(r.date);
-                    return recordDate.getFullYear() === year && recordDate.getMonth() + 1 === month;
-                });
-                daysPresent = monthRecords.filter(r => r.status === 'P').length;
-            } else {
-                 // This handles new employees or employees with empty/missing attendance documents gracefully
-                 console.log(`No attendance records or invalid records array found for ${employee.fullName}. Days present defaults to 0.`);
-            }
-            
-            // 4. Calculate final salary
-            const baseSalary = employee.salary || 0;
-            const finalSalary = (baseSalary / totalWorkingDays) * daysPresent;
+				let daysPresent = 0;
+				// Total days in the previous month
+				const totalWorkingDays = new Date(year, month, 0).getDate();
 
-            const newSalary = {
-                employee: employee._id,
-                month,
-                year,
-                baseSalary,
-                daysPresent,
-                totalWorkingDays,
-                finalSalary: parseFloat(finalSalary.toFixed(2)),
-                totalEarnings: parseFloat(finalSalary.toFixed(2)),
-            };
+				// 3. Robustly check for the attendance records array
+				if (attendanceData && Array.isArray(attendanceData.records)) {
+					const monthRecords = attendanceData.records.filter(r => {
+						// Safety check for date property existence
+						if (!r.date) return false;
 
-            await db.InsertDocument("salary", newSalary);
-            console.log(`Created salary record for ${employee.fullName} for ${month}/${year}. Salary: ${newSalary.finalSalary}.`);
-        }
-    } catch (error) {
-        console.error('--- CRON JOB FAILED: Monthly Salary Generation ---', error);
-    }
-}, {
-    scheduled: true,
-    timezone: "Asia/Kolkata" // Set your timezone
-});
-//'0 0 * * *'      "*/20 * * * * *"
+						const recordDate = new Date(r.date);
+						return recordDate.getFullYear() === year && recordDate.getMonth() + 1 === month;
+					});
+					daysPresent = monthRecords.filter(r => r.status === 'P').length;
+				} else {
+					// This handles new employees or employees with empty/missing attendance documents gracefully
+					console.log(`No attendance records or invalid records array found for ${employee.fullName}. Days present defaults to 0.`);
+				}
 
-const jobalert = CronJob.schedule('0 0 * * *', async () => {
-    generateFleetAlerts();
-	generateEmployeeAlerts();	
-	generatePaymentAlerts();
+				// 4. Calculate final salary
+				const baseSalary = employee.salary || 0;
+				const finalSalary = (baseSalary / totalWorkingDays) * daysPresent;
 
-}, {
-    scheduled: true,
-    timezone: "Asia/Kolkata" // or your specific timezone
-});
+				const newSalary = {
+					employee: employee._id,
+					month,
+					year,
+					baseSalary,
+					daysPresent,
+					totalWorkingDays,
+					finalSalary: parseFloat(finalSalary.toFixed(2)),
+					totalEarnings: parseFloat(finalSalary.toFixed(2)),
+				};
+
+				await db.InsertDocument("salary", newSalary);
+				console.log(`Created salary record for ${employee.fullName} for ${month}/${year}. Salary: ${newSalary.finalSalary}.`);
+			}
+		} catch (error) {
+			console.error('--- CRON JOB FAILED: Monthly Salary Generation ---', error);
+		}
+	}, {
+		scheduled: true,
+		timezone: "Asia/Kolkata" // Set your timezone
+	});
+	//'0 0 * * *'      "*/20 * * * * *"
+
+	const jobalert = CronJob.schedule('0 0 * * *', async () => {
+		generateFleetAlerts();
+		generateEmployeeAlerts();
+		generatePaymentAlerts();
+
+	}, {
+		scheduled: true,
+		timezone: "Asia/Kolkata" // or your specific timezone
+	});
 
 	// var orderStatus = CronJob.schedule('0 * * * *', async () => {
 	// 	console.log('Running scheduled task to update Shiprocket status for orders...');
@@ -121,8 +200,8 @@ const jobalert = CronJob.schedule('0 0 * * *', async () => {
 	// 	}
 	// });
 
-	
-    // orderStatus.start()
+
+	// orderStatus.start()
 
 	// var job = new CronJob({
 	// 	cronTime: '*/1 * * * *', //Daily Cron Check @ 00:00
@@ -137,7 +216,7 @@ const jobalert = CronJob.schedule('0 0 * * *', async () => {
 		orderTimeoutAlert();
 		//timeZone: 'America/Los_Angeles'
 	});
-	var job2 =CronJob.schedule('* 10 */2 * * ',async()=>{
+	var job2 = CronJob.schedule('* 10 */2 * * ', async () => {
 		subscribeUserSendMail()
 		//timeZone: 'America/Los_Angeles'
 	});
@@ -929,229 +1008,229 @@ const jobalert = CronJob.schedule('0 0 * * *', async () => {
 	}
 
 
-function formatDate(d) {
-  if (!d) return '';
-  const date = new Date(d);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
+	function formatDate(d) {
+		if (!d) return '';
+		const date = new Date(d);
+		const day = String(date.getDate()).padStart(2, '0');
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const year = date.getFullYear();
+		return `${day}/${month}/${year}`;
+	}
 
 
- async function generateEmployeeAlerts() {
-  let employees = await db.GetDocument("employee", {}, {}, {});
-  let today = new Date();
+	async function generateEmployeeAlerts() {
+		let employees = await db.GetDocument("employee", {}, {}, {});
+		let today = new Date();
 
-  for (let emp of employees.doc) {
+		for (let emp of employees.doc) {
 
-    // CIVIL ID
-    if (emp.civilIdExpiry) {
-      let alertDate = new Date(emp.civilIdExpiry);
-      alertDate.setDate(alertDate.getDate() - 30);
+			// CIVIL ID
+			if (emp.civilIdExpiry) {
+				let alertDate = new Date(emp.civilIdExpiry);
+				alertDate.setDate(alertDate.getDate() - 30);
 
-      if (alertDate <= today) {
+				if (alertDate <= today) {
 
-        // ⛔ Avoid duplicates
-        const exists = await db.GetOneDocument("alert", {
-          type: "employee_civilid_expiry",
-          employeeId: emp._id,
-          resolved: { $ne: true }
-        });
-        if (!exists.doc && exists.status) {
-          await db.InsertDocument("alert", {
-            type: "employee_civilid_expiry",
-            message: `${emp.fullName}'s Civil ID expires on ${formatDate(emp.civilIdExpiry)}`,
-            employeeId: emp._id,
-            alertDate,
-            expireAt: new Date(today.getTime() + 5 * 86400000) // ⏳ expires after 5 days
-          });
-        }
-      }
-    }
+					// ⛔ Avoid duplicates
+					const exists = await db.GetOneDocument("alert", {
+						type: "employee_civilid_expiry",
+						employeeId: emp._id,
+						resolved: { $ne: true }
+					});
+					if (!exists.doc && exists.status) {
+						await db.InsertDocument("alert", {
+							type: "employee_civilid_expiry",
+							message: `${emp.fullName}'s Civil ID expires on ${formatDate(emp.civilIdExpiry)}`,
+							employeeId: emp._id,
+							alertDate,
+							expireAt: new Date(today.getTime() + 5 * 86400000) // ⏳ expires after 5 days
+						});
+					}
+				}
+			}
 
-    // VISA
-    if (emp.visaExpiry) {
-      let alertDate = new Date(emp.visaExpiry);
-      alertDate.setDate(alertDate.getDate() - 30);
+			// VISA
+			if (emp.visaExpiry) {
+				let alertDate = new Date(emp.visaExpiry);
+				alertDate.setDate(alertDate.getDate() - 30);
 
-      if (alertDate <= today) {
+				if (alertDate <= today) {
 
-        const exists = await db.GetOneDocument("alert", {
-          type: "employee_visa_expiry",
-          employeeId: emp._id,
-          resolved: { $ne: true }
-        });
-        if (!exists.doc && exists.status) {
-          await db.InsertDocument("alert", {
-            type: "employee_visa_expiry",
-            message: `${emp.fullName}'s Visa expires on ${formatDate(emp.visaExpiry)}`,
-            employeeId: emp._id,
-            alertDate,
-            expireAt: new Date(today.getTime() + 5 * 86400000)
-          });
-        }
-      }
-    }
+					const exists = await db.GetOneDocument("alert", {
+						type: "employee_visa_expiry",
+						employeeId: emp._id,
+						resolved: { $ne: true }
+					});
+					if (!exists.doc && exists.status) {
+						await db.InsertDocument("alert", {
+							type: "employee_visa_expiry",
+							message: `${emp.fullName}'s Visa expires on ${formatDate(emp.visaExpiry)}`,
+							employeeId: emp._id,
+							alertDate,
+							expireAt: new Date(today.getTime() + 5 * 86400000)
+						});
+					}
+				}
+			}
 
-    // LICENSE
-    if (emp.licenseExpiry) {
-      let alertDate = new Date(emp.licenseExpiry);
-      alertDate.setDate(alertDate.getDate() - 30);
+			// LICENSE
+			if (emp.licenseExpiry) {
+				let alertDate = new Date(emp.licenseExpiry);
+				alertDate.setDate(alertDate.getDate() - 30);
 
-      if (alertDate <= today) {
+				if (alertDate <= today) {
 
-        const exists = await db.GetOneDocument("alert", {
-          type: "employee_license_expiry",
-          employeeId: emp._id,
-          resolved: { $ne: true }
-        });
+					const exists = await db.GetOneDocument("alert", {
+						type: "employee_license_expiry",
+						employeeId: emp._id,
+						resolved: { $ne: true }
+					});
 
-        if (!exists.doc && exists.status) {
-          await db.InsertDocument("alert", {
-            type: "employee_license_expiry",
-            message: `${emp.fullName}'s License expires on ${formatDate(emp.licenseExpiry)}`,
-            employeeId: emp._id,
-            alertDate,
-            expireAt: new Date(today.getTime() + 5 * 86400000)
-          });
-        }
-      }
-    }
-  }
-}
-
-
-
-
- async function generateFleetAlerts() {
-  let fleets = await db.GetDocument("fleet", {}, {}, {});
-  let today = new Date();
-
-  for (let fleet of fleets.doc) {
-
-    // INSURANCE
-    if (fleet.passingExpiry) {
-      let alertDate = new Date(fleet.passingExpiry);
-      alertDate.setDate(alertDate.getDate() - 30);
-
-      if (alertDate <= today) {
-
-        const exists = await db.GetOneDocument("alert", {
-          type: "fleet_insurance_expiry",
-          fleetId: fleet._id,
-          resolved: { $ne: true }
-        });
-        if (!exists.doc && exists.status) {
-          await db.InsertDocument("alert", {
-            type: "fleet_insurance_expiry",
-            message: `${fleet.vehicleName}'s insurance expires on ${formatDate(fleet.passingExpiry)}`,
-            fleetId: fleet._id,
-            alertDate,
-            expireAt: new Date(today.getTime() + 5 * 86400000)
-          });
-        }
-      }
-    }
-
-    // MAINTENANCE
-    if (fleet.maintenance?.nextMaintenanceDue) {
-      let due = new Date(fleet.maintenance.nextMaintenanceDue);
-      let alertDate = new Date(due);
-      alertDate.setDate(alertDate.getDate() - 30);
-
-      if (alertDate <= today) {
-
-        const exists = await db.GetOneDocument("alert", {
-          type: "fleet_maintenance_due",
-          fleetId: fleet._id,
-          resolved: { $ne: true }
-        });
-
-        if (!exists.doc && exists.status) {
-          await db.InsertDocument("alert", {
-            type: "fleet_maintenance_due",
-            message: `${fleet.vehicleName}'s maintenance is due on ${formatDate(due)}`,
-            fleetId: fleet._id,
-            alertDate,
-            expireAt: new Date(today.getTime() + 5 * 86400000)
-          });
-        }
-      }
-    }
-  }
-}
-
-
-async function generatePaymentAlerts() {
-  let today = new Date();
-
-  // --- CUSTOMER PAYMENTS ---
-  let customerPayments = await db.GetDocument("customerPayment", {}, {}, {});
-  for (let pay of customerPayments.doc) {
-
-    let due = pay.nextDueDate || pay.dueDate;
-    if (!due) continue;
-
-    let alertDate = new Date(due);
-    alertDate.setDate(alertDate.getDate() - 5); // alert 5 days before due date
-
-    if (alertDate <= today && pay.balance > 0) {
-
-      const exists = await db.GetOneDocument("alert", {
-        type: "customer_payment_due",
-        paymentId: pay._id,
-        resolved: { $ne: true }
-      });
-
-      if (!exists.doc && exists.status) {
-        await db.InsertDocument("alert", {
-          type: "customer_payment_due",
-          message: `Payment due for customer ${pay.clientName}. Due on ${formatDate(due)} - Balance: ${pay.balance}`,
-          customerId: pay._id,
-          paymentId: pay._id,
-          alertDate,
-          expireAt: new Date(today.getTime() + 5 * 86400000),
-        });
-      }
-    }
-  }
-
-  // --- VENDOR PAYMENTS ---
-  let vendorPayments = await db.GetDocument("vendorPayment", {}, {}, {});
-  for (let pay of vendorPayments.doc) {
-
-    let due = pay.nextDueDate || pay.dueDate;
-    if (!due) continue;
-
-    let alertDate = new Date(due);
-    alertDate.setDate(alertDate.getDate() - 5);
-
-    if (alertDate <= today && pay.balance > 0) {
-
-      const exists = await db.GetOneDocument("alert", {
-        type: "vendor_payment_due",
-        paymentId: pay._id,
-        resolved: { $ne: true }
-      });
-
-      if (!exists.doc && exists.status) {
-        await db.InsertDocument("alert", {
-          type: "vendor_payment_due",
-          message: `Payment due for Vendor invoice ${pay.invoiceNo}. Due on ${formatDate(due)} - Balance: ${pay.balance}`,
-          vendorId: pay._id,
-          paymentId: pay._id,
-          alertDate,
-          expireAt: new Date(today.getTime() + 5 * 86400000),
-        });
-      }
-    }
-  }
-}
+					if (!exists.doc && exists.status) {
+						await db.InsertDocument("alert", {
+							type: "employee_license_expiry",
+							message: `${emp.fullName}'s License expires on ${formatDate(emp.licenseExpiry)}`,
+							employeeId: emp._id,
+							alertDate,
+							expireAt: new Date(today.getTime() + 5 * 86400000)
+						});
+					}
+				}
+			}
+		}
+	}
 
 
 
 
+	async function generateFleetAlerts() {
+		let fleets = await db.GetDocument("fleet", {}, {}, {});
+		let today = new Date();
 
-	
+		for (let fleet of fleets.doc) {
+
+			// INSURANCE
+			if (fleet.passingExpiry) {
+				let alertDate = new Date(fleet.passingExpiry);
+				alertDate.setDate(alertDate.getDate() - 30);
+
+				if (alertDate <= today) {
+
+					const exists = await db.GetOneDocument("alert", {
+						type: "fleet_insurance_expiry",
+						fleetId: fleet._id,
+						resolved: { $ne: true }
+					});
+					if (!exists.doc && exists.status) {
+						await db.InsertDocument("alert", {
+							type: "fleet_insurance_expiry",
+							message: `${fleet.vehicleName}'s insurance expires on ${formatDate(fleet.passingExpiry)}`,
+							fleetId: fleet._id,
+							alertDate,
+							expireAt: new Date(today.getTime() + 5 * 86400000)
+						});
+					}
+				}
+			}
+
+			// MAINTENANCE
+			if (fleet.maintenance?.nextMaintenanceDue) {
+				let due = new Date(fleet.maintenance.nextMaintenanceDue);
+				let alertDate = new Date(due);
+				alertDate.setDate(alertDate.getDate() - 30);
+
+				if (alertDate <= today) {
+
+					const exists = await db.GetOneDocument("alert", {
+						type: "fleet_maintenance_due",
+						fleetId: fleet._id,
+						resolved: { $ne: true }
+					});
+
+					if (!exists.doc && exists.status) {
+						await db.InsertDocument("alert", {
+							type: "fleet_maintenance_due",
+							message: `${fleet.vehicleName}'s maintenance is due on ${formatDate(due)}`,
+							fleetId: fleet._id,
+							alertDate,
+							expireAt: new Date(today.getTime() + 5 * 86400000)
+						});
+					}
+				}
+			}
+		}
+	}
+
+
+	async function generatePaymentAlerts() {
+		let today = new Date();
+
+		// --- CUSTOMER PAYMENTS ---
+		let customerPayments = await db.GetDocument("customerPayment", {}, {}, {});
+		for (let pay of customerPayments.doc) {
+
+			let due = pay.nextDueDate || pay.dueDate;
+			if (!due) continue;
+
+			let alertDate = new Date(due);
+			alertDate.setDate(alertDate.getDate() - 5); // alert 5 days before due date
+
+			if (alertDate <= today && pay.balance > 0) {
+
+				const exists = await db.GetOneDocument("alert", {
+					type: "customer_payment_due",
+					paymentId: pay._id,
+					resolved: { $ne: true }
+				});
+
+				if (!exists.doc && exists.status) {
+					await db.InsertDocument("alert", {
+						type: "customer_payment_due",
+						message: `Payment due for customer ${pay.clientName}. Due on ${formatDate(due)} - Balance: ${pay.balance}`,
+						customerId: pay._id,
+						paymentId: pay._id,
+						alertDate,
+						expireAt: new Date(today.getTime() + 5 * 86400000),
+					});
+				}
+			}
+		}
+
+		// --- VENDOR PAYMENTS ---
+		let vendorPayments = await db.GetDocument("vendorPayment", {}, {}, {});
+		for (let pay of vendorPayments.doc) {
+
+			let due = pay.nextDueDate || pay.dueDate;
+			if (!due) continue;
+
+			let alertDate = new Date(due);
+			alertDate.setDate(alertDate.getDate() - 5);
+
+			if (alertDate <= today && pay.balance > 0) {
+
+				const exists = await db.GetOneDocument("alert", {
+					type: "vendor_payment_due",
+					paymentId: pay._id,
+					resolved: { $ne: true }
+				});
+
+				if (!exists.doc && exists.status) {
+					await db.InsertDocument("alert", {
+						type: "vendor_payment_due",
+						message: `Payment due for Vendor invoice ${pay.invoiceNo}. Due on ${formatDate(due)} - Balance: ${pay.balance}`,
+						vendorId: pay._id,
+						paymentId: pay._id,
+						alertDate,
+						expireAt: new Date(today.getTime() + 5 * 86400000),
+					});
+				}
+			}
+		}
+	}
+
+
+
+
+
+
 }

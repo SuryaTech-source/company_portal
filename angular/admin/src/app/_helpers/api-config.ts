@@ -165,6 +165,10 @@ export const Apiconfig = {
         "url": "admin/employee/save",
         "method": "post"
     },
+    addVacation: {
+        "url": "admin/employee/add-vacation",
+        "method": "post"
+    },
     vendorList: {
         "url": "admin/vendor/list",
         "method": "post"

@@ -1620,6 +1620,7 @@ module.exports = function (app, io) {
 
     //alert management
     app.post("/admin/alerts/list", ensureAuthorized, alertController.listAlerts);
+    app.post("/admin/employee/add-vacation", ensureAuthorized, employee.addVacation);
   } catch (e) {
     console.log("erroe in index.js---------->>>>", e);
   }

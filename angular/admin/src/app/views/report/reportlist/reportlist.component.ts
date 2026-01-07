@@ -423,8 +423,8 @@ export class ReportlistComponent implements OnInit {
     });
   }
 
-  // bulk mark attendance
-  bulkMarkAttendance(status: 'P' | 'A' | 'L') {
+  // Bulk mark attendance for multiple employees
+  bulkMarkAttendance(status: 'P' | 'A' | 'L' | 'SL' | 'V') {
     const payload = {
       employeeIds: this.selectedEmployees,
       date: this.selectedDate,
@@ -442,6 +442,66 @@ export class ReportlistComponent implements OnInit {
         this.selectedEmployees = [];
       } else {
         this.notification.showError(res.message || 'Error marking attendance');
+      }
+    });
+  }
+
+  // --- Vacation Modal & Logic ---
+  showVacationModal = false;
+  allEmployees: any[] = [];
+  vacationForm = {
+    employeeId: '',
+    startDate: '',
+    endDate: '',
+    type: 'Vacation',
+    remarks: ''
+  };
+
+  openVacationModal() {
+    this.showVacationModal = true;
+    this.loadEmployees();
+  }
+
+  closeVacationModal() {
+    this.showVacationModal = false;
+    this.vacationForm = {
+      employeeId: '',
+      startDate: '',
+      endDate: '',
+      type: 'Vacation',
+      remarks: ''
+    };
+  }
+
+  loadEmployees() {
+    // Only fetch if empty to save calls, or fetch every time if updates needed
+    if (this.allEmployees.length > 0) return;
+    this.apiService.CommonApi(
+      Apiconfig.listEmployees.method,
+      Apiconfig.listEmployees.url,
+      { status: 1 } // fetch active only
+    ).subscribe((res: any) => {
+      if (res.status) {
+        this.allEmployees = res.data;
+      }
+    });
+  }
+
+  saveVacation() {
+    if (!this.vacationForm.employeeId || !this.vacationForm.startDate || !this.vacationForm.endDate) {
+      this.notification.showError("Please fill all required fields");
+      return;
+    }
+    this.apiService.CommonApi(
+      Apiconfig.addVacation.method,
+      Apiconfig.addVacation.url,
+      this.vacationForm
+    ).subscribe((res: any) => {
+      if (res.status) {
+        this.notification.showSuccess("Vacation added successfully");
+        this.closeVacationModal();
+      } else {
+        this.notification.showError(res.message || "Error adding vacation");
       }
     });
   }
