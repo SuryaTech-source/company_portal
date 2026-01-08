@@ -169,6 +169,18 @@ export const Apiconfig = {
         "url": "admin/employee/add-vacation",
         "method": "post"
     },
+    listVacations: {
+        "url": "admin/employee/vacations/list",
+        "method": "post"
+    },
+    editVacation: {
+        "url": "admin/employee/vacation/edit",
+        "method": "post"
+    },
+    deleteVacation: {
+        "url": "admin/employee/vacation/delete",
+        "method": "post"
+    },
     vendorList: {
         "url": "admin/vendor/list",
         "method": "post"
@@ -184,6 +196,10 @@ export const Apiconfig = {
     },
     viewEmployee: {
         "url": "admin/employee/view",
+        "method": "post"
+    },
+    getEmployeeHistory: {
+        "url": "admin/employee/history",
         "method": "post"
     },
     saveSparePart: {
@@ -295,6 +311,22 @@ export const Apiconfig = {
         "url": "admin/salary/edit",
         "method": "post"
 
+    },
+    addPenalty: {
+        "url": "admin/salary/penalty/add",
+        "method": "post"
+    },
+    addAllowance: {
+        "url": "admin/salary/allowance/add",
+        "method": "post"
+    },
+    getOutstandingBalance: {
+        "url": "admin/salary/outstanding",
+        "method": "post"
+    },
+    getDriverOnDate: {
+        "url": "admin/salary/driver-on-date",
+        "method": "post"
     },
     listSalariesOfEmployee: {
         "url": "admin/salaries/employee-list",

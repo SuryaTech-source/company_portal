@@ -27,6 +27,7 @@ export class SalaryViewComponent implements OnInit {
   // Modal
   modalRef?: BsModalRef;
   editingSalary: any = null;
+  outstandingBalance: { penalty: number, allowance: number } = { penalty: 0, allowance: 0 };
 
   loading = false;
 
@@ -60,6 +61,19 @@ export class SalaryViewComponent implements OnInit {
 
     this.getEmployeeDetails();
     this.getSalaries();
+    this.getEmployeeDetails();
+    this.getSalaries();
+    this.getOutstanding();
+  }
+
+  getOutstanding() {
+    this.apiService.CommonApi(Apiconfig.getOutstandingBalance.method, Apiconfig.getOutstandingBalance.url, { employeeId: this.employeeId })
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.outstandingBalance.penalty = res.data.outstandingPenalty || 0;
+          this.outstandingBalance.allowance = res.data.outstandingAllowance || 0;
+        }
+      });
   }
 
   getEmployeeDetails(): void {
@@ -92,6 +106,10 @@ export class SalaryViewComponent implements OnInit {
 
   openEditModal(template: TemplateRef<any>, salary: any): void {
     this.editingSalary = JSON.parse(JSON.stringify(salary)); // Deep copy
+    // Initialize new fields if missing
+    if (!this.editingSalary.penaltyDeduction) this.editingSalary.penaltyDeduction = 0;
+    if (!this.editingSalary.allowanceDeduction) this.editingSalary.allowanceDeduction = 0;
+
     this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
 

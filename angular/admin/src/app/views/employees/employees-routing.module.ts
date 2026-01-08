@@ -4,6 +4,7 @@ import { AddNewEmployeesComponent } from './add-new-employees/add-new-employees.
 import { ActiveEmployeesComponent } from './active-employees/active-employees.component';
 import { SalaryViewComponent } from './salary-view/salary-view.component';
 import { SalaryListComponent } from './salary-list/salary-list.component';
+import { EmployeeHistoryComponent } from './employee-history/employee-history.component';
 
 const routes: Routes = [
   {
@@ -48,6 +49,13 @@ const routes: Routes = [
     component: SalaryListComponent,
     data: {
       title: 'Salary List',
+    },
+  },
+  {
+    path: 'history/:id',
+    component: EmployeeHistoryComponent,
+    data: {
+      title: 'History',
     },
   }
 ];

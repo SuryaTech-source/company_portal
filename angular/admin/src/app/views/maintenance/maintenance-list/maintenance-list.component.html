@@ -134,7 +134,8 @@
               <div class="col-md-6 col-sm-12">
                 <div class="label_input">
                   <label class="form-label">Vehicle</label>
-                  <select class="form-select" [(ngModel)]="form.vehicle" name="vehicle" required>
+                  <select class="form-select" [(ngModel)]="form.vehicle" name="vehicle" (change)="onVehicleSelect()"
+                    required>
                     <option *ngFor="let v of vehicles" [value]="v._id">
                       {{ v.registrationNo }}
                     </option>

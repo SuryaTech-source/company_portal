@@ -73,7 +73,27 @@
       </div>
     </div>
 
-    <h6>Penalties</h6>
+    <!-- Outstanding Balances & Deductions -->
+    <div class="row mb-3 border p-2 bg-light">
+      <div class="col-md-6">
+        <div class="alert alert-danger p-2 mb-2">
+          <strong>Total Outstanding Penalty: {{ outstandingBalance.penalty | currency: currency_code: currency_symbol
+            }}</strong>
+        </div>
+        <label>Deduct Penalty this Month</label>
+        <input type="number" class="form-control" [(ngModel)]="editingSalary.penaltyDeduction">
+      </div>
+      <div class="col-md-6">
+        <div class="alert alert-info p-2 mb-2">
+          <strong>Total Outstanding Allowance: {{ outstandingBalance.allowance | currency: currency_code:
+            currency_symbol }}</strong>
+        </div>
+        <label>Deduct Allowance this Month</label>
+        <input type="number" class="form-control" [(ngModel)]="editingSalary.allowanceDeduction">
+      </div>
+    </div>
+
+    <h6>Other Ad-hoc Penalties</h6>
     <div *ngFor="let penalty of editingSalary.penalties; let i = index" class="row align-items-center mb-2">
       <div class="col-md-4"><input type="text" class="form-control" placeholder="Description"
           [(ngModel)]="penalty.description"></div>
@@ -88,7 +108,7 @@
       </div>
       <div class="col-md-2"><button class="btn btn-sm btn-danger" (click)="removePenalty(i)">X</button></div>
     </div>
-    <button class="btn btn-sm btn-secondary" (click)="addPenalty()">+ Add Penalty</button>
+    <button class="btn btn-sm btn-secondary" (click)="addPenalty()">+ Add Other Penalty</button>
 
     <hr>
     <div class="row">

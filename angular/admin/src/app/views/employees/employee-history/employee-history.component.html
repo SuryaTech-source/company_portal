@@ -1,0 +1,179 @@
+<div class="employee-history-page">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page_title">
+            History: {{ historyData.employee?.fullName }}
+            <small class="text-muted">({{ historyData.employee?.employeeId }})</small>
+        </h2>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'penalty'" (click)="switchTab('penalty')">
+                Penalties ({{ historyData.penalties.totalCount }})
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'allowance'" (click)="switchTab('allowance')">
+                Allowances ({{ historyData.allowances.totalCount }})
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'vacation'" (click)="switchTab('vacation')">
+                Vacations ({{ historyData.vacations.totalCount }})
+            </a>
+        </li>
+    </ul>
+
+    <!-- Penalty Tab -->
+    <div *ngIf="activeTab === 'penalty'">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h5>Total Amount</h5>
+                        <h3>{{ historyData.penalties.totalAmount | currency:currency_code:currency_symbol }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5>Paid Amount</h5>
+                        <h3>{{ historyData.penalties.paidAmount | currency:currency_code:currency_symbol }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body">
+                        <h5>Balance Due</h5>
+                        <h3>{{ historyData.penalties.balance | currency:currency_code:currency_symbol }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Vehicle</th>
+                    <th>Reason</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of historyData.penalties.list">
+                    <td>{{ item.date | date:'dd MMM yyyy' }}</td>
+                    <td>
+                        {{ item.fleet?.vehicleName || 'N/A' }}
+                        <span *ngIf="item.fleet?.registrationNo">({{ item.fleet.registrationNo }})</span>
+                    </td>
+                    <td>{{ item.reason }}</td>
+                    <td class="fw-bold text-danger">{{ item.amount | currency:currency_code:currency_symbol }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+                <tr *ngIf="historyData.penalties.list.length === 0">
+                    <td colspan="5" class="text-center">No penalty records found.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Allowance Tab -->
+    <div *ngIf="activeTab === 'allowance'">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5>Total Taken</h5>
+                        <h3>{{ historyData.allowances.totalAmount | currency:currency_code:currency_symbol }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5>Repaid</h5>
+                        <h3>{{ historyData.allowances.repaidAmount | currency:currency_code:currency_symbol }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body">
+                        <h5>Pending Repayment</h5>
+                        <h3>{{ historyData.allowances.balance | currency:currency_code:currency_symbol }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Notes</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of historyData.allowances.list">
+                    <td>{{ item.date | date:'dd MMM yyyy' }}</td>
+                    <td>{{ item.notes }}</td>
+                    <td class="fw-bold text-info">{{ item.amount | currency:currency_code:currency_symbol }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+                <tr *ngIf="historyData.allowances.list.length === 0">
+                    <td colspan="4" class="text-center">No allowance records found.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Vacation Tab -->
+    <div *ngIf="activeTab === 'vacation'">
+        <div class="alert alert-info" *ngIf="historyData.vacations.list.length > 0">
+            <strong>Total Vacations Taken:</strong> {{ historyData.vacations.totalCount }}
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Type</th>
+                    <th>Remarks</th>
+                    <th>Status</th> <!-- Calculated logic for Past/Future -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of historyData.vacations.list">
+                    <td>{{ item.startDate | date:'dd MMM yyyy' }}</td>
+                    <td>{{ item.endDate | date:'dd MMM yyyy' }}</td>
+                    <td>{{ item.type }}</td>
+                    <td>{{ item.remarks }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="{
+                            'bg-success': (item.endDate | date:'yyyy-MM-dd') < (today | date:'yyyy-MM-dd'),
+                            'bg-primary': (item.startDate | date:'yyyy-MM-dd') > (today | date:'yyyy-MM-dd'),
+                            'bg-warning': (item.startDate | date:'yyyy-MM-dd') <= (today | date:'yyyy-MM-dd') && (item.endDate | date:'yyyy-MM-dd') >= (today | date:'yyyy-MM-dd')
+                        }">
+                            {{
+                            (item.endDate | date:'yyyy-MM-dd') < (today | date:'yyyy-MM-dd') ? 'Completed' :
+                                (item.startDate | date:'yyyy-MM-dd')> (today | date:'yyyy-MM-dd') ? 'Upcoming' :
+                                'Ongoing'
+                                }}
+                        </span>
+                    </td>
+                </tr>
+                <tr *ngIf="historyData.vacations.list.length === 0">
+                    <td colspan="5" class="text-center">No vacation records found.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

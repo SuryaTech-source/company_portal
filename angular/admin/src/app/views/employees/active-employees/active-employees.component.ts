@@ -22,10 +22,19 @@ export class ActiveEmployeesComponent implements OnInit {
     { key: 'Mechanic', display: 'Mechanics' },
     { key: 'Helper', display: 'Helpers' },
     { key: 'Supervisor', display: 'Supervisors' },
-    { key: 'Others', display: 'Others' }
+    { key: 'Others', display: 'Others' },
+    { key: 'Vacation', display: 'Vacations' }
   ];
   activeTab: string = 'Staff'; // Default to 'Employees' (Staff)
   loading = false;
+  vacationsLoading = false;
+  vacationList: any[] = [];
+
+  // Vacation Modals
+  vacationModalRef: BsModalRef;
+  viewVacationData: any;
+  editVacationData: any = {};
+  deleteVacationData: any;
   currency_code = 'KWD';
   currency_symbol = 'KD';
 
@@ -73,6 +82,20 @@ export class ActiveEmployeesComponent implements OnInit {
       );
   }
 
+  getVacations(): void {
+    this.vacationsLoading = true;
+    this.apiService.CommonApi(Apiconfig.listVacations.method, Apiconfig.listVacations.url, {})
+      .subscribe((res: any) => {
+        this.vacationsLoading = false;
+        if (res.status) {
+          this.vacationList = res.data;
+        }
+      }, err => {
+        this.vacationsLoading = false;
+        console.error(err);
+      });
+  }
+
   // --- New method to filter employees for the active tab ---
   getEmployeesForTab(roleKey: string): any[] {
     if (roleKey === 'Staff') {
@@ -105,6 +128,9 @@ export class ActiveEmployeesComponent implements OnInit {
 
   switchTab(tabKey: string): void {
     this.activeTab = tabKey;
+    if (tabKey === 'Vacation') {
+      this.getVacations();
+    }
   }
 
   // Track by function for performance
@@ -164,6 +190,10 @@ export class ActiveEmployeesComponent implements OnInit {
     });
   }
 
+  viewHistory(employeeId: string): void {
+    this.router.navigate(['/app/employees/history', employeeId]);
+  }
+
   openDeleteModal(template: TemplateRef<any>, employee: any) {
     this.deleteEmployeeData = employee;
     this.modalRef = this.modalService.show(template, { class: 'modal-md' });
@@ -195,5 +225,76 @@ export class ActiveEmployeesComponent implements OnInit {
           }
         );
     }
+  }
+
+  // --- Vacation Actions ---
+
+  openViewVacationModal(template: TemplateRef<any>, vac: any) {
+    this.viewVacationData = vac;
+    this.vacationModalRef = this.modalService.show(template, { class: 'modal-md' });
+  }
+
+  openEditVacationModal(template: TemplateRef<any>, vac: any) {
+    // Clone to avoid live editing table
+    this.editVacationData = { ...vac };
+    // Format dates for input if needed (usually handled by date picker binding) 
+    // If using <input type="date">, might need YYYY-MM-DD
+    this.editVacationData.startDate = new Date(vac.startDate);
+    this.editVacationData.endDate = new Date(vac.endDate);
+
+    this.vacationModalRef = this.modalService.show(template, { class: 'modal-md' });
+  }
+
+  openDeleteVacationModal(template: TemplateRef<any>, vac: any) {
+    this.deleteVacationData = vac;
+    this.vacationModalRef = this.modalService.show(template, { class: 'modal-sm' });
+  }
+
+  closeVacationModal() {
+    if (this.vacationModalRef) this.vacationModalRef.hide();
+    this.viewVacationData = null;
+    this.editVacationData = {};
+    this.deleteVacationData = null;
+  }
+
+  saveVacationChanges() {
+    if (!this.editVacationData.startDate || !this.editVacationData.endDate) {
+      this.notify.showError("Dates are required");
+      return;
+    }
+
+    // Map _id (MongoID) to employeeId for backend, as backend expects ObjectId
+    const payload = {
+      ...this.editVacationData,
+      employeeId: this.editVacationData._id
+    };
+
+    this.apiService.CommonApi(Apiconfig.editVacation.method, Apiconfig.editVacation.url, payload)
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.notify.showSuccess("Vacation updated");
+          this.getVacations(); // Refresh list
+          this.closeVacationModal();
+        } else {
+          this.notify.showError(res.message);
+        }
+      });
+  }
+
+  confirmDeleteVacation() {
+    if (!this.deleteVacationData) return;
+
+    this.apiService.CommonApi(Apiconfig.deleteVacation.method, Apiconfig.deleteVacation.url, {
+      vacationId: this.deleteVacationData.vacationId,
+      employeeId: this.deleteVacationData._id // Use ObjectId
+    }).subscribe((res: any) => {
+      if (res.status) {
+        this.notify.showSuccess("Vacation deleted");
+        this.getVacations(); // Refresh
+        this.closeVacationModal();
+      } else {
+        this.notify.showError(res.message);
+      }
+    });
   }
 }

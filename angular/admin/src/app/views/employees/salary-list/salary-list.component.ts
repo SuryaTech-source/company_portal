@@ -5,6 +5,8 @@ import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { DefaultStoreService } from 'src/app/_services/default-store.service';
 import html2pdf from 'html2pdf.js';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { TemplateRef } from '@angular/core';
 
 @Component({
     selector: 'app-salary-list',
@@ -42,13 +44,38 @@ export class SalaryListComponent implements OnInit {
     sortBy: string = 'employeeName';
     sortOrder: number = 1; // 1: Asc, -1: Desc
 
+    // Modals
+    modalRef: BsModalRef;
+
+    // Penalty Data
+    fleets: any[] = [];
+    penaltyData = {
+        fleetId: null,
+        date: new Date(),
+        driverName: '', // Read-only
+        driverId: null,
+        amount: 0,
+        reason: ''
+    };
+    loadingDriver = false;
+
+    // Allowance Data
+    employees: any[] = [];
+    allowanceData = {
+        employeeId: null,
+        date: new Date(),
+        amount: 0,
+        notes: ''
+    };
+
 
     constructor(
         private apiService: ApiService,
         private notify: NotificationService,
         private router: Router,
         private route: ActivatedRoute,
-        private store: DefaultStoreService
+        private store: DefaultStoreService,
+        private modalService: BsModalService
     ) { }
 
     ngOnInit(): void {
@@ -174,5 +201,112 @@ export class SalaryListComponent implements OnInit {
             actionHeaders.forEach((el: any) => el.style.display = '');
             actionCells.forEach((el: any) => el.style.display = '');
         });
+    }
+
+    // --- Penalty & Allowance Logic ---
+
+    openPenaltyModal(template: TemplateRef<any>) {
+        // Reset
+        this.penaltyData = {
+            fleetId: null,
+            date: new Date(),
+            driverName: '',
+            driverId: null,
+            amount: 0,
+            reason: ''
+        };
+        this.fetchFleets();
+        this.modalRef = this.modalService.show(template);
+    }
+
+    openAllowanceModal(template: TemplateRef<any>) {
+        this.allowanceData = {
+            employeeId: null,
+            date: new Date(),
+            amount: 0,
+            notes: ''
+        };
+        this.fetchEmployees();
+        this.modalRef = this.modalService.show(template);
+    }
+
+    fetchFleets() {
+        // Use listFleets or activeFleetList from Apiconfig
+        this.apiService.CommonApi(Apiconfig.listFleets.method, Apiconfig.listFleets.url, { status: 1 }).subscribe((res: any) => {
+            if (res.status) {
+                this.fleets = res.data;
+            }
+        });
+    }
+
+    fetchEmployees() {
+        this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1 }).subscribe((res: any) => {
+            if (res.status) {
+                this.employees = res.data;
+            }
+        });
+    }
+
+    onPenaltyDetailsChange() {
+        if (this.penaltyData.fleetId && this.penaltyData.date) {
+            this.loadingDriver = true;
+            this.apiService.CommonApi(Apiconfig.getDriverOnDate.method, Apiconfig.getDriverOnDate.url, {
+                fleetId: this.penaltyData.fleetId,
+                date: this.penaltyData.date
+            }).subscribe((res: any) => {
+                this.loadingDriver = false;
+                if (res.status && res.driver) {
+                    this.penaltyData.driverId = res.driver._id;
+                    this.penaltyData.driverName = res.driver.fullName;
+                } else {
+                    this.penaltyData.driverId = null;
+                    this.penaltyData.driverName = 'No Driver Found';
+                }
+            }, err => {
+                this.loadingDriver = false;
+                this.penaltyData.driverName = 'Error fetching driver';
+            });
+        }
+    }
+
+    savePenalty() {
+        if (!this.penaltyData.fleetId || !this.penaltyData.date || !this.penaltyData.amount) {
+            this.notify.showError("Please fill all required fields");
+            return;
+        }
+
+        // Ensure driver was fetched
+        // Wait, user said "we should automatically fetch the driver... and it should be recorded"
+        // I'll rely on backend to re-verify if needed, or trust the fetched ID.
+        // My addPenalty controller actually re-fetches logic, so I just send fleet and date.
+        // But let's send what we have. controller.addPenalty uses fleetId and date to find driver again. 
+        // So I don't strictly need to send driverId, but visual feedback is good.
+
+        this.apiService.CommonApi(Apiconfig.addPenalty.method, Apiconfig.addPenalty.url, this.penaltyData)
+            .subscribe((res: any) => {
+                if (res.status) {
+                    this.notify.showSuccess("Penalty Added");
+                    this.modalRef.hide();
+                } else {
+                    this.notify.showError(res.message);
+                }
+            });
+    }
+
+    saveAllowance() {
+        if (!this.allowanceData.employeeId || !this.allowanceData.date || !this.allowanceData.amount) {
+            this.notify.showError("Please fill all required fields");
+            return;
+        }
+
+        this.apiService.CommonApi(Apiconfig.addAllowance.method, Apiconfig.addAllowance.url, this.allowanceData)
+            .subscribe((res: any) => {
+                if (res.status) {
+                    this.notify.showSuccess("Allowance Added");
+                    this.modalRef.hide();
+                } else {
+                    this.notify.showError(res.message);
+                }
+            });
     }
 }

@@ -88,6 +88,8 @@ var payment_schema = require('../schema/coustomerVentorPayment.schema.js');
 var fleetfleetassignment_schema = require('../schema/fleetassignment.schema.js');
 var salary_schema = require('../schema/salary.schema.js');
 var alert_schema = require('../schema/alert.schema.js');
+var penalty_schema = require('../schema/penalty.schema.js');
+var allowance_schema = require('../schema/allowance.schema.js');
 
 // define the schema for our user model
 var adminSchema = mongoose.Schema(config_admin_schema.ADMIN, { timestamps: true, versionKey: false });
@@ -179,6 +181,8 @@ var customerPaymentSchema = mongoose.Schema(payment_schema.CUSTOMER_PAYMENT, { t
 var fleetAssignmentSchema = mongoose.Schema(fleetfleetassignment_schema.FLEET_ASSIGNMENT, { timestamps: true, versionKey: false });
 var salarySchema = mongoose.Schema(salary_schema.SALARY, { timestamps: true, versionKey: false });
 var alert_schema = mongoose.Schema(alert_schema.ALERT, { timestamps: true, versionKey: false });
+var penaltySchema = mongoose.Schema(penalty_schema.PENALTY, { timestamps: true, versionKey: false });
+var allowanceSchema = mongoose.Schema(allowance_schema.ALLOWANCE, { timestamps: true, versionKey: false });
 
 // var checkin_schema = mongoose.Schema(checkin_schema.CHECKIN,{timestamps:true,versionkey:false})
 /* 
@@ -589,6 +593,8 @@ var alert = mongoose.model('alert', alert_schema, 'alert');
 const tags = mongoose.model('tags', tagsSchema, 'tags');
 const deals = mongoose.model('deals', dealsSchema, 'deals');
 const combo = mongoose.model('combo', comboSchema, 'combo');
+const penalty = mongoose.model('penalty', penaltySchema, 'penalty');
+const allowance = mongoose.model('allowance', allowanceSchema, 'allowance');
 
 
 module.exports = {
@@ -654,7 +660,7 @@ module.exports = {
 	'webbanners': webbanners,
 	'mobbanners': mobbanners,
 	'favourite': favourite,
-	'temp_favourite':temp_favourite,
+	'temp_favourite': temp_favourite,
 	'recently_visit': recently_visit,
 	'subscribe': subscribe,
 	'recent_temp_visit': recent_temp_visit,
@@ -680,6 +686,8 @@ module.exports = {
 	'customerPayment': customerPayment,
 	'fleetAssignment': fleetAssignment,
 	'salary': salary,
-	'alert': alert
+	'alert': alert,
+	'penalty': penalty,
+	'allowance': allowance
 	// 'checkin':checkin
 };

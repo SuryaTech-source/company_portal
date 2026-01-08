@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SalaryViewComponent } from './salary-view/salary-view.component';
 import { SalaryListComponent } from './salary-list/salary-list.component';
+import { EmployeeHistoryComponent } from './employee-history/employee-history.component';
 
 
 @NgModule({
@@ -15,7 +16,9 @@ import { SalaryListComponent } from './salary-list/salary-list.component';
     AddNewEmployeesComponent,
     ActiveEmployeesComponent,
     SalaryViewComponent,
-    SalaryListComponent
+    SalaryViewComponent,
+    SalaryListComponent,
+    EmployeeHistoryComponent
   ],
   imports: [
     CommonModule,

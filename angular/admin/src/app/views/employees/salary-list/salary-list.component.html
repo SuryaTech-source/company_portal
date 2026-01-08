@@ -1,7 +1,14 @@
 <div class="salary-list-page">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="page_title">Salary List</h2>
-
+        <div>
+            <button class="btn btn-danger mr-2" (click)="openPenaltyModal(penaltyTemplate)">
+                <i class="fa fa-exclamation-triangle"></i> Add Penalty
+            </button>
+            <button class="btn btn-success" (click)="openAllowanceModal(allowanceTemplate)">
+                <i class="fa fa-money"></i> Add Allowance
+            </button>
+        </div>
     </div>
 
     <!-- Filters -->
@@ -105,3 +112,89 @@
         <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>
     </div>
 </div>
+
+<!-- Penalty Modal -->
+<ng-template #penaltyTemplate>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Add Driver Penalty</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group mb-3">
+            <label>Vehicle <span class="text-danger">*</span></label>
+            <ng-select [items]="fleets" bindLabel="vehicleName" bindValue="_id" [(ngModel)]="penaltyData.fleetId"
+                (change)="onPenaltyDetailsChange()" placeholder="Select Vehicle">
+
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.vehicleName}} ({{item.registrationNo}})
+                </ng-template>
+            </ng-select>
+        </div>
+        <div class="form-group mb-3">
+            <label>Penalty Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" [ngModel]="penaltyData.date | date:'yyyy-MM-dd'"
+                (ngModelChange)="penaltyData.date = $event; onPenaltyDetailsChange()">
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Driver (Auto-Selected)</label>
+            <input type="text" class="form-control" [value]="penaltyData.driverName" readonly>
+            <small *ngIf="loadingDriver" class="text-muted">Fetching driver...</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Penalty Amount <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="penaltyData.amount">
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Reason</label>
+            <textarea class="form-control" rows="2" [(ngModel)]="penaltyData.reason"></textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
+        <button type="button" class="btn btn-danger" [disabled]="!penaltyData.driverId" (click)="savePenalty()">Record
+            Penalty</button>
+    </div>
+</ng-template>
+
+<!-- Allowance Modal -->
+<ng-template #allowanceTemplate>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Add Employee Allowance/Advance</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group mb-3">
+            <label>Employee <span class="text-danger">*</span></label>
+            <ng-select [items]="employees" bindLabel="fullName" bindValue="_id" [(ngModel)]="allowanceData.employeeId"
+                placeholder="Search Employee">
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.fullName}} ({{item.employeeId}})
+                </ng-template>
+            </ng-select>
+        </div>
+        <div class="form-group mb-3">
+            <label>Date Given <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" [ngModel]="allowanceData.date | date:'yyyy-MM-dd'"
+                (ngModelChange)="allowanceData.date = $event">
+        </div>
+        <div class="form-group mb-3">
+            <label>Amount <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="allowanceData.amount">
+        </div>
+        <div class="form-group mb-3">
+            <label>Notes</label>
+            <textarea class="form-control" rows="2" [(ngModel)]="allowanceData.notes"></textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="saveAllowance()">Record Allowance</button>
+    </div>
+</ng-template>

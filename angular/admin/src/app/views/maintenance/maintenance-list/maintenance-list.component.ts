@@ -19,6 +19,7 @@ export class MaintenanceListComponent implements OnInit {
   records: any[] = [];
   vehicles: any[] = [];
   drivers: any[] = [];
+  allDrivers: any[] = [];
   spareParts: any[] = [];
   currency_code = 'KWD';
   currency_symbol = 'KD';
@@ -97,9 +98,10 @@ export class MaintenanceListComponent implements OnInit {
 
   // 👨 Fetch drivers
   loadDrivers() {
-    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { role: 'Driver', status: 1 })
+    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1 })
       .subscribe((res: any) => {
-        if (res.status) this.drivers = res.data;
+        // Drivers will be loaded dynamically based on vehicle selection
+        if (res.status) this.allDrivers = res.data;
       });
   }
 
@@ -190,8 +192,11 @@ export class MaintenanceListComponent implements OnInit {
           finalPrice: p.finalPrice || 0,
         })) || []
       };
+      // Populate drivers list with the saved driver for this record
+      this.drivers = row.driverData ? [row.driverData] : [];
     } else {
       // Default empty form for add
+      this.drivers = []; // Reset drivers list
       this.form = {
         vehicle: '',
         driver: '',
@@ -202,6 +207,39 @@ export class MaintenanceListComponent implements OnInit {
         partsUsed: []
       };
     }
+  }
+
+  onVehicleSelect() {
+    if (!this.form.vehicle) return;
+
+    this.apiService.CommonApi(
+      Apiconfig.getActiveAssignment.method,
+      Apiconfig.getActiveAssignment.url,
+      { fleetId: this.form.vehicle }
+    ).subscribe((res: any) => {
+      if (res.status && res.data && res.data.driverId) {
+        let assignedDriver = res.data.driverId;
+
+        // If backend returns populated object, use it.
+        // If it returns string ID, find it in allDrivers list.
+        if (typeof assignedDriver === 'string') {
+          assignedDriver = this.allDrivers.find(d => d._id === assignedDriver);
+        }
+
+        if (assignedDriver) {
+          this.drivers = [assignedDriver];
+          this.form.driver = assignedDriver._id;
+        } else {
+          console.warn('Driver ID found but driver details missing in loaded list.');
+          this.drivers = [];
+          this.form.driver = '';
+        }
+      } else {
+        this.drivers = []; // Clear dropdown if no assignment
+        this.form.driver = '';
+        this.notification.showWarning('No active driver assignment found for this vehicle');
+      }
+    });
   }
 
   closeModal() {

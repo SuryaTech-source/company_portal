@@ -930,16 +930,35 @@ module.exports = function (app, io) {
         }
     }
 
-    router.general = async function (req, res) {
+router.general = async function (req, res) {
+    try {
         console.log('before mqry');
-        let docdata = await db.GetDocument('settings', { alias: "general" }, {}, {});
-        // console.log(docdata.doc, 'after mqry');
-        if (docdata && docdata.doc[0] && docdata.doc[0].settings) {
-            res.send(docdata.doc[0].settings);
-        } else {
-            res.send(docdata.doc);
+
+        const docdata = await db.GetDocument(
+            'settings',
+            { alias: "general" },
+            {},
+            {}
+        );
+
+        if (
+            docdata &&
+            Array.isArray(docdata.doc) &&
+            docdata.doc.length > 0 &&
+            docdata.doc[0].settings
+        ) {
+            return res.send(docdata.doc[0].settings);
         }
+
+        // fallback response
+        return res.send(docdata?.doc || null);
+
+    } catch (err) {
+        console.error('Error in general settings:', err);
+        return res.status(500).send({ message: 'Internal server error' });
     }
+};
+
 
 
     router.taskexport = function (req, res) {

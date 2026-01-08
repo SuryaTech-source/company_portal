@@ -595,5 +595,207 @@ module.exports = function () {
     }
   };
 
+  /**
+   * @route POST /employee/vacations/list
+   * @desc List active and future vacations
+   */
+  controller.listVacations = async function (req, res) {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const pipeline = [
+        { $unwind: "$vacations" },
+        {
+          $match: {
+            "vacations.endDate": { $gte: today } // Active or Future
+          }
+        },
+        {
+          $project: {
+            fullName: 1,
+            employeeId: 1,
+            designation: 1,
+            vacationId: "$vacations._id",
+            startDate: "$vacations.startDate",
+            endDate: "$vacations.endDate",
+            type: "$vacations.type",
+            remarks: "$vacations.remarks"
+          }
+        },
+        { $sort: { startDate: 1 } }
+      ];
+
+      const result = await db.GetAggregation("employee", pipeline);
+
+      return res.send({
+        status: true,
+        count: result.length,
+        data: result
+      });
+    } catch (error) {
+      console.log(error, "ERROR listVacations");
+      return res.send({ status: false, message: "Error fetching vacations" });
+    }
+  };
+
+  /**
+   * @route POST /employee/vacation/edit
+   * @desc Edit vacation details
+   */
+  controller.editVacation = async function (req, res) {
+    try {
+      const { vacationId, employeeId, startDate, endDate, type, remarks } = req.body;
+
+      if (!vacationId || !employeeId || !startDate || !endDate) {
+        return res.send({ status: false, message: "Missing required fields" });
+      }
+
+      const result = await db.UpdateDocument(
+        "employee",
+        { _id: new mongoose.Types.ObjectId(employeeId), "vacations._id": new mongoose.Types.ObjectId(vacationId) },
+        {
+          $set: {
+            "vacations.$.startDate": new Date(startDate),
+            "vacations.$.endDate": new Date(endDate),
+            "vacations.$.type": type,
+            "vacations.$.remarks": remarks
+          }
+        }
+      );
+
+      return res.send({
+        status: true,
+        message: "Vacation updated successfully",
+        data: result
+      });
+    } catch (error) {
+      console.log(error, "ERROR editVacation");
+      return res.send({ status: false, message: "Error updating vacation" });
+    }
+  };
+
+  /**
+   * @route POST /employee/vacation/delete
+   * @desc Delete vacation entry
+   */
+  controller.deleteVacation = async function (req, res) {
+    try {
+      const { vacationId, employeeId } = req.body;
+
+      if (!vacationId || !employeeId) {
+        return res.send({ status: false, message: "Missing required fields" });
+      }
+
+      const result = await db.UpdateDocument(
+        "employee",
+        { _id: new mongoose.Types.ObjectId(employeeId) },
+        {
+          $pull: { vacations: { _id: new mongoose.Types.ObjectId(vacationId) } }
+        }
+      );
+
+      return res.send({
+        status: true,
+        message: "Vacation deleted successfully",
+        data: result
+      });
+
+    } catch (error) {
+      console.log(error, "ERROR deleteVacation");
+      return res.send({ status: false, message: "Error deleting vacation" });
+    }
+  };
+
+  /**
+     * @route POST /admin/employee/history
+     * @description Get comprehensive history (Penalties, Allowances, Vacations)
+     */
+  controller.getEmployeeHistory = async function (req, res) {
+    try {
+      const { employeeId } = req.body;
+      if (!employeeId) return res.send({ status: false, message: "Employee ID required" });
+
+      const empId = new mongoose.Types.ObjectId(employeeId);
+
+      // 1. Fetch Employee (for Profile & Vacations)
+      const employee = await db.GetOneDocument("employee", { _id: empId }, {}, { lean: true });
+      if (!employee) return res.send({ status: false, message: "Employee not found" });
+
+      // 2. Fetch Penalties
+      const penaltyRes = await db.GetDocument(
+        "penalty",
+        { employee: empId },
+        {},
+        { sort: { date: -1 }, populate: ["fleet"] }
+      );
+      const penalties = (penaltyRes.status && penaltyRes.doc) ? penaltyRes.doc : [];
+
+      // 3. Fetch Allowances
+      const allowanceRes = await db.GetDocument(
+        "allowance",
+        { employee: empId },
+        {},
+        { sort: { date: -1 } }
+      );
+      const allowances = (allowanceRes.status && allowanceRes.doc) ? allowanceRes.doc : [];
+
+      // 4. Calculate Stats (Outstanding done via salary deduction sum usually, 
+      // but for history list, we might just show raw totals or try to calculate outstanding.
+
+      const salaryPipeline = [
+        { $match: { employee: empId } },
+        {
+          $group: {
+            _id: null,
+            totalPenaltyDeducted: { $sum: "$penaltyDeduction" },
+            totalAllowanceDeducted: { $sum: "$allowanceDeduction" }
+          }
+        }
+      ];
+      const salaryRes = await db.GetAggregation("salary", salaryPipeline);
+      const deducted = salaryRes.length ? salaryRes[0] : { totalPenaltyDeducted: 0, totalAllowanceDeducted: 0 };
+
+      const totalPenaltyAmount = penalties.reduce((sum, p) => sum + (p.amount || 0), 0);
+      const totalAllowanceAmount = allowances.reduce((sum, a) => sum + (a.amount || 0), 0);
+
+      // Organize Vacations (Sort by Date Desc)
+      const vacations = (employee.vacations || []).sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+
+      const data = {
+        employee: {
+          fullName: employee.fullName,
+          employeeId: employee.employeeId,
+          designation: employee.designation,
+          joiningDate: employee.joiningDate
+        },
+        penalties: {
+          list: penalties,
+          totalCount: penalties.length,
+          totalAmount: totalPenaltyAmount,
+          paidAmount: deducted.totalPenaltyDeducted, // Best effort "Paid"
+          balance: totalPenaltyAmount - deducted.totalPenaltyDeducted
+        },
+        allowances: {
+          list: allowances,
+          totalCount: allowances.length,
+          totalAmount: totalAllowanceAmount,
+          repaidAmount: deducted.totalAllowanceDeducted,
+          balance: totalAllowanceAmount - deducted.totalAllowanceDeducted
+        },
+        vacations: {
+          list: vacations,
+          totalCount: vacations.length
+        }
+      };
+
+      return res.send({ status: true, data: data });
+
+    } catch (error) {
+      console.error("ERROR getEmployeeHistory", error);
+      return res.send({ status: false, message: "Error fetching history" });
+    }
+  };
+
   return controller;
 };

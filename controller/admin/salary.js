@@ -120,9 +120,15 @@ module.exports = function () {
             const overtimeHours = Number(body.overtimeHours) || 0;
             const overtimeRate = Number(body.overtimeRate) || 0;
             const penalties = Array.isArray(body.penalties) ? body.penalties : [];
+            // New deductions
+            const penaltyDeduction = Number(body.penaltyDeduction) || 0;
+            const allowanceDeduction = Number(body.allowanceDeduction) || 0;
 
             const overtimeAmount = overtimeHours * overtimeRate;
-            const totalPenaltyAmount = penalties.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+            // Existing inline penalties array (optional, keeping for backward compat if used)
+            const inlinePenaltyAmount = penalties.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+            const totalPenaltyAmount = inlinePenaltyAmount + penaltyDeduction + allowanceDeduction;
 
             // Prorated salary based on days present
             const proratedBase = originalSalary.totalWorkingDays > 0
@@ -130,13 +136,15 @@ module.exports = function () {
                 : 0;
 
             const totalEarnings = proratedBase + overtimeAmount;
-            const finalSalary = totalEarnings - totalPenaltyAmount;
+            const finalSalary = totalEarnings - totalPenaltyAmount; // Deducts all: inline penalties + ledger penalties + allowances
 
             const updateData = {
                 overtimeHours,
                 overtimeRate,
                 overtimeAmount,
                 penalties,
+                penaltyDeduction,
+                allowanceDeduction,
                 totalPenaltyAmount,
                 totalEarnings,
                 finalSalary,
@@ -152,6 +160,174 @@ module.exports = function () {
         } catch (error) {
             console.error("ERROR updateSalary:", error);
             return res.send({ status: false, message: "Failed to update salary." });
+        }
+    };
+
+    /**
+     * @route POST /salary/penalty/add
+     */
+    controller.addPenalty = async function (req, res) {
+        try {
+            const { fleetId, date, amount, reason } = req.body;
+            if (!fleetId || !date || !amount) {
+                return res.send({ status: false, message: "Fleet, Date and Amount are required" });
+            }
+
+            // Fetch Driver
+            const targetDate = new Date(date);
+            const assignment = await db.GetOneDocument(
+                "fleetAssignment",
+                {
+                    fleetId: new mongoose.Types.ObjectId(fleetId),
+                    dateAssigned: { $lte: targetDate },
+                    $or: [
+                        { dateUnassigned: { $gte: targetDate } },
+                        { dateUnassigned: null },
+                        { dateUnassigned: { $exists: false } } // Handle missing field
+                    ]
+                },
+                {},
+                { sort: { dateAssigned: -1 } } // Get most recent assignment
+            );
+
+            // Allow manual override if needed, but for now strict auto-fetch
+            const driverId = assignment.doc ? assignment.doc.driverId : null;
+
+            if (!driverId) {
+                return res.send({ status: false, message: "No driver found assigned to this vehicle on the specified date." });
+            }
+
+            const data = {
+                fleet: fleetId,
+                employee: driverId,
+                date: targetDate,
+                amount: Number(amount),
+                reason: reason || "",
+                status: "Pending",
+                paidAmount: 0
+            };
+
+            const result = await db.InsertDocument("penalty", data);
+            return res.send({ status: true, message: "Penalty recorded", data: result });
+
+        } catch (error) {
+            console.error("ERROR addPenalty", error);
+            return res.send({ status: false, message: "Error adding penalty" });
+        }
+    };
+
+    /**
+     * @route POST /salary/allowance/add
+     */
+    controller.addAllowance = async function (req, res) {
+        try {
+            const { employeeId, date, amount, notes } = req.body;
+            if (!employeeId || !date || !amount) return res.send({ status: false, message: "Missing fields" });
+
+            const data = {
+                employee: employeeId,
+                date: new Date(date),
+                amount: Number(amount),
+                notes: notes || "",
+                status: "Pending",
+                repaidAmount: 0
+            };
+
+            const result = await db.InsertDocument("allowance", data);
+            return res.send({ status: true, message: "Allowance recorded", data: result });
+        } catch (error) {
+            console.error("ERROR addAllowance", error);
+            return res.send({ status: false, message: "Error adding allowance" });
+        }
+    };
+
+    /**
+     * @route POST /salary/outstanding
+     */
+    controller.getOutstandingBalance = async function (req, res) {
+        try {
+            const { employeeId } = req.body;
+            if (!employeeId) return res.send({ status: false });
+
+            const empId = new mongoose.Types.ObjectId(employeeId);
+
+            // 1. Total Penalties (Master Records)
+            const penaltyPipeline = [
+                { $match: { employee: empId } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ];
+            const penaltyRes = await db.GetAggregation("penalty", penaltyPipeline);
+            const totalPenaltyRecorded = penaltyRes.length ? penaltyRes[0].total : 0;
+
+            // 2. Total Allowances (Master Records)
+            const allowancePipeline = [
+                { $match: { employee: empId } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ];
+            const allowanceRes = await db.GetAggregation("allowance", allowancePipeline);
+            const totalAllowanceRecorded = allowanceRes.length ? allowanceRes[0].total : 0;
+
+            // 3. Total Deductions (from Salary Slips)
+            const salaryPipeline = [
+                { $match: { employee: empId } },
+                {
+                    $group: {
+                        _id: null,
+                        totalPenaltyDeducted: { $sum: "$penaltyDeduction" },
+                        totalAllowanceDeducted: { $sum: "$allowanceDeduction" }
+                    }
+                }
+            ];
+            const salaryRes = await db.GetAggregation("salary", salaryPipeline);
+            const deducted = salaryRes.length ? salaryRes[0] : { totalPenaltyDeducted: 0, totalAllowanceDeducted: 0 };
+
+            return res.send({
+                status: true,
+                data: {
+                    outstandingPenalty: totalPenaltyRecorded - deducted.totalPenaltyDeducted,
+                    outstandingAllowance: totalAllowanceRecorded - deducted.totalAllowanceDeducted
+                }
+            });
+
+        } catch (error) {
+            console.error("ERROR getOutstandingBalance", error);
+            return res.send({ status: false, message: "Error" });
+        }
+    };
+
+    /**
+     * @route POST /salary/driver-on-date
+     */
+    controller.getDriverOnDate = async function (req, res) {
+        try {
+            const { fleetId, date } = req.body;
+            if (!fleetId || !date) return res.send({ status: false, message: "Missing params" });
+
+            const targetDate = new Date(date);
+            const assignment = await db.GetOneDocument(
+                "fleetAssignment",
+                {
+                    fleetId: new mongoose.Types.ObjectId(fleetId),
+                    dateAssigned: { $lte: targetDate },
+                    $or: [
+                        { dateUnassigned: { $gte: targetDate } },
+                        { dateUnassigned: null },
+                        { dateUnassigned: { $exists: false } }
+                    ]
+                },
+                {},
+                { sort: { dateAssigned: -1 }, populate: ["driverId"] }
+            );
+
+            if (assignment.doc && assignment.doc.driverId) {
+                return res.send({ status: true, driver: assignment.doc.driverId });
+            } else {
+                return res.send({ status: false, message: "No driver found" });
+            }
+
+        } catch (error) {
+            console.error("ERROR getDriverOnDate", error);
+            return res.send({ status: false, message: "Error" });
         }
     };
 

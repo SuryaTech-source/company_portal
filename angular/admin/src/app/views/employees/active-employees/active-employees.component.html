@@ -32,8 +32,8 @@
         </div>
       </div>
 
-      <!-- Table -->
-      <div [id]="role.key + 'Table'" class="table_section">
+      <!-- Standard Employee Tables -->
+      <div [id]="role.key + 'Table'" class="table_section" *ngIf="role.key !== 'Vacation'">
         <table class="table table-bordered table-striped text-center">
           <thead class="thead-dark">
             <tr>
@@ -63,8 +63,10 @@
               <td>
                 <button class="btn btn-sm btn-info mr-1" (click)="viewEmployee(emp)">View</button>
                 <button class="btn btn-sm btn-warning mr-1" (click)="editEmployee(emp)">Edit</button>
-                <!-- New Salary View Button -->
                 <button class="btn btn-sm btn-success mr-1" (click)="viewSalary(emp)">Salary</button>
+                <button class="btn btn-sm btn-primary mr-1" (click)="viewHistory(emp._id)" title="History">
+                  <i class="fa fa-history"></i>
+                </button>
                 <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, emp)">Delete</button>
               </td>
             </tr>
@@ -74,7 +76,47 @@
           </tbody>
         </table>
       </div>
-      <div class="text-center mt-3">
+
+      <!-- Vacation Table -->
+      <div [id]="role.key + 'Table'" class="table_section" *ngIf="role.key === 'Vacation'">
+        <div *ngIf="vacationsLoading" class="text-center p-4">Loading vacations...</div>
+        <table class="table table-bordered table-striped text-center" *ngIf="!vacationsLoading">
+          <thead class="thead-dark">
+            <tr>
+              <th>NAME</th>
+              <th>ID NO.</th>
+              <th>DESIGNATION</th>
+              <th>FROM DATE</th>
+              <th>TO DATE</th>
+              <th>TYPE</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let vac of vacationList">
+              <td>{{ vac.fullName }}</td>
+              <td>{{ vac.employeeId }}</td>
+              <td>{{ vac.designation }}</td>
+              <td>{{ vac.startDate | date:'dd/MM/yyyy' }}</td>
+              <td>{{ vac.endDate | date:'dd/MM/yyyy' }}</td>
+              <td>{{ vac.type }}</td>
+              <td>
+                <button class="btn btn-sm btn-info mr-1"
+                  (click)="openViewVacationModal(viewVacationTemplate, vac)">View</button>
+                <button class="btn btn-sm btn-warning mr-1"
+                  (click)="openEditVacationModal(editVacationTemplate, vac)">Edit</button>
+                <button class="btn btn-sm btn-danger"
+                  (click)="openDeleteVacationModal(deleteVacationTemplate, vac)">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="vacationList.length === 0">
+              <td colspan="7">No active vacations found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="text-center mt-3" *ngIf="role.key !== 'Vacation' || (!vacationsLoading && vacationList.length > 0)">
         <button class="btn btn-outline-primary" (click)="downloadPDF(role.key)">Download as PDF</button>
       </div>
     </div>
@@ -85,6 +127,7 @@
   </div>
 </div>
 
+<!-- Delete Employee Modal -->
 <ng-template #deletePopup>
   <div class="logout_modal">
     <div class="modal-body login-body">
@@ -97,12 +140,76 @@
       <h6 class="modal-title">Are you sure you want to delete {{ deleteEmployeeData?.fullName }}?</h6>
     </div>
     <div class="modal-footer border-0">
-      <button type="button" (click)="closeModal()" class="btn cancel-btn">
-        Cancel
-      </button>
-      <button type="button" (click)="confirmDelete()" class="btn btn-danger">
-        Delete
-      </button>
+      <button type="button" (click)="closeModal()" class="btn cancel-btn">Cancel</button>
+      <button type="button" (click)="confirmDelete()" class="btn btn-danger">Delete</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- View Vacation Modal -->
+<ng-template #viewVacationTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Vacation Details</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeVacationModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" *ngIf="viewVacationData">
+    <p><strong>Employee:</strong> {{viewVacationData.fullName}} ({{viewVacationData.employeeId}})</p>
+    <p><strong>Type:</strong> {{viewVacationData.type}}</p>
+    <p><strong>Period:</strong> {{viewVacationData.startDate | date}} - {{viewVacationData.endDate | date}}</p>
+    <p><strong>Remarks:</strong> {{viewVacationData.remarks || 'None'}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeVacationModal()">Close</button>
+  </div>
+</ng-template>
+
+<!-- Edit Vacation Modal -->
+<ng-template #editVacationTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Edit Vacation</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeVacationModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Start Date</label>
+      <input type="date" class="form-control" [ngModel]="editVacationData.startDate | date:'yyyy-MM-dd'"
+        (ngModelChange)="editVacationData.startDate = $event">
+    </div>
+    <div class="form-group">
+      <label>End Date</label>
+      <input type="date" class="form-control" [ngModel]="editVacationData.endDate | date:'yyyy-MM-dd'"
+        (ngModelChange)="editVacationData.endDate = $event">
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select class="form-control" [(ngModel)]="editVacationData.type">
+        <option value="Vacation">Vacation</option>
+        <option value="Sick Leave">Sick Leave</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Remarks</label>
+      <textarea class="form-control" rows="3" [(ngModel)]="editVacationData.remarks"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeVacationModal()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="saveVacationChanges()">Save Changes</button>
+  </div>
+</ng-template>
+
+<!-- Delete Vacation Modal -->
+<ng-template #deleteVacationTemplate>
+  <div class="modal-body text-center">
+    <h4>Delete Vacation?</h4>
+    <p>Are you sure you want to remove this vacation entry?</p>
+    <div class="mt-3">
+      <button type="button" class="btn btn-secondary mr-2" (click)="closeVacationModal()">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="confirmDeleteVacation()">Delete</button>
     </div>
   </div>
 </ng-template>

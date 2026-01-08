@@ -1617,10 +1617,18 @@ module.exports = function (app, io) {
       ensureAuthorized,
       salaryController.updateSalary
     );
+    app.post("/admin/salary/penalty/add", ensureAuthorized, salaryController.addPenalty);
+    app.post("/admin/salary/allowance/add", ensureAuthorized, salaryController.addAllowance);
+    app.post("/admin/salary/outstanding", ensureAuthorized, salaryController.getOutstandingBalance);
+    app.post("/admin/salary/driver-on-date", ensureAuthorized, salaryController.getDriverOnDate);
 
     //alert management
     app.post("/admin/alerts/list", ensureAuthorized, alertController.listAlerts);
     app.post("/admin/employee/add-vacation", ensureAuthorized, employee.addVacation);
+    app.post("/admin/employee/vacations/list", ensureAuthorized, employee.listVacations);
+    app.post("/admin/employee/vacation/edit", ensureAuthorized, employee.editVacation);
+    app.post("/admin/employee/vacation/delete", ensureAuthorized, employee.deleteVacation);
+    app.post("/admin/employee/history", ensureAuthorized, employee.getEmployeeHistory);
   } catch (e) {
     console.log("erroe in index.js---------->>>>", e);
   }
