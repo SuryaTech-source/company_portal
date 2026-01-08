@@ -32,6 +32,15 @@ module.exports = function () {
 
       const results = [];
 
+      // Fetch all penalties for the month (for Driving Behavior automation)
+      const allPenaltiesRes = await db.GetDocument(
+        "penalty",
+        { date: { $gte: startDate, $lte: endDate } },
+        {},
+        {}
+      );
+      const allPenalties = (allPenaltiesRes.status && allPenaltiesRes.doc) ? allPenaltiesRes.doc : [];
+
       for (const emp of employees.doc) {
         // Get attendance document for employee
         const attnDoc = await db.GetOneDocument(
@@ -46,37 +55,62 @@ module.exports = function () {
           presentDays = 0,
           totalDays = 0;
 
-        if (attnDoc.status && attnDoc.doc && attnDoc.doc.records.length > 0) {
+        if (attnDoc.status && attnDoc.doc && attnDoc.doc.records && attnDoc.doc.records.length > 0) {
+          // Fixed: Check .records existence
           const records = attnDoc.doc.records.filter(
             (r) => r.date >= startDate && r.date <= endDate
           );
 
+          // Count logic - assuming records contain one entry per working day
+          // Or should we use totalWorkingDays from elsewhere?
+          // Using recorded entries as Total Days for now.
           totalDays = records.length;
           records.forEach((r) => {
             if (r.status === "P") presentDays++;
-            if (r.status === "A") leaveDays++;
-            if (r.status === "L" || r.status === "S") sickDays++;
+            if (r.status === "A") leaveDays++; // Absent counts as leave? or Unpaid Leave?
+            if (r.status === "L") { leaveDays++; } // Leave
+            if (r.status === "S") { sickDays++; } // Sick
           });
+
+          // If totalDays is 0 (no attendance records), use standard 30?
+          // For now, keep existing logic: 0% if no records.
         }
 
         // Compute performance percentage
+        // Logic: (Present / Total Recorded Days) * 100
         const performancePercent =
-          totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : 0;
+          totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : "0.00";
 
-        // Get driver performance data if applicable
+        // AUTOMATED DRIVING BEHAVIOUR
         let drivingBehaviour = null;
-        if (emp.role === "Driver" && attnDoc.status && attnDoc.doc.performance.length > 0) {
-          const perf = attnDoc.doc.performance.find(
-            (p) => p.month === month && p.year === year
-          );
-          if (perf) {
-            drivingBehaviour = {
-              speedViolations: perf.speedViolations,
-              accidents: perf.accidents,
-              trafficPenalties: perf.trafficPenalties,
-              incidents: perf.incidents,
-            };
-          }
+        if (emp.role === "Driver") {
+          const empPenalties = allPenalties.filter(p => p.employee.toString() === emp._id.toString());
+
+          const counts = {
+            speedViolations: 0,
+            accidents: 0,
+            trafficPenalties: 0,
+            incidents: 0,
+            others: 0
+          };
+
+          empPenalties.forEach(p => {
+            if (p.type === "Speed Violations") counts.speedViolations++;
+            else if (p.type === "Accidents") counts.accidents++;
+            else if (p.type === "Traffic Penalties") counts.trafficPenalties++;
+            else if (p.type === "Incidents") counts.incidents++;
+            else counts.others++;
+          });
+
+          // Only show behavior object if there are relevant stats? Or always show 0?
+          // User screenshot shows "-" if empty.
+          // If we have data, we send it.
+          drivingBehaviour = {
+            speedViolations: counts.speedViolations,
+            accidents: counts.accidents,
+            trafficPenalties: counts.trafficPenalties,
+            incidents: counts.incidents
+          };
         }
 
         results.push({
@@ -128,46 +162,46 @@ module.exports = function () {
   };
 
   controller.updateDrivingBehaviour = async function (req, res) {
-  try {
-    const { employeeId, month, year, speedViolations, accidents, trafficPenalties, incidents } = req.body;
+    try {
+      const { employeeId, month, year, speedViolations, accidents, trafficPenalties, incidents } = req.body;
 
-    if (!employeeId || !month || !year)
-      return res.send({ status: false, message: "Employee ID, month, and year are required" });
+      if (!employeeId || !month || !year)
+        return res.send({ status: false, message: "Employee ID, month, and year are required" });
 
-    const emp = await db.GetOneDocument("employee", { _id: new mongoose.Types.ObjectId(employeeId) }, {}, {});
-    if (!emp.status) return res.send({ status: false, message: "Employee not found" });
+      const emp = await db.GetOneDocument("employee", { _id: new mongoose.Types.ObjectId(employeeId) }, {}, {});
+      if (!emp.status) return res.send({ status: false, message: "Employee not found" });
 
-    await db.UpdateDocument(
-      "attendance",
-      { employee: emp.doc._id },
-      {
-        $pull: { performance: { month, year } }
-      }
-    );
+      await db.UpdateDocument(
+        "attendance",
+        { employee: emp.doc._id },
+        {
+          $pull: { performance: { month, year } }
+        }
+      );
 
-    await db.UpdateDocument(
-      "attendance",
-      { employee: emp.doc._id },
-      {
-        $push: {
-          performance: {
-            month,
-            year,
-            speedViolations,
-            accidents,
-            trafficPenalties,
-            incidents
+      await db.UpdateDocument(
+        "attendance",
+        { employee: emp.doc._id },
+        {
+          $push: {
+            performance: {
+              month,
+              year,
+              speedViolations,
+              accidents,
+              trafficPenalties,
+              incidents
+            }
           }
         }
-      }
-    );
+      );
 
-    return res.send({ status: true, message: "Driving behaviour updated successfully" });
-  } catch (err) {
-    console.log(err, "ERROR updateDrivingBehaviour");
-    return res.send({ status: false, message: "Error updating driving behaviour" });
-  }
-};
+      return res.send({ status: true, message: "Driving behaviour updated successfully" });
+    } catch (err) {
+      console.log(err, "ERROR updateDrivingBehaviour");
+      return res.send({ status: false, message: "Error updating driving behaviour" });
+    }
+  };
 
   return controller;
 };

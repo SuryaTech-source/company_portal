@@ -55,6 +55,7 @@ export class SalaryListComponent implements OnInit {
         driverName: '', // Read-only
         driverId: null,
         amount: 0,
+        type: 'Other',
         reason: ''
     };
     loadingDriver = false;
@@ -213,6 +214,7 @@ export class SalaryListComponent implements OnInit {
             driverName: '',
             driverId: null,
             amount: 0,
+            type: 'Other',
             reason: ''
         };
         this.fetchFleets();

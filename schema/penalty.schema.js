@@ -8,6 +8,12 @@ PENALTY_SCHEMA.PENALTY = {
     fleet: { type: Schema.Types.ObjectId, ref: "Fleet" }, // Optional
     date: { type: Date, required: true },
     amount: { type: Number, required: true },
+    type: {
+        type: String,
+        enum: ["Speed Violations", "Accidents", "Traffic Penalties", "Incidents", "Other"],
+        default: "Other",
+        required: true
+    },
     reason: String,
 
     // Tracking status

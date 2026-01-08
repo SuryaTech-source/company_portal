@@ -180,7 +180,7 @@ module.exports = function () {
      */
     controller.addPenalty = async function (req, res) {
         try {
-            const { fleetId, date, amount, reason } = req.body;
+            const { fleetId, date, amount, reason, type } = req.body;
             if (!fleetId || !date || !amount) {
                 return res.send({ status: false, message: "Fleet, Date and Amount are required" });
             }
@@ -214,6 +214,7 @@ module.exports = function () {
                 employee: driverId,
                 date: targetDate,
                 amount: Number(amount),
+                type: type || "Other",
                 reason: reason || "",
                 status: "Pending",
                 paidAmount: 0
