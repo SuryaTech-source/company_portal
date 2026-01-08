@@ -723,22 +723,20 @@ module.exports = function () {
       if (!employee) return res.send({ status: false, message: "Employee not found" });
 
       // 2. Fetch Penalties
-      const penaltyRes = await db.GetDocument(
+      const penalties = await db.GetDoc(
         "penalty",
         { employee: empId },
         {},
         { sort: { date: -1 }, populate: ["fleet"] }
       );
-      const penalties = (penaltyRes.status && penaltyRes.doc) ? penaltyRes.doc : [];
 
       // 3. Fetch Allowances
-      const allowanceRes = await db.GetDocument(
+      const allowances = await db.GetDoc(
         "allowance",
         { employee: empId },
         {},
         { sort: { date: -1 } }
       );
-      const allowances = (allowanceRes.status && allowanceRes.doc) ? allowanceRes.doc : [];
 
       // 4. Calculate Stats (Outstanding done via salary deduction sum usually, 
       // but for history list, we might just show raw totals or try to calculate outstanding.

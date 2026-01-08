@@ -257,6 +257,7 @@ module.exports = function () {
                 { $group: { _id: null, total: { $sum: "$amount" } } }
             ];
             const penaltyRes = await db.GetAggregation("penalty", penaltyPipeline);
+            
             const totalPenaltyRecorded = penaltyRes.length ? penaltyRes[0].total : 0;
 
             // 2. Total Allowances (Master Records)

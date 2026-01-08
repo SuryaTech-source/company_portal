@@ -249,13 +249,13 @@ async function UpdateAllDocument(model, criteria, doc, options) {
 }
 
 async function GetCount(model, conditions = {}) {
-  try {
-    const count = await db[model].countDocuments(conditions);
-    return count;
-  } catch (err) {
-    console.error("Error in GetCount:", err);
-    throw err;
-  }
+    try {
+        const count = await db[model].countDocuments(conditions);
+        return count;
+    } catch (err) {
+        console.error("Error in GetCount:", err);
+        throw err;
+    }
 }
 
 
@@ -271,37 +271,30 @@ function RemoveDocument(model, criteria, callback) {
     });
 }
 
-const GetDoc = (model, query, projection, extension) => {
-    const Query = db[model].find(query, projection, extension.options);
-    return new Promise((resolve, reject) => {
+const GetDoc = async (model, query, projection, extension) => {
+    try {
+        const Query = db[model].find(query, projection, extension.options);
+
         if (extension.populate) {
             Query.populate(extension.populate);
         }
         if (extension.sort) {
             Query.sort(extension.sort);
         }
-        Query.exec(function (err, docs) {
-            if (extension.count) {
-                Query.count(function (err, docs) {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(docs);
-                    }
-                });
-            } else {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(docs);
-                }
-            }
-        });
-    });
 
-
-
+        if (extension.count) {
+            return await Query.countDocuments();
+        } else {
+            return await Query.exec();
+        }
+    } catch (err) {
+        throw err;
+    }
 }
+
+
+
+
 
 async function BulkWriteDocument(model, operations, options = {}) {
     try {
