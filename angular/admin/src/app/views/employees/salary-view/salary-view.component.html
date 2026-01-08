@@ -24,6 +24,7 @@
           <th>Month</th>
           <th>Base Salary</th>
           <th>Overtime</th>
+          <th>Allowances</th>
           <th>Penalties</th>
           <th>Final Salary</th>
           <th>Status</th>
@@ -35,7 +36,9 @@
           <td>{{ getMonthName(salary.month) }} {{ salary.year }}</td>
           <td>{{ salary.baseSalary | currency:currency_code:currency_symbol }}</td>
           <td>{{ salary.overtimeAmount | currency:currency_code:currency_symbol }}</td>
-          <td>{{ salary.totalPenaltyAmount | currency:currency_code:currency_symbol }}</td>
+          <td>{{ (salary.allowanceDeduction || 0) | currency:currency_code:currency_symbol }}</td>
+          <td>{{ (salary.totalPenaltyAmount - (salary.allowanceDeduction || 0)) | currency:currency_code:currency_symbol
+            }}</td>
           <td>{{ salary.finalSalary | currency:currency_code:currency_symbol }}</td>
           <td>
             <span class="badge"

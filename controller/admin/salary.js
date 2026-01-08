@@ -111,10 +111,11 @@ module.exports = function () {
                 return res.send({ status: false, message: "Invalid Salary ID" });
             }
 
-            const originalSalary = await db.GetOneDocument("salary", { _id: salaryId }, {}, {});
-            if (!originalSalary) {
+            const originalSalaryRes = await db.GetOneDocument("salary", { _id: salaryId }, {}, {});
+            if (!originalSalaryRes || !originalSalaryRes.doc) {
                 return res.send({ status: false, message: "Salary record not found." });
             }
+            const originalSalary = originalSalaryRes.doc;
 
             // --- Recalculate derived fields ---
             const overtimeHours = Number(body.overtimeHours) || 0;
@@ -123,20 +124,30 @@ module.exports = function () {
             // New deductions
             const penaltyDeduction = Number(body.penaltyDeduction) || 0;
             const allowanceDeduction = Number(body.allowanceDeduction) || 0;
+            const leaveDeduction = Number(body.leaveDeduction) || 0;
 
             const overtimeAmount = overtimeHours * overtimeRate;
             // Existing inline penalties array (optional, keeping for backward compat if used)
             const inlinePenaltyAmount = penalties.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
-            const totalPenaltyAmount = inlinePenaltyAmount + penaltyDeduction + allowanceDeduction;
+            // Total Deductions for reference (Penalties)
+            const totalPenaltyAmount = inlinePenaltyAmount + penaltyDeduction;
 
-            // Prorated salary based on days present
-            const proratedBase = originalSalary.totalWorkingDays > 0
-                ? (originalSalary.baseSalary / originalSalary.totalWorkingDays) * originalSalary.daysPresent
-                : 0;
+            // --- USER FORMULA ---
+            // finalSalary = baseSalary + overtime - penalty - allowance - leave
+            let finalSalary = 0;
+            const baseSalary = Number(originalSalary.baseSalary) || 0;
 
-            const totalEarnings = proratedBase + overtimeAmount;
-            const finalSalary = totalEarnings - totalPenaltyAmount; // Deducts all: inline penalties + ledger penalties + allowances
+            finalSalary += baseSalary;
+            finalSalary += overtimeAmount;
+            finalSalary -= totalPenaltyAmount;
+            finalSalary -= allowanceDeduction;
+            finalSalary -= leaveDeduction;
+
+            const totalEarnings = baseSalary + overtimeAmount;
+
+            // Should we update daysPresent? No, user didn't ask to change that.
+            // But we should probably set day info effectively ignored for calculation.
 
             const updateData = {
                 overtimeHours,
@@ -145,9 +156,10 @@ module.exports = function () {
                 penalties,
                 penaltyDeduction,
                 allowanceDeduction,
-                totalPenaltyAmount,
+                totalPenaltyAmount: totalPenaltyAmount + allowanceDeduction,
                 totalEarnings,
                 finalSalary,
+                leaveDeduction,
                 paymentStatus: body.paymentStatus || 'Pending',
                 paymentDate: body.paymentStatus === 'Paid' ? (body.paymentDate || new Date()) : null,
                 remarks: body.remarks || originalSalary.remarks,
@@ -257,7 +269,7 @@ module.exports = function () {
                 { $group: { _id: null, total: { $sum: "$amount" } } }
             ];
             const penaltyRes = await db.GetAggregation("penalty", penaltyPipeline);
-            
+
             const totalPenaltyRecorded = penaltyRes.length ? penaltyRes[0].total : 0;
 
             // 2. Total Allowances (Master Records)

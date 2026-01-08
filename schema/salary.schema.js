@@ -30,6 +30,7 @@ SALARY_SCHEMA.SALARY = {
   // Manual deductions this month
   penaltyDeduction: { type: Number, default: 0 },
   allowanceDeduction: { type: Number, default: 0 },
+  leaveDeduction: { type: Number, default: 0 },
 
   totalPenaltyAmount: { type: Number, default: 0 },
   totalEarnings: { type: Number, default: 0 },
