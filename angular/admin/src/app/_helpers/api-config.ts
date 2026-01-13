@@ -169,6 +169,14 @@ export const Apiconfig = {
         "url": "admin/employee/check-id",
         "method": "post"
     },
+    restoreEmployee: {
+        "url": "admin/employee/restore",
+        "method": "post"
+    },
+    permanentDeleteEmployee: {
+        "url": "admin/employee/permanent-delete",
+        "method": "post"
+    },
     addVacation: {
         "url": "admin/employee/add-vacation",
         "method": "post"

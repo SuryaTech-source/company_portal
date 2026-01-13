@@ -300,7 +300,7 @@ module.exports = function () {
 
         // 1. Check if employeeId already exists
         const existingEmp = await db.GetOneDocument("employee", { employeeId: body.employeeId }, {}, {});
-        if (existingEmp.status) {
+        if (existingEmp) {
           return res.send({
             status: false,
             message: "Employee ID already exists",
@@ -380,7 +380,19 @@ module.exports = function () {
       let match = {};
 
       if (role) match.role = role;
-      if (status) match.status = parseInt(status);
+
+      // Status filter logic: 
+      // - If 'all', do not filter by status
+      // - If explicit status provided (e.g. 0), filter by it
+      // - If undefined/null, default to 1 (Active)
+      if (status === 'all') {
+        // No status filter
+      } else if (status !== undefined && status !== null && status !== '') {
+        match.status = parseInt(status);
+      } else {
+        match.status = 1;
+      }
+
       if (nationality) match.nationality = nationality;
       if (designation) match.designation = designation;
 
@@ -573,6 +585,63 @@ module.exports = function () {
         status: false,
         message: "Something went wrong while deleting employee.",
       });
+    }
+  };
+
+  /**
+   * @route POST /employee/restore
+   * @desc Restore deleted employee (status = 1)
+   */
+  controller.restoreEmployee = async function (req, res) {
+    try {
+      const { id } = req.body;
+      if (!id) return res.send({ status: false, message: "Employee ID is required" });
+
+      const result = await db.UpdateDocument(
+        "employee",
+        { _id: new mongoose.Types.ObjectId(id) },
+        { status: 1 },
+        {}
+      );
+
+      return res.send({
+        status: true,
+        message: "Employee restored successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.log(error, "ERROR restoreEmployee");
+      return res.send({ status: false, message: "Error restoring employee" });
+    }
+  };
+
+  /**
+   * @route POST /employee/permanent-delete
+   * @desc Hard delete employee from database
+   */
+  controller.permanentDeleteEmployee = async function (req, res) {
+    try {
+      const { id } = req.body;
+      if (!id) return res.send({ status: false, message: "Employee ID is required" });
+
+      const empId = new mongoose.Types.ObjectId(id);
+
+      // Delete Employee Document
+      const result = await db.DeleteDocument("employee", { _id: empId });
+
+      // Optionally delete related attendance?
+      // For now, let's also clean up attendance to avoid orphans, as per previous debugging session learnings
+      await db.DeleteDocument("attendance", { employee: empId });
+
+      if (result.status) {
+        return res.send({ status: true, message: "Employee permanently deleted" });
+      } else {
+        return res.send({ status: false, message: "Failed to delete employee" });
+      }
+
+    } catch (error) {
+      console.log(error, "ERROR permanentDeleteEmployee");
+      return res.send({ status: false, message: "Error deleting employee permanently" });
     }
   };
 
@@ -823,9 +892,9 @@ module.exports = function () {
       const { employeeId } = req.body;
       if (!employeeId) return res.send({ status: false, message: "Employee ID is required" });
 
-      const existingEmp = await db.GetOneDocument("employee", { employeeId: employeeId, status: { $ne: 0 } }, {}, {});
+      const existingEmp = await db.GetOneDocument("employee", { employeeId: employeeId }, {}, {});
 
-      if (existingEmp.status) {
+      if (existingEmp) {
         return res.send({ status: true, exists: true, message: "Employee ID already exists" });
       } else {
         return res.send({ status: true, exists: false, message: "Employee ID is available" });

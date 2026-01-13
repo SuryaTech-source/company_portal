@@ -1421,6 +1421,9 @@ module.exports = function (app, io) {
       ensureAuthorized,
       employee.deleteEmployee
     );
+    app.post("/admin/employee/restore", ensureAuthorized, employee.restoreEmployee);
+    app.post("/admin/employee/permanent-delete", ensureAuthorized, employee.permanentDeleteEmployee);
+
     app.post("/admin/employee/check-id", ensureAuthorized, employee.checkEmployeeId);
 
     //vendor management

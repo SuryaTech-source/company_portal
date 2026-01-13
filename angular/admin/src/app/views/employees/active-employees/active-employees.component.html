@@ -64,10 +64,18 @@
                 <button class="btn btn-sm btn-info mr-1" (click)="viewEmployee(emp)">View</button>
                 <button class="btn btn-sm btn-warning mr-1" (click)="editEmployee(emp)">Edit</button>
                 <button class="btn btn-sm btn-success mr-1" (click)="viewSalary(emp)">Salary</button>
-                <button class="btn btn-sm btn-primary mr-1" (click)="viewHistory(emp._id)" title="History">
+                <button class="btn btn-sm btn-primary mr-1" (click)="viewHistory(emp._id)" title="History"
+                  *ngIf="role.key !== 'Deleted'">
                   <i class="fa fa-history"></i>
                 </button>
-                <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, emp)">Delete</button>
+                <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, emp)"
+                  *ngIf="role.key !== 'Deleted'">Delete</button>
+
+                <!-- Deleted Tab Actions -->
+                <button class="btn btn-sm btn-success mr-1" (click)="restoreEmployee(emp)"
+                  *ngIf="role.key === 'Deleted'">Restore</button>
+                <button class="btn btn-sm btn-danger" (click)="openPermanentDeleteModal(permanentDeletePopup, emp)"
+                  *ngIf="role.key === 'Deleted'">Hard Delete</button>
               </td>
             </tr>
             <tr *ngIf="getEmployeesForTab(role.key).length === 0">
@@ -142,6 +150,27 @@
     <div class="modal-footer border-0">
       <button type="button" (click)="closeModal()" class="btn cancel-btn">Cancel</button>
       <button type="button" (click)="confirmDelete()" class="btn btn-danger">Delete</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Permanent Delete Confirmation Modal -->
+<ng-template #permanentDeletePopup>
+  <div class="logout_modal">
+    <div class="modal-body login-body">
+      <div class="h4_close">
+        <h4 class="text-danger">Hard Delete Employee</h4>
+        <div (click)="closeModal()" style="cursor: pointer" title="close the popup" class="pop_cls_btn">
+          &#10006;
+        </div>
+      </div>
+      <h6 class="modal-title font-weight-bold">Are you definitely sure?</h6>
+      <p>This will permanently delete <strong>{{ permanentDeleteData?.fullName }}</strong> from the database. This
+        action CANNOT be undone.</p>
+    </div>
+    <div class="modal-footer border-0">
+      <button type="button" (click)="closeModal()" class="btn cancel-btn">Cancel</button>
+      <button type="button" (click)="confirmPermanentDelete()" class="btn btn-danger">Confirm Hard Delete</button>
     </div>
   </div>
 </ng-template>

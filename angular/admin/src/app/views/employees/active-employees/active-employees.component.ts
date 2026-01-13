@@ -23,7 +23,8 @@ export class ActiveEmployeesComponent implements OnInit {
     { key: 'Helper', display: 'Helpers' },
     { key: 'Supervisor', display: 'Supervisors' },
     { key: 'Others', display: 'Others' },
-    { key: 'Vacation', display: 'Vacations' }
+    { key: 'Vacation', display: 'Vacations' },
+    { key: 'Deleted', display: 'Deleted Employees' }
   ];
   activeTab: string = 'Staff'; // Default to 'Employees' (Staff)
   loading = false;
@@ -39,10 +40,11 @@ export class ActiveEmployeesComponent implements OnInit {
   currency_symbol = 'KD';
 
   // Statistics
-  stats: { [key: string]: { total: number, active?: number, inactive?: number, deployed?: number, vacation?: number } } = {};
+  stats: { [key: string]: { total: number, active?: number, inactive?: number, deployed?: number, vacation?: number, deleted?: number } } = {};
 
   modalRef: BsModalRef;
   deleteEmployeeData: any;
+  permanentDeleteData: any;
 
   constructor(
     private apiService: ApiService,
@@ -65,7 +67,8 @@ export class ActiveEmployeesComponent implements OnInit {
   // --- Replaces getEmployees() and getDrivers() with a single call ---
   getAllEmployees(): void {
     this.loading = true;
-    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 1 })
+    // Pass status: 'all' to fetch active, inactive, and deleted employees
+    this.apiService.CommonApi(Apiconfig.listEmployees.method, Apiconfig.listEmployees.url, { status: 'all' })
       .subscribe(
         (res: any) => {
           this.loading = false;
@@ -98,15 +101,24 @@ export class ActiveEmployeesComponent implements OnInit {
 
   // --- New method to filter employees for the active tab ---
   getEmployeesForTab(roleKey: string): any[] {
-    if (roleKey === 'Staff') {
-      return this.allEmployees;
+    if (roleKey === 'Deleted') {
+      return this.allEmployees.filter(e => e.status === 0);
     }
-    return this.allEmployees.filter(e => e.role === roleKey || (roleKey === 'Helper' && e.role === 'Maid'));
+    if (roleKey === 'Staff') {
+      return this.allEmployees.filter(e => e.status !== 0);
+    }
+    return this.allEmployees.filter(e => (e.role === roleKey || (roleKey === 'Helper' && e.role === 'Maid')) && e.status !== 0);
   }
 
   calculateStats(): void {
     this.roles.forEach(role => {
-      const employeesForRole = this.getEmployeesForTab(role.key);
+      if (role.key === 'Deleted') {
+        const deletedCount = this.allEmployees.filter(e => e.status === 0).length;
+        this.stats[role.key] = { total: deletedCount };
+        return;
+      }
+
+      const employeesForRole = this.getEmployeesForTab(role.key); // this already filters out status 0 for non-Deleted tabs
 
       const total = employeesForRole.length;
       if (role.key === 'Driver') {
@@ -199,9 +211,15 @@ export class ActiveEmployeesComponent implements OnInit {
     this.modalRef = this.modalService.show(template, { class: 'modal-md' });
   }
 
+  openPermanentDeleteModal(template: TemplateRef<any>, employee: any) {
+    this.permanentDeleteData = employee;
+    this.modalRef = this.modalService.show(template, { class: 'modal-md' });
+  }
+
   closeModal() {
-    this.modalRef.hide();
+    if (this.modalRef) this.modalRef.hide();
     this.deleteEmployeeData = null;
+    this.permanentDeleteData = null;
   }
 
   confirmDelete(): void {
@@ -211,8 +229,10 @@ export class ActiveEmployeesComponent implements OnInit {
           (res: any) => {
             if (res && res.status) {
               this.notify.showSuccess(res.message);
-              // Optimistically remove from list or refresh
-              this.allEmployees = this.allEmployees.filter(e => e._id !== this.deleteEmployeeData._id);
+              // Update local state: find employee and set status to 0
+              const emp = this.allEmployees.find(e => e._id === this.deleteEmployeeData._id);
+              if (emp) emp.status = 0;
+
               this.calculateStats();
               this.closeModal();
             } else {
@@ -224,6 +244,51 @@ export class ActiveEmployeesComponent implements OnInit {
             this.notify.showError("Failed to delete employee.");
           }
         );
+    }
+  }
+
+  restoreEmployee(employee: any): void {
+    this.apiService.CommonApi(Apiconfig.restoreEmployee.method, Apiconfig.restoreEmployee.url, { id: employee._id })
+      .subscribe(
+        (res: any) => {
+          if (res && res.status) {
+            this.notify.showSuccess(res.message);
+            // Update local state: set status back to 1
+            const emp = this.allEmployees.find(e => e._id === employee._id);
+            if (emp) emp.status = 1;
+            this.calculateStats();
+          } else {
+            this.notify.showError(res.message);
+          }
+        },
+        err => {
+          console.error(err);
+          this.notify.showError("Failed to restore employee");
+        }
+      )
+  }
+
+  confirmPermanentDelete(): void {
+    if (this.permanentDeleteData && this.permanentDeleteData._id) {
+      this.apiService.CommonApi(Apiconfig.permanentDeleteEmployee.method, Apiconfig.permanentDeleteEmployee.url, { id: this.permanentDeleteData._id })
+        .subscribe(
+          (res: any) => {
+            if (res && res.status) {
+              this.notify.showSuccess(res.message);
+              // Convert ID to string for comparison because mongo IDs can be tricky objects sometimes, 
+              // though typically strings in Angular response.
+              this.allEmployees = this.allEmployees.filter(e => e._id !== this.permanentDeleteData._id);
+              this.calculateStats();
+              this.closeModal();
+            } else {
+              this.notify.showError(res.message);
+            }
+          },
+          err => {
+            console.error(err);
+            this.notify.showError("Failed to permanently delete employee");
+          }
+        )
     }
   }
 
