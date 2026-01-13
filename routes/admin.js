@@ -1421,6 +1421,7 @@ module.exports = function (app, io) {
       ensureAuthorized,
       employee.deleteEmployee
     );
+    app.post("/admin/employee/check-id", ensureAuthorized, employee.checkEmployeeId);
 
     //vendor management
     app.post(

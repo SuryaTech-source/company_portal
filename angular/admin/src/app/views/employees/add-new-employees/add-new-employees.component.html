@@ -106,8 +106,8 @@
       <div class="col-md-6 col-lg-4">
         <div class="form-group">
           <label>Employee ID</label>
-          <input type="text" class="form-control" [(ngModel)]="employeeId" name="employeeId" #empIdCtrl="ngModel"
-            [readonly]="readonly" required maxlength="30" />
+          <input type="text" class="form-control" [ngModel]="employeeId" (ngModelChange)="onEmployeeIdChange($event)"
+            name="employeeId" #empIdCtrl="ngModel" [readonly]="readonly" required maxlength="30" />
           <div *ngIf="employeeForm.submitted && empIdCtrl.errors" class="text-danger small">
             <div *ngIf="empIdCtrl.errors['required']">
               Employee ID is required.
@@ -115,6 +115,9 @@
             <div *ngIf="empIdCtrl.errors['maxlength']">
               Maximum 30 characters allowed.
             </div>
+          </div>
+          <div *ngIf="!isIdUnique && mode === 'add'" class="text-danger small">
+            Employee ID already exists.
           </div>
         </div>
       </div>

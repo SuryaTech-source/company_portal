@@ -4,6 +4,8 @@ import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { environment } from 'src/environments/environment';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-new-employees',
@@ -62,7 +64,36 @@ export class AddNewEmployeesComponent implements OnInit {
     private router: Router,
     private apiService: ApiService,
     private notifyService: NotificationService
-  ) { }
+  ) {
+    this.employeeIdSubject.pipe(debounceTime(500)).subscribe(id => {
+      this.checkEmployeeId(id);
+    });
+  }
+
+  employeeIdSubject = new Subject<string>();
+  isIdUnique: boolean = true;
+
+  checkEmployeeId(id: string) {
+    if (!id || this.mode === 'edit') return;
+
+    this.apiService.CommonApi(
+      Apiconfig.checkEmployeeId.method,
+      Apiconfig.checkEmployeeId.url,
+      { employeeId: id }
+    ).subscribe((res: any) => {
+      if (res.status && res.exists) {
+        this.isIdUnique = false;
+        this.notifyService.showError('Employee ID already exists');
+      } else {
+        this.isIdUnique = true;
+      }
+    });
+  }
+
+  onEmployeeIdChange(id: string) {
+    this.employeeId = id;
+    this.employeeIdSubject.next(id);
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -320,6 +351,11 @@ export class AddNewEmployeesComponent implements OnInit {
   submitForm(form: any) {
     if (form.invalid) {
       this.notifyService.showError('Please fill all required fields');
+      return;
+    }
+
+    if (!this.isIdUnique && this.mode === 'add') {
+      this.notifyService.showError('Employee ID already exists. Please use a different ID.');
       return;
     }
 

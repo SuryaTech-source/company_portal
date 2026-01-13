@@ -297,7 +297,26 @@ module.exports = function () {
         });
       } else {
         // Insert
+
+        // 1. Check if employeeId already exists
+        const existingEmp = await db.GetOneDocument("employee", { employeeId: body.employeeId }, {}, {});
+        if (existingEmp.status) {
+          return res.send({
+            status: false,
+            message: "Employee ID already exists",
+          });
+        }
+
         result = await db.InsertDocument("employee", employeeData);
+
+        // 2. Validate result
+        if (!result || !result._id) {
+          return res.send({
+            status: false,
+            message: "Failed to create employee. Check unique fields."
+          });
+        }
+
         await db.InsertDocument("attendance", {
           employee: result._id,
           records: [],
@@ -792,6 +811,29 @@ module.exports = function () {
     } catch (error) {
       console.error("ERROR getEmployeeHistory", error);
       return res.send({ status: false, message: "Error fetching history" });
+    }
+  };
+
+  /**
+   * @route POST /employee/check-id
+   * @desc Check if employee ID exists
+   */
+  controller.checkEmployeeId = async function (req, res) {
+    try {
+      const { employeeId } = req.body;
+      if (!employeeId) return res.send({ status: false, message: "Employee ID is required" });
+
+      const existingEmp = await db.GetOneDocument("employee", { employeeId: employeeId, status: { $ne: 0 } }, {}, {});
+
+      if (existingEmp.status) {
+        return res.send({ status: true, exists: true, message: "Employee ID already exists" });
+      } else {
+        return res.send({ status: true, exists: false, message: "Employee ID is available" });
+      }
+
+    } catch (error) {
+      console.log(error, "ERROR checkEmployeeId");
+      return res.send({ status: false, message: "Error checking ID" });
     }
   };
 
