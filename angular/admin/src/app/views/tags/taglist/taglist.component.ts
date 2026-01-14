@@ -75,7 +75,7 @@ export class TaglistComponent {
     this.curentUser = this.authService.currentUserValue;
     if (this.curentUser && this.curentUser.doc.role == "subadmin") {
       if (this.router.url == '/app/tags/list' && this.curentUser.doc.privileges) {
-        this.userPrivilegeDetails = this.curentUser.doc.privileges.filter(x => x.alias == 'tags');
+        this.userPrivilegeDetails = this.curentUser.doc.privileges.filter(x => x.alias == 'operations');
         // if (!this.userPrivilegeDetails[0].status.view) {
         //   this.notifyService.showWarning('You are not authorized this module');
         //   this.router.navigate(['/app']);

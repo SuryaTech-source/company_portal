@@ -5,6 +5,8 @@ import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { DefaultStoreService } from 'src/app/_services/default-store.service';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-maintenance-list',
@@ -39,15 +41,25 @@ export class MaintenanceListComponent implements OnInit {
   form: any = { partsUsed: [] };
 
   deleteData: any = null;
+  permissions = {
+    add: true,
+    edit: true,
+    view: true,
+    delete: true
+  };
+  currentUser: any;
 
   constructor(
     private apiService: ApiService,
     private notification: NotificationService,
     private modalService: BsModalService,
-    private store: DefaultStoreService
+    private store: DefaultStoreService,
+    private authService: AuthenticationService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
+    this.checkPrivileges();
     this.store.generalSettings.subscribe((settings) => {
       if (settings) {
         this.currency_code = settings.currency_code;
@@ -60,10 +72,34 @@ export class MaintenanceListComponent implements OnInit {
     this.loadSpareParts();
   }
 
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'support');
+      if (privilege && privilege.status) {
+        this.permissions = {
+          add: !!privilege.status.add,
+          edit: !!privilege.status.edit,
+          view: !!privilege.status.view,
+          delete: !!privilege.status.delete
+        };
+
+        if (!this.permissions.view) {
+          this.notification.showError('You do not have permission to view this module.');
+          this.router.navigate(['/app/dashboard']);
+        }
+      }
+    }
+  }
+
   // ... (existing code) ...
 
   // 🗑️ Delete Maintenance
   openDeleteModal(template: TemplateRef<any>, row: any) {
+    if (!this.permissions.delete) {
+      this.notification.showError('You do not have permission to delete.');
+      return;
+    }
     this.deleteData = row;
     this.modalRef = this.modalService.show(template, { class: 'modal-md' });
   }
@@ -169,6 +205,14 @@ export class MaintenanceListComponent implements OnInit {
 
   // 🎛️ Modal
   openModal(row: any = null) {
+    if (row && !this.permissions.edit) {
+      this.notification.showError('You do not have permission to edit.');
+      return;
+    }
+    if (!row && !this.permissions.add) {
+      this.notification.showError('You do not have permission to add.');
+      return;
+    }
     console.log(row, 'edit row');
 
     this.showModal = true;

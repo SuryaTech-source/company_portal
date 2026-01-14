@@ -74,7 +74,7 @@ export class ListTestimonialComponent {
     this.curentUser = this.authService.currentUserValue;
     if (this.curentUser && this.curentUser.doc.role == "subadmin") {
       if (this.router.url == '/app/fleet/list' && this.curentUser.doc.privileges) {
-        this.userPrivilegeDetails = this.curentUser.doc.privileges.filter(x => x.alias == 'Testimonial');
+        this.userPrivilegeDetails = this.curentUser.doc.privileges.filter(x => x.alias == 'resources');
         // if (!this.userPrivilegeDetails[0].status.view) {
         //   this.notifyService.showWarning('You are not authorized this module');
         //   this.router.navigate(['/app']);

@@ -6,6 +6,7 @@ import { NotificationService } from 'src/app/_services/notification.service';
 import { Apiconfig } from "src/app/_helpers/api-config";
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from 'src/app/_services/api.service';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { environment } from 'src/environments/environment';
 import { ImageCropperComponent, ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper';
@@ -27,18 +28,43 @@ export class AddEditTestimonialComponent implements OnInit {
 
   preview: string = '';
   getFleet: any = null;
+  currentUser: any;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private notifyService: NotificationService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private authService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
+    this.checkPrivileges();
     this.id = this.route.snapshot.paramMap.get('id');
     if (this.id) {
       this.getFleetDetails();
+    }
+  }
+
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'resources');
+      if (privilege && privilege.status) {
+        // If ID exists, it's edit mode
+        if (this.route.snapshot.paramMap.get('id')) {
+          if (!privilege.status.edit) {
+            this.notifyService.showError('You do not have permission to edit fleet.');
+            this.router.navigate(['/app/fleet/list']);
+          }
+        } else {
+          // Add mode
+          if (!privilege.status.add) {
+            this.notifyService.showError('You do not have permission to add fleet.');
+            this.router.navigate(['/app/fleet/list']);
+          }
+        }
+      }
     }
   }
 

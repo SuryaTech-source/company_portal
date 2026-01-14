@@ -5,6 +5,7 @@ import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { environment } from 'src/environments/environment';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
 
 @Component({
   selector: 'app-add-edit-tag',
@@ -16,6 +17,7 @@ export class AddEditTagComponent implements OnInit {
   viewpage = false;
   userDetails: any = {};
   id: string | null = null;
+  currentUser: any;
 
   contractTypes = ['Monthly', 'Yearly'];
 
@@ -42,10 +44,12 @@ export class AddEditTagComponent implements OnInit {
     private apiService: ApiService,
     private router: Router,
     private notifyService: NotificationService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
+    this.checkPrivileges();
     this.id = this.route.snapshot.paramMap.get('id');
     const path = this.route.snapshot.routeConfig?.path;
 
@@ -56,6 +60,28 @@ export class AddEditTagComponent implements OnInit {
     }
     if (this.id && !this.viewpage) {
       this.getVendor();
+    }
+  }
+
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'operations');
+      if (privilege && privilege.status) {
+        if (!this.id && !privilege.status.add) {
+          this.notifyService.showError('You do not have permission to add vendors.');
+          // Use /app/tags/list as that seems to be the list route
+          this.router.navigate(['/app/tags/list']);
+        }
+        if (this.id && !privilege.status.edit && !this.viewpage) {
+          this.notifyService.showError('You do not have permission to edit vendors.');
+          this.router.navigate(['/app/tags/list']);
+        }
+        if (this.viewpage && !privilege.status.view) {
+          this.notifyService.showError('You do not have permission to view vendors.');
+          this.router.navigate(['/app/dashboard']);
+        }
+      }
     }
   }
 

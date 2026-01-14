@@ -62,20 +62,21 @@
               </td>
               <td>
                 <button class="btn btn-sm btn-info mr-1" (click)="viewEmployee(emp)">View</button>
-                <button class="btn btn-sm btn-warning mr-1" (click)="editEmployee(emp)">Edit</button>
+                <button class="btn btn-sm btn-warning mr-1" *ngIf="permissions.edit"
+                  (click)="editEmployee(emp)">Edit</button>
                 <button class="btn btn-sm btn-success mr-1" (click)="viewSalary(emp)">Salary</button>
                 <button class="btn btn-sm btn-primary mr-1" (click)="viewHistory(emp._id)" title="History"
                   *ngIf="role.key !== 'Deleted'">
                   <i class="fa fa-history"></i>
                 </button>
                 <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, emp)"
-                  *ngIf="role.key !== 'Deleted'">Delete</button>
+                  *ngIf="role.key !== 'Deleted' && permissions.delete">Delete</button>
 
                 <!-- Deleted Tab Actions -->
                 <button class="btn btn-sm btn-success mr-1" (click)="restoreEmployee(emp)"
-                  *ngIf="role.key === 'Deleted'">Restore</button>
+                  *ngIf="role.key === 'Deleted' && permissions.edit">Restore</button>
                 <button class="btn btn-sm btn-danger" (click)="openPermanentDeleteModal(permanentDeletePopup, emp)"
-                  *ngIf="role.key === 'Deleted'">Hard Delete</button>
+                  *ngIf="role.key === 'Deleted' && permissions.delete">Hard Delete</button>
               </td>
             </tr>
             <tr *ngIf="getEmployeesForTab(role.key).length === 0">

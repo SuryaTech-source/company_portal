@@ -3,6 +3,7 @@ import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { Router } from '@angular/router';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
 import html2pdf from 'html2pdf.js';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
@@ -46,15 +47,25 @@ export class ActiveEmployeesComponent implements OnInit {
   deleteEmployeeData: any;
   permanentDeleteData: any;
 
+  permissions = {
+    add: true,
+    edit: true,
+    view: true,
+    delete: true
+  };
+  currentUser: any;
+
   constructor(
     private apiService: ApiService,
     private notify: NotificationService,
     private router: Router,
     private modalService: BsModalService,
-    private store: DefaultStoreService
+    private store: DefaultStoreService,
+    private authService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
+    this.checkPrivileges();
     this.store.generalSettings.subscribe((settings) => {
       if (settings) {
         this.currency_code = settings.currency_code;
@@ -62,6 +73,26 @@ export class ActiveEmployeesComponent implements OnInit {
       }
     });
     this.getAllEmployees();
+  }
+
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'resources');
+      if (privilege && privilege.status) {
+        this.permissions = {
+          add: !!privilege.status.add,
+          edit: !!privilege.status.edit,
+          view: !!privilege.status.view,
+          delete: !!privilege.status.delete
+        };
+
+        if (!this.permissions.view) {
+          this.notify.showError('You do not have permission to view this module.');
+          this.router.navigate(['/app/dashboard']);
+        }
+      }
+    }
   }
 
   // --- Replaces getEmployees() and getDrivers() with a single call ---
@@ -191,6 +222,10 @@ export class ActiveEmployeesComponent implements OnInit {
   }
 
   editEmployee(employee: any): void {
+    if (!this.permissions.edit) {
+      this.notify.showError('You do not have permission to edit.');
+      return;
+    }
     this.router.navigate(['/app/employees/edit', employee._id]);
   }
 
@@ -207,6 +242,10 @@ export class ActiveEmployeesComponent implements OnInit {
   }
 
   openDeleteModal(template: TemplateRef<any>, employee: any) {
+    if (!this.permissions.delete) {
+      this.notify.showError('You do not have permission to delete.');
+      return;
+    }
     this.deleteEmployeeData = employee;
     this.modalRef = this.modalService.show(template, { class: 'modal-md' });
   }

@@ -4,6 +4,7 @@ import { Apiconfig } from 'src/app/_helpers/api-config';
 import { ApiService } from 'src/app/_services/api.service';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { DefaultStoreService } from 'src/app/_services/default-store.service';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
 
 @Component({
   selector: 'app-spare-parts-list',
@@ -19,15 +20,24 @@ export class SparePartsListComponent implements OnInit {
   loading = false;
   currency_code = 'KWD';
   currency_symbol = 'KD';
+  permissions = {
+    add: true,
+    edit: true,
+    view: true,
+    delete: true
+  };
+  currentUser: any;
 
   constructor(
     private apiService: ApiService,
     private router: Router,
     private notifyService: NotificationService,
-    private store: DefaultStoreService
+    private store: DefaultStoreService,
+    private authService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
+    this.checkPrivileges();
     this.store.generalSettings.subscribe((settings) => {
       if (settings) {
         this.currency_code = settings.currency_code;
@@ -35,6 +45,26 @@ export class SparePartsListComponent implements OnInit {
       }
     });
     this.getSpareParts();
+  }
+
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'support');
+      if (privilege && privilege.status) {
+        this.permissions = {
+          add: !!privilege.status.add,
+          edit: !!privilege.status.edit,
+          view: !!privilege.status.view,
+          delete: !!privilege.status.delete
+        };
+
+        if (!this.permissions.view) {
+          this.notifyService.showError('You do not have permission to view this module.');
+          this.router.navigate(['/app/dashboard']);
+        }
+      }
+    }
   }
 
   getSpareParts() {
@@ -73,6 +103,10 @@ export class SparePartsListComponent implements OnInit {
   }
 
   editSparePart(id: string) {
+    if (!this.permissions.edit) {
+      this.notifyService.showError('You do not have permission to edit.');
+      return;
+    }
     this.router.navigate(['/app/spare-parts/edit', id]);
   }
 }

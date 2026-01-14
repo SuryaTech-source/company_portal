@@ -4,6 +4,7 @@ import { ApiService } from 'src/app/_services/api.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { environment } from 'src/environments/environment';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -57,13 +58,15 @@ export class AddNewEmployeesComponent implements OnInit {
   civilIdExpiry: string = '';
   licenseExpiry: string = ''; // for drivers only
   minDate: string = new Date().toISOString().split('T')[0];
+  currentUser: any;
 
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private apiService: ApiService,
-    private notifyService: NotificationService
+    private notifyService: NotificationService,
+    private authService: AuthenticationService
   ) {
     this.employeeIdSubject.pipe(debounceTime(500)).subscribe(id => {
       this.checkEmployeeId(id);
@@ -97,6 +100,8 @@ export class AddNewEmployeesComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
+      this.mode = this.router.url.includes('view') ? 'view' : (params['id'] ? 'edit' : 'add');
+      this.checkPrivileges();
       if (params['id']) {
         this.id = params['id'];
         this.mode = this.router.url.includes('view') ? 'view' : 'edit';
@@ -108,6 +113,27 @@ export class AddNewEmployeesComponent implements OnInit {
       }
     });
     this.loadContracts();
+  }
+
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'resources');
+      if (privilege && privilege.status) {
+        if (this.mode === 'add' && !privilege.status.add) {
+          this.notifyService.showError('You do not have permission to add employees.');
+          this.router.navigate(['/app/employees/active-list']);
+        }
+        if (this.mode === 'edit' && !privilege.status.edit) {
+          this.notifyService.showError('You do not have permission to edit employees.');
+          this.router.navigate(['/app/employees/active-list']);
+        }
+        if (this.mode === 'view' && !privilege.status.view) {
+          this.notifyService.showError('You do not have permission to view employees.');
+          this.router.navigate(['/app/dashboard']);
+        }
+      }
+    }
   }
 
 

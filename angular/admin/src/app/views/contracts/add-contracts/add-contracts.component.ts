@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from 'src/app/_services/api.service';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { Apiconfig } from 'src/app/_helpers/api-config';
 import { environment } from 'src/environments/environment';
@@ -34,6 +35,7 @@ export class AddContractsComponent implements OnInit {
   // Dropdown options
   fleetOptions: any[] = [];
   employeeOptions: any[] = [];
+  currentUser: any;
 
   readonly = false;
 
@@ -41,7 +43,8 @@ export class AddContractsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private apiService: ApiService,
-    private notify: NotificationService
+    private notify: NotificationService,
+    private authService: AuthenticationService
   ) {
     this.id = this.route.snapshot.paramMap.get('id');
     const path = this.route.snapshot.routeConfig?.path;
@@ -53,6 +56,7 @@ export class AddContractsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.checkPrivileges();
     this.loadDropdowns();
 
     if (this.id) {
@@ -78,6 +82,27 @@ export class AddContractsComponent implements OnInit {
             this.status = data.status;
           }
         });
+    }
+  }
+
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'operations');
+      if (privilege && privilege.status) {
+        if (this.mode === 'add' && !privilege.status.add) {
+          this.notify.showError('You do not have permission to add contracts.');
+          this.router.navigate(['/app/contracts/list']);
+        }
+        if (this.mode === 'edit' && !privilege.status.edit) {
+          this.notify.showError('You do not have permission to edit contracts.');
+          this.router.navigate(['/app/contracts/list']);
+        }
+        if (this.mode === 'view' && !privilege.status.view) {
+          this.notify.showError('You do not have permission to view contracts.');
+          this.router.navigate(['/app/dashboard']);
+        }
+      }
     }
   }
 

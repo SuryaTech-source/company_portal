@@ -4,6 +4,7 @@ import { Apiconfig } from 'src/app/_helpers/api-config';
 import html2pdf from 'html2pdf.js';
 import { NotificationService } from 'src/app/_services/notification.service';
 import { Router } from '@angular/router';
+import { AuthenticationService } from 'src/app/_services/authentication.service';
 import { DefaultStoreService } from 'src/app/_services/default-store.service';
 
 @Component({
@@ -19,6 +20,13 @@ export class InvoiceListComponent implements OnInit {
   totalPages: number = 0;
   currency_code = 'KWD';
   currency_symbol = 'KD';
+  permissions = {
+    add: true,
+    edit: true,
+    view: true,
+    delete: true
+  };
+  currentUser: any;
 
   // Filters
   searchText: string = '';
@@ -32,7 +40,8 @@ export class InvoiceListComponent implements OnInit {
     private api: ApiService,
     private notify: NotificationService,
     private router: Router,
-    private store: DefaultStoreService
+    private store: DefaultStoreService,
+    private authService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
@@ -42,7 +51,28 @@ export class InvoiceListComponent implements OnInit {
         this.currency_symbol = settings.currency_symbol;
       }
     });
+    this.checkPrivileges();
     this.loadInvoices();
+  }
+
+  checkPrivileges() {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.doc.role === 'subadmin' && this.currentUser.doc.privileges) {
+      const privilege = this.currentUser.doc.privileges.find(p => p.alias === 'finance');
+      if (privilege && privilege.status) {
+        this.permissions = {
+          add: !!privilege.status.add,
+          edit: !!privilege.status.edit,
+          view: !!privilege.status.view,
+          delete: !!privilege.status.delete
+        };
+
+        if (!this.permissions.view) {
+          this.notify.showError('You do not have permission to view this module.');
+          this.router.navigate(['/app/dashboard']);
+        }
+      }
+    }
   }
 
   loadInvoices() {
@@ -77,6 +107,10 @@ export class InvoiceListComponent implements OnInit {
 
   // ✅ Navigate to edit route
   viewInvoice(id: string) {
+    if (!this.permissions.edit) {
+      this.notify.showError('You do not have permission to edit.');
+      return;
+    }
     this.router.navigate(['/app/invoice/edit', id]);
   }
 
@@ -95,6 +129,10 @@ export class InvoiceListComponent implements OnInit {
   }
 
   deleteInvoice(id: string) {
+    if (!this.permissions.delete) {
+      this.notify.showError('You do not have permission to delete.');
+      return;
+    }
     if (!confirm("Are you sure you want to delete this invoice?")) return;
 
     this.api.CommonApi(Apiconfig.deleteInvoice.method, `${Apiconfig.deleteInvoice.url}/${id}`, {})

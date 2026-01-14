@@ -2,7 +2,7 @@
   <div class="title_sec">
     <h5 class="page_title">Maintenance Records Report</h5>
     <div class="d-flex gap-3">
-      <button class="btn btn-sm btn-success" (click)="openModal()">
+      <button class="btn btn-sm btn-success" (click)="openModal()" *ngIf="permissions.add">
         <i class="bi bi-plus-lg"></i> Add Maintenance
       </button>
       <button class="export_btn" (click)="downloadPDF()">
@@ -106,10 +106,11 @@
           </td>
           <td>{{ row.remarks }}</td>
           <td>
-            <button class="btn btn-sm btn-warning me-2" (click)="openModal(row)">
+            <button class="btn btn-sm btn-warning me-2" (click)="openModal(row)" *ngIf="permissions.edit">
               Edit
             </button>
-            <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, row)">
+            <button class="btn btn-sm btn-danger" (click)="openDeleteModal(deletePopup, row)"
+              *ngIf="permissions.delete">
               Delete
             </button>
           </td>
