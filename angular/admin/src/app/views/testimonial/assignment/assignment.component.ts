@@ -22,6 +22,10 @@ export class AssignmentComponent implements OnInit {
   limit = 10;
   count = 0;
   search = '';
+  totalPages = 0;
+  startIndex = 0;
+  endIndex = 0;
+  pages: number[] = [];
 
   // Modal controls
   showAssignModal = false;
@@ -76,10 +80,50 @@ export class AssignmentComponent implements OnInit {
         if (res?.status) {
           this.fleets = res.data || [];
           this.count = res.count || this.fleets.length;
+          this.totalPages = Math.ceil(this.count / this.limit);
+          this.calculateIndices();
+          this.updatePages();
         } else {
           this.notify.showError(res.message || 'Failed to load assignments');
         }
       });
+  }
+
+  calculateIndices() {
+    if (this.count === 0) {
+      this.startIndex = 0;
+      this.endIndex = 0;
+    } else {
+      this.startIndex = (this.page - 1) * this.limit + 1;
+      this.endIndex = Math.min(this.startIndex + this.limit - 1, this.count);
+    }
+  }
+
+  onLimitChange(newLimit: any) {
+    this.limit = parseInt(newLimit);
+    this.page = 1;
+    this.loadFleetAssignments();
+  }
+
+  changePage(newPage: number) {
+    if (newPage < 1 || newPage > this.totalPages) return;
+    this.page = newPage;
+    this.loadFleetAssignments();
+  }
+
+  updatePages() {
+    this.pages = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, this.page - 2);
+    let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      this.pages.push(i);
+    }
   }
 
   loadContracts() {

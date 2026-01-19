@@ -1,3 +1,7 @@
+.feet-assignment_page {
+    padding-bottom: 50px;
+}
+
 .card_sec {
     &:nth-child(1) {
         .card-body {
@@ -46,6 +50,65 @@
         font-weight: 700;
         margin: 0;
     }
+}
 
+.pagination_sec {
+    font-size: 0.9rem;
+    color: #666;
 
+    .entries_info {
+        font-weight: 500;
+    }
+
+    .pagination {
+        .page-item {
+            margin: 0 2px;
+
+            .page-link {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #666;
+                border: 1px solid #dee2e6;
+                background-color: #fff;
+                font-weight: 500;
+
+                &:focus {
+                    box-shadow: none;
+                }
+
+                &:hover {
+                    background-color: #f8f9fa;
+                    color: #333;
+                }
+            }
+
+            &.active .page-link {
+                background-color: #ff4500; // Orange color like in the image
+                border-color: #ff4500;
+                color: #fff;
+            }
+
+            &.disabled .page-link {
+                color: #ccc;
+                pointer-events: none;
+                background-color: #fff;
+            }
+        }
+    }
+
+    .items_per_page {
+        select {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+
+            &:focus {
+                border-color: #ff4500;
+                box-shadow: 0 0 0 0.2rem rgba(255, 69, 0, 0.25);
+            }
+        }
+    }
 }

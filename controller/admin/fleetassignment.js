@@ -212,29 +212,39 @@ module.exports = function () {
         { $unwind: { path: "$contract", preserveNullAndEmptyArrays: true } },
         { $match: match },
         {
-          $project: {
-            vehicleName: "$fleet.vehicleName",
-            registrationNo: "$fleet.registrationNo",
-            assetCode: "$fleet.assetCode",
-            assignedTo: "$driver.fullName",
-            driverId: "$driver._id",
-            contractId: "$contract.contractId", // ✅ show actual contractId string
-            clientName: "$contract.clientName", // optional extra field
-            dateAssigned: 1,
-            dateUnassigned: 1,
-            odometerReadingStart: 1,
-            odometerReadingEnd: 1,
-            remarks: 1,
-            status: 1
+          $facet: {
+            data: [
+              {
+                $project: {
+                  vehicleName: "$fleet.vehicleName",
+                  registrationNo: "$fleet.registrationNo",
+                  assetCode: "$fleet.assetCode",
+                  assignedTo: "$driver.fullName",
+                  driverId: "$driver._id",
+                  contractId: "$contract.contractId",
+                  clientName: "$contract.clientName",
+                  dateAssigned: 1,
+                  dateUnassigned: 1,
+                  odometerReadingStart: 1,
+                  odometerReadingEnd: 1,
+                  remarks: 1,
+                  status: 1
+                }
+              },
+              { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
+              { $skip: skip },
+              { $limit: parseInt(limit) }
+            ],
+            totalCount: [
+              { $count: "count" }
+            ]
           }
-        },
-        { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
-        { $skip: skip },
-        { $limit: parseInt(limit) }
+        }
       ];
 
-      const data = await db.GetAggregation("fleetAssignment", pipeline);
-      const totalCount = await db.GetCount("fleetAssignment", { status: { $in: [1, 2] } });
+      const result = await db.GetAggregation("fleetAssignment", pipeline);
+      const data = result[0].data;
+      const totalCount = result[0].totalCount.length > 0 ? result[0].totalCount[0].count : 0;
 
       return res.send({
         status: true,
