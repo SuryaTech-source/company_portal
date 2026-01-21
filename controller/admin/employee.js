@@ -221,7 +221,7 @@ module.exports = function () {
 
         // match uploaded file for this index
         const matchedFile = filesArr.find(
-          (f) => f.fieldname === `documents[${idx}][file]`
+          (f) => f.fieldname === `documents[${idx}][file]`,
         );
 
         // existing file url path (if no new file)
@@ -288,7 +288,7 @@ module.exports = function () {
         result = await db.UpdateDocument(
           "employee",
           { _id: new mongoose.Types.ObjectId(body._id) },
-          employeeData
+          employeeData,
         );
         return res.send({
           status: true,
@@ -299,8 +299,13 @@ module.exports = function () {
         // Insert
 
         // 1. Check if employeeId already exists
-        const existingEmp = await db.GetOneDocument("employee", { employeeId: body.employeeId }, {}, {});
-        if (existingEmp) {
+        const existingEmp = await db.GetOneDocument(
+          "employee",
+          { employeeId: body.employeeId },
+          {},
+          {},
+        );
+        if (existingEmp.status) {
           return res.send({
             status: false,
             message: "Employee ID already exists",
@@ -313,7 +318,7 @@ module.exports = function () {
         if (!result || !result._id) {
           return res.send({
             status: false,
-            message: "Failed to create employee. Check unique fields."
+            message: "Failed to create employee. Check unique fields.",
           });
         }
 
@@ -344,7 +349,7 @@ module.exports = function () {
         "employee",
         { _id: new mongoose.Types.ObjectId(id) },
         {},
-        {}
+        {},
       );
 
       if (!result) {
@@ -381,13 +386,13 @@ module.exports = function () {
 
       if (role) match.role = role;
 
-      // Status filter logic: 
+      // Status filter logic:
       // - If 'all', do not filter by status
       // - If explicit status provided (e.g. 0), filter by it
       // - If undefined/null, default to 1 (Active)
-      if (status === 'all') {
+      if (status === "all") {
         // No status filter
-      } else if (status !== undefined && status !== null && status !== '') {
+      } else if (status !== undefined && status !== null && status !== "") {
         match.status = parseInt(status);
       } else {
         match.status = 1;
@@ -571,7 +576,7 @@ module.exports = function () {
         "employee",
         { _id: new mongoose.Types.ObjectId(id) },
         { status: 0 },
-        {}
+        {},
       );
 
       return res.send({
@@ -595,13 +600,14 @@ module.exports = function () {
   controller.restoreEmployee = async function (req, res) {
     try {
       const { id } = req.body;
-      if (!id) return res.send({ status: false, message: "Employee ID is required" });
+      if (!id)
+        return res.send({ status: false, message: "Employee ID is required" });
 
       const result = await db.UpdateDocument(
         "employee",
         { _id: new mongoose.Types.ObjectId(id) },
         { status: 1 },
-        {}
+        {},
       );
 
       return res.send({
@@ -622,7 +628,8 @@ module.exports = function () {
   controller.permanentDeleteEmployee = async function (req, res) {
     try {
       const { id } = req.body;
-      if (!id) return res.send({ status: false, message: "Employee ID is required" });
+      if (!id)
+        return res.send({ status: false, message: "Employee ID is required" });
 
       const empId = new mongoose.Types.ObjectId(id);
 
@@ -634,14 +641,22 @@ module.exports = function () {
       await db.DeleteDocument("attendance", { employee: empId });
 
       if (result.status) {
-        return res.send({ status: true, message: "Employee permanently deleted" });
+        return res.send({
+          status: true,
+          message: "Employee permanently deleted",
+        });
       } else {
-        return res.send({ status: false, message: "Failed to delete employee" });
+        return res.send({
+          status: false,
+          message: "Failed to delete employee",
+        });
       }
-
     } catch (error) {
       console.log(error, "ERROR permanentDeleteEmployee");
-      return res.send({ status: false, message: "Error deleting employee permanently" });
+      return res.send({
+        status: false,
+        message: "Error deleting employee permanently",
+      });
     }
   };
 
@@ -666,7 +681,7 @@ module.exports = function () {
       const result = await db.UpdateDocument(
         "employee",
         { _id: new mongoose.Types.ObjectId(employeeId) },
-        { $push: { vacations: vacationData } }
+        { $push: { vacations: vacationData } },
       );
 
       return res.send({
@@ -696,8 +711,8 @@ module.exports = function () {
         { $unwind: "$vacations" },
         {
           $match: {
-            "vacations.endDate": { $gte: today } // Active or Future
-          }
+            "vacations.endDate": { $gte: today }, // Active or Future
+          },
         },
         {
           $project: {
@@ -708,10 +723,10 @@ module.exports = function () {
             startDate: "$vacations.startDate",
             endDate: "$vacations.endDate",
             type: "$vacations.type",
-            remarks: "$vacations.remarks"
-          }
+            remarks: "$vacations.remarks",
+          },
         },
-        { $sort: { startDate: 1 } }
+        { $sort: { startDate: 1 } },
       ];
 
       const result = await db.GetAggregation("employee", pipeline);
@@ -719,7 +734,7 @@ module.exports = function () {
       return res.send({
         status: true,
         count: result.length,
-        data: result
+        data: result,
       });
     } catch (error) {
       console.log(error, "ERROR listVacations");
@@ -733,7 +748,8 @@ module.exports = function () {
    */
   controller.editVacation = async function (req, res) {
     try {
-      const { vacationId, employeeId, startDate, endDate, type, remarks } = req.body;
+      const { vacationId, employeeId, startDate, endDate, type, remarks } =
+        req.body;
 
       if (!vacationId || !employeeId || !startDate || !endDate) {
         return res.send({ status: false, message: "Missing required fields" });
@@ -741,21 +757,24 @@ module.exports = function () {
 
       const result = await db.UpdateDocument(
         "employee",
-        { _id: new mongoose.Types.ObjectId(employeeId), "vacations._id": new mongoose.Types.ObjectId(vacationId) },
+        {
+          _id: new mongoose.Types.ObjectId(employeeId),
+          "vacations._id": new mongoose.Types.ObjectId(vacationId),
+        },
         {
           $set: {
             "vacations.$.startDate": new Date(startDate),
             "vacations.$.endDate": new Date(endDate),
             "vacations.$.type": type,
-            "vacations.$.remarks": remarks
-          }
-        }
+            "vacations.$.remarks": remarks,
+          },
+        },
       );
 
       return res.send({
         status: true,
         message: "Vacation updated successfully",
-        data: result
+        data: result,
       });
     } catch (error) {
       console.log(error, "ERROR editVacation");
@@ -779,16 +798,17 @@ module.exports = function () {
         "employee",
         { _id: new mongoose.Types.ObjectId(employeeId) },
         {
-          $pull: { vacations: { _id: new mongoose.Types.ObjectId(vacationId) } }
-        }
+          $pull: {
+            vacations: { _id: new mongoose.Types.ObjectId(vacationId) },
+          },
+        },
       );
 
       return res.send({
         status: true,
         message: "Vacation deleted successfully",
-        data: result
+        data: result,
       });
-
     } catch (error) {
       console.log(error, "ERROR deleteVacation");
       return res.send({ status: false, message: "Error deleting vacation" });
@@ -796,26 +816,33 @@ module.exports = function () {
   };
 
   /**
-     * @route POST /admin/employee/history
-     * @description Get comprehensive history (Penalties, Allowances, Vacations)
-     */
+   * @route POST /admin/employee/history
+   * @description Get comprehensive history (Penalties, Allowances, Vacations)
+   */
   controller.getEmployeeHistory = async function (req, res) {
     try {
       const { employeeId } = req.body;
-      if (!employeeId) return res.send({ status: false, message: "Employee ID required" });
+      if (!employeeId)
+        return res.send({ status: false, message: "Employee ID required" });
 
       const empId = new mongoose.Types.ObjectId(employeeId);
 
       // 1. Fetch Employee (for Profile & Vacations)
-      const employee = await db.GetOneDocument("employee", { _id: empId }, {}, { lean: true });
-      if (!employee) return res.send({ status: false, message: "Employee not found" });
+      const employee = await db.GetOneDocument(
+        "employee",
+        { _id: empId },
+        {},
+        { lean: true },
+      );
+      if (!employee)
+        return res.send({ status: false, message: "Employee not found" });
 
       // 2. Fetch Penalties
       const penalties = await db.GetDoc(
         "penalty",
         { employee: empId },
         {},
-        { sort: { date: -1 }, populate: ["fleet"] }
+        { sort: { date: -1 }, populate: ["fleet"] },
       );
 
       // 3. Fetch Allowances
@@ -823,10 +850,10 @@ module.exports = function () {
         "allowance",
         { employee: empId },
         {},
-        { sort: { date: -1 } }
+        { sort: { date: -1 } },
       );
 
-      // 4. Calculate Stats (Outstanding done via salary deduction sum usually, 
+      // 4. Calculate Stats (Outstanding done via salary deduction sum usually,
       // but for history list, we might just show raw totals or try to calculate outstanding.
 
       const salaryPipeline = [
@@ -835,48 +862,57 @@ module.exports = function () {
           $group: {
             _id: null,
             totalPenaltyDeducted: { $sum: "$penaltyDeduction" },
-            totalAllowanceDeducted: { $sum: "$allowanceDeduction" }
-          }
-        }
+            totalAllowanceDeducted: { $sum: "$allowanceDeduction" },
+          },
+        },
       ];
       const salaryRes = await db.GetAggregation("salary", salaryPipeline);
-      const deducted = salaryRes.length ? salaryRes[0] : { totalPenaltyDeducted: 0, totalAllowanceDeducted: 0 };
+      const deducted = salaryRes.length
+        ? salaryRes[0]
+        : { totalPenaltyDeducted: 0, totalAllowanceDeducted: 0 };
 
-      const totalPenaltyAmount = penalties.reduce((sum, p) => sum + (p.amount || 0), 0);
-      const totalAllowanceAmount = allowances.reduce((sum, a) => sum + (a.amount || 0), 0);
+      const totalPenaltyAmount = penalties.reduce(
+        (sum, p) => sum + (p.amount || 0),
+        0,
+      );
+      const totalAllowanceAmount = allowances.reduce(
+        (sum, a) => sum + (a.amount || 0),
+        0,
+      );
 
       // Organize Vacations (Sort by Date Desc)
-      const vacations = (employee.vacations || []).sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      const vacations = (employee.vacations || []).sort(
+        (a, b) => new Date(b.startDate) - new Date(a.startDate),
+      );
 
       const data = {
         employee: {
           fullName: employee.fullName,
           employeeId: employee.employeeId,
           designation: employee.designation,
-          joiningDate: employee.joiningDate
+          joiningDate: employee.joiningDate,
         },
         penalties: {
           list: penalties,
           totalCount: penalties.length,
           totalAmount: totalPenaltyAmount,
           paidAmount: deducted.totalPenaltyDeducted, // Best effort "Paid"
-          balance: totalPenaltyAmount - deducted.totalPenaltyDeducted
+          balance: totalPenaltyAmount - deducted.totalPenaltyDeducted,
         },
         allowances: {
           list: allowances,
           totalCount: allowances.length,
           totalAmount: totalAllowanceAmount,
           repaidAmount: deducted.totalAllowanceDeducted,
-          balance: totalAllowanceAmount - deducted.totalAllowanceDeducted
+          balance: totalAllowanceAmount - deducted.totalAllowanceDeducted,
         },
         vacations: {
           list: vacations,
-          totalCount: vacations.length
-        }
+          totalCount: vacations.length,
+        },
       };
 
       return res.send({ status: true, data: data });
-
     } catch (error) {
       console.error("ERROR getEmployeeHistory", error);
       return res.send({ status: false, message: "Error fetching history" });
@@ -890,16 +926,30 @@ module.exports = function () {
   controller.checkEmployeeId = async function (req, res) {
     try {
       const { employeeId } = req.body;
-      if (!employeeId) return res.send({ status: false, message: "Employee ID is required" });
+      if (!employeeId)
+        return res.send({ status: false, message: "Employee ID is required" });
 
-      const existingEmp = await db.GetOneDocument("employee", { employeeId: employeeId }, {}, {});
+      const existingEmp = await db.GetOneDocument(
+        "employee",
+        { employeeId: employeeId },
+        {},
+        {},
+      );
+      console.log(existingEmp,"existingEmpexistingEmp");
 
-      if (existingEmp) {
-        return res.send({ status: true, exists: true, message: "Employee ID already exists" });
+      if (existingEmp.status) {
+        return res.send({
+          status: true,
+          exists: true,
+          message: "Employee ID already exists",
+        });
       } else {
-        return res.send({ status: true, exists: false, message: "Employee ID is available" });
+        return res.send({
+          status: true,
+          exists: false,
+          message: "Employee ID is available",
+        });
       }
-
     } catch (error) {
       console.log(error, "ERROR checkEmployeeId");
       return res.send({ status: false, message: "Error checking ID" });
